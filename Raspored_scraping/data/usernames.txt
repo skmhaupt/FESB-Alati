@@ -1,0 +1,5 @@
+# Put usernames you want to check here, one per line
+
+shaupt00
+sjurko00
+ncarap00

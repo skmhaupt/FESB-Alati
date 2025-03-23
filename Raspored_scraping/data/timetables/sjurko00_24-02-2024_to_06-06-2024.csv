@@ -1,0 +1,130 @@
+id, name, shortName, colorId, professor, eventType, groups, classroom, start, end, description, recurring, recurringType, recurringUntil, studyCode
+532053,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-02-26T10:15,2024-02-26T12:00,ponedjeljak 26.2.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532137,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-02-27T08:15,2024-02-27T10:00,utorak 27.2.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532077,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-02-27T10:15,2024-02-27T12:00,utorak 27.2.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532113,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-02-27T12:15,2024-02-27T14:00,utorak 27.2.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532065,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-02-28T08:15,2024-02-28T11:00,srijeda 28.2.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532089,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-02-28T11:15,2024-02-28T13:00,srijeda 28.2.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532054,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-03-04T10:15,2024-03-04T12:00,ponedjeljak 4.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532138,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-03-05T08:15,2024-03-05T10:00,utorak 5.3.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532078,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-03-05T10:15,2024-03-05T12:00,utorak 5.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532114,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-03-05T12:15,2024-03-05T14:00,utorak 5.3.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532066,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-03-06T08:15,2024-03-06T11:00,srijeda 6.3.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532090,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-03-06T11:15,2024-03-06T13:00,srijeda 6.3.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537772,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-03-06T13:15,2024-03-06T14:45,srijeda 6.3.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535589,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-07T08:30,2024-03-07T10:00,četvrtak 7.3.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535331,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-08T08:00,2024-03-08T09:30,petak 8.3.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532055,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-03-11T10:15,2024-03-11T12:00,ponedjeljak 11.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532139,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-03-12T08:15,2024-03-12T10:00,utorak 12.3.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532079,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-03-12T10:15,2024-03-12T12:00,utorak 12.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532115,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-03-12T12:15,2024-03-12T14:00,utorak 12.3.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532067,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-03-13T08:15,2024-03-13T11:00,srijeda 13.3.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532091,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-03-13T11:15,2024-03-13T13:00,srijeda 13.3.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537773,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-03-13T13:15,2024-03-13T14:45,srijeda 13.3.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535590,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-14T08:30,2024-03-14T10:00,četvrtak 14.3.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535332,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-15T08:00,2024-03-15T09:30,petak 15.3.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532056,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-03-18T10:15,2024-03-18T12:00,ponedjeljak 18.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534195,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-03-18T18:30,2024-03-18T20:00,ponedjeljak 18.3.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532140,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-03-19T08:15,2024-03-19T10:00,utorak 19.3.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532080,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-03-19T10:15,2024-03-19T12:00,utorak 19.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532116,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-03-19T12:15,2024-03-19T14:00,utorak 19.3.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532068,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-03-20T08:15,2024-03-20T11:00,srijeda 20.3.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532092,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-03-20T11:15,2024-03-20T13:00,srijeda 20.3.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537774,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-03-20T13:15,2024-03-20T14:45,srijeda 20.3.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535591,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-21T08:30,2024-03-21T10:00,četvrtak 21.3.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538454,Podržano strojno učenje,PSU,0,Perković Toni,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-03-21T10:00,2024-03-21T12:15,četvrtak 21.3.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 18.4.2024.,250
+535333,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-22T08:00,2024-03-22T09:30,petak 22.3.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538287,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-23T08:00,2024-03-23T09:30,subota 23.3.2024. 8:00 - 9:30 (2 sata),false,ONCE,,250
+532057,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-03-25T10:15,2024-03-25T12:00,ponedjeljak 25.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534196,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-03-25T18:30,2024-03-25T20:00,ponedjeljak 25.3.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532141,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-03-26T08:15,2024-03-26T10:00,utorak 26.3.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532081,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-03-26T10:15,2024-03-26T12:00,utorak 26.3.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532117,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-03-26T12:15,2024-03-26T14:00,utorak 26.3.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532069,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-03-27T08:15,2024-03-27T11:00,srijeda 27.3.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532093,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-03-27T11:15,2024-03-27T13:00,srijeda 27.3.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537775,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-03-27T13:15,2024-03-27T14:45,srijeda 27.3.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535592,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-03-28T08:30,2024-03-28T10:00,četvrtak 28.3.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538455,Podržano strojno učenje,PSU,0,Perković Toni,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-03-28T10:00,2024-03-28T12:15,četvrtak 28.3.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 18.4.2024.,250
+532142,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-04-02T08:15,2024-04-02T10:00,utorak 2.4.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532082,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-04-02T10:15,2024-04-02T12:00,utorak 2.4.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532118,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-04-02T12:15,2024-04-02T14:00,utorak 2.4.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532070,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-04-03T08:15,2024-04-03T11:00,srijeda 3.4.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532094,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-04-03T11:15,2024-04-03T13:00,srijeda 3.4.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537776,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-04-03T13:15,2024-04-03T14:45,srijeda 3.4.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535593,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-04-04T08:30,2024-04-04T10:00,četvrtak 4.4.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538456,Podržano strojno učenje,PSU,0,Perković Toni,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-04-04T10:00,2024-04-04T12:15,četvrtak 4.4.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 18.4.2024.,250
+535334,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-04-05T08:00,2024-04-05T09:30,petak 5.4.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532058,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-04-08T10:15,2024-04-08T12:00,ponedjeljak 8.4.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534197,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-04-08T18:30,2024-04-08T20:00,ponedjeljak 8.4.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532143,Podržano strojno učenje,PSU,0,Perković Toni,PREDAVANJE,,A243,2024-04-09T08:15,2024-04-09T10:00,utorak 9.4.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532083,Metode optimizacije,MO,0,Braović Maja,PREDAVANJE,,C502,2024-04-09T10:15,2024-04-09T12:00,utorak 9.4.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532119,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-04-09T12:15,2024-04-09T14:00,utorak 9.4.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532071,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-04-10T08:15,2024-04-10T11:00,srijeda 10.4.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532095,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-04-10T11:15,2024-04-10T13:00,srijeda 10.4.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537777,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-04-10T13:15,2024-04-10T14:45,srijeda 10.4.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535594,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-04-11T08:30,2024-04-11T10:00,četvrtak 11.4.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538457,Podržano strojno učenje,PSU,0,Perković Toni,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-04-11T10:00,2024-04-11T12:15,četvrtak 11.4.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 18.4.2024.,250
+535335,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-04-12T08:00,2024-04-12T09:30,petak 12.4.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538620,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,KOLOKVIJ,,A100,2024-04-15T18:15,2024-04-15T20:00,ponedjeljak 15.4.2024. 18:15 - 20:00 (2 sata),true,WEEKLY,do 21.4.2024.,250
+538623,Podržano strojno učenje,PSU,0,Vasilj Josip,KOLOKVIJ,,A101,2024-04-16T12:15,2024-04-16T14:00,utorak 16.4.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 21.4.2024.,250
+538621,Jezici i prevoditelji,JIP,0,Đerek Jurica,KOLOKVIJ,,B525,2024-04-19T10:15,2024-04-19T15:00,petak 19.4.2024. 10:15 - 15:00 (5 sati),true,WEEKLY,do 21.4.2024.,250
+538767,IP komunikacije,IK,0,Russo Mladen,KOLOKVIJ,,A302,2024-04-22T12:15,2024-04-22T14:00,ponedjeljak 22.4.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 28.4.2024.,250
+538765,Napredne računalne arhitekture,NRA,0,Gotovac Sven,KOLOKVIJ,,A100,2024-04-23T14:15,2024-04-23T16:00,utorak 23.4.2024. 14:15 - 16:00 (2 sata),true,WEEKLY,do 28.4.2024.,250
+538764,Metode optimizacije,MO,0,Marasović Jadranka,KOLOKVIJ,,A100,2024-04-25T11:15,2024-04-25T13:00,četvrtak 25.4.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 28.4.2024.,250
+532059,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-04-29T10:15,2024-04-29T12:00,ponedjeljak 29.4.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534198,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-04-29T18:30,2024-04-29T20:00,ponedjeljak 29.4.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532144,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-04-30T08:15,2024-04-30T10:00,utorak 30.4.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532084,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-04-30T10:15,2024-04-30T12:00,utorak 30.4.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532120,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-04-30T12:15,2024-04-30T14:00,utorak 30.4.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+535595,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-02T08:30,2024-05-02T10:00,četvrtak 2.5.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538989,Podržano strojno učenje,PSU,0,Vasilj Josip,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-05-02T10:00,2024-05-02T12:15,četvrtak 2.5.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 13.6.2024.,250
+535336,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-03T08:00,2024-05-03T09:30,petak 3.5.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532060,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-05-06T10:15,2024-05-06T12:00,ponedjeljak 6.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534199,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-05-06T18:30,2024-05-06T20:00,ponedjeljak 6.5.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532072,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-05-08T08:15,2024-05-08T11:00,srijeda 8.5.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532096,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-05-08T11:15,2024-05-08T13:00,srijeda 8.5.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537778,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-05-08T13:15,2024-05-08T14:45,srijeda 8.5.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535596,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-09T08:30,2024-05-09T10:00,četvrtak 9.5.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538990,Podržano strojno učenje,PSU,0,Vasilj Josip,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-05-09T10:00,2024-05-09T12:15,četvrtak 9.5.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 13.6.2024.,250
+535337,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-10T08:00,2024-05-10T09:30,petak 10.5.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532061,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-05-13T10:15,2024-05-13T12:00,ponedjeljak 13.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534200,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-05-13T18:30,2024-05-13T20:00,ponedjeljak 13.5.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532145,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-05-14T08:15,2024-05-14T10:00,utorak 14.5.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532085,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-05-14T10:15,2024-05-14T12:00,utorak 14.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532121,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-05-14T12:15,2024-05-14T14:00,utorak 14.5.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532073,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-05-15T08:15,2024-05-15T11:00,srijeda 15.5.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532097,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-05-15T11:15,2024-05-15T13:00,srijeda 15.5.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537779,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-05-15T13:15,2024-05-15T14:45,srijeda 15.5.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532146,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-05-15T15:15,2024-05-15T17:00,srijeda 15.5.2024. 15:15 - 17:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+535597,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-16T08:30,2024-05-16T10:00,četvrtak 16.5.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538991,Podržano strojno učenje,PSU,0,Vasilj Josip,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-05-16T10:00,2024-05-16T12:15,četvrtak 16.5.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 13.6.2024.,250
+535338,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-17T08:00,2024-05-17T09:30,petak 17.5.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532062,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-05-20T10:15,2024-05-20T12:00,ponedjeljak 20.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534201,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-05-20T18:30,2024-05-20T20:00,ponedjeljak 20.5.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532086,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-05-21T10:15,2024-05-21T12:00,utorak 21.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532122,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-05-21T12:15,2024-05-21T14:00,utorak 21.5.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532074,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-05-22T08:15,2024-05-22T11:00,srijeda 22.5.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532098,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-05-22T11:15,2024-05-22T13:00,srijeda 22.5.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537780,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-05-22T13:15,2024-05-22T14:45,srijeda 22.5.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535598,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-23T08:30,2024-05-23T10:00,četvrtak 23.5.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538992,Podržano strojno učenje,PSU,0,Vasilj Josip,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-05-23T10:00,2024-05-23T12:15,četvrtak 23.5.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 13.6.2024.,250
+535339,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-24T08:00,2024-05-24T09:30,petak 24.5.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532063,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-05-27T10:15,2024-05-27T12:00,ponedjeljak 27.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534202,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-05-27T18:30,2024-05-27T20:00,ponedjeljak 27.5.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532147,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-05-28T08:15,2024-05-28T10:00,utorak 28.5.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532087,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-05-28T10:15,2024-05-28T12:00,utorak 28.5.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532123,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-05-28T12:15,2024-05-28T14:00,utorak 28.5.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532075,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-05-29T08:15,2024-05-29T11:00,srijeda 29.5.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532099,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-05-29T11:15,2024-05-29T13:00,srijeda 29.5.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537781,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-05-29T13:15,2024-05-29T14:45,srijeda 29.5.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535340,IP komunikacije,IK,0,Meter Davor,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-05-31T08:00,2024-05-31T09:30,petak 31.5.2024. 8:00 - 9:30 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532064,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,PREDAVANJE,,C501,2024-06-03T10:15,2024-06-03T12:00,ponedjeljak 3.6.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+534203,Metode optimizacije,MO,0,Bašić Martina,LABORATORIJSKA_VJEZBA,Grupa 1,B420,2024-06-03T18:30,2024-06-03T20:00,ponedjeljak 3.6.2024. 18:30 - 20:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+532148,Podržano strojno učenje,PSU,0,Vasilj Josip,PREDAVANJE,,A243,2024-06-04T08:15,2024-06-04T10:00,utorak 4.6.2024. 8:15 - 10:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532088,Metode optimizacije,MO,0,Marasović Jadranka,PREDAVANJE,,C502,2024-06-04T10:15,2024-06-04T12:00,utorak 4.6.2024. 10:15 - 12:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532124,IP komunikacije,IK,0,Russo Mladen,PREDAVANJE,,A105,2024-06-04T12:15,2024-06-04T14:00,utorak 4.6.2024. 12:15 - 14:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+532076,Jezici i prevoditelji,JIP,0,Sikora Marjan,PREDAVANJE,,B401,2024-06-05T08:15,2024-06-05T11:00,srijeda 5.6.2024. 8:15 - 11:00 (3 sata),true,WEEKLY,do 9.6.2024.,250
+532100,Napredne računalne arhitekture,NRA,0,Gotovac Sven,PREDAVANJE,,B401,2024-06-05T11:15,2024-06-05T13:00,srijeda 5.6.2024. 11:15 - 13:00 (2 sata),true,WEEKLY,do 9.6.2024.,250
+537782,Kriptografija i mrežna sigurnost,KIMS,0,Čagalj Mario,LABORATORIJSKA_VJEZBA,Grupa 4,A507,2024-06-05T13:15,2024-06-05T14:45,srijeda 5.6.2024. 13:15 - 14:45 (2 sata),true,WEEKLY,do 7.6.2024.,250
+535599,Jezici i prevoditelji,JIP,0,Sikora Marjan,LABORATORIJSKA_VJEZBA,Grupa 1,B526,2024-06-06T08:30,2024-06-06T10:00,četvrtak 6.6.2024. 8:30 - 10:00 (2 sata),true,WEEKLY,do 7.6.2024.,250
+538993,Podržano strojno učenje,PSU,0,Vasilj Josip,LABORATORIJSKA_VJEZBA,Grupa 1,A507,2024-06-06T10:00,2024-06-06T12:15,četvrtak 6.6.2024. 10:00 - 12:15 (3 sata),true,WEEKLY,do 13.6.2024.,250
