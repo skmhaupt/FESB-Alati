@@ -17,7 +17,7 @@ def pars_cours_participants():
     cours_participants = []
     
     #get path to file
-    fpath = glob.glob('../data/courseid_*_participants.csv')
+    fpath = glob.glob('data/courseid_*_participants.csv')
     if(len(fpath) > 1):
         print('Error: Found', len(fpath), 'courseid_#number_participants.csv files, make sure there is only one!')
         return
