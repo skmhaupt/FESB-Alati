@@ -182,6 +182,8 @@ cython_debug/
 
 Raspored_scraping/.gradle
 **/build/
+**/data/timetables
+**/data/freeTimes
 !Raspored_scraping/gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

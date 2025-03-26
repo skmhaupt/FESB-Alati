@@ -1,7 +1,7 @@
-import os
-import subprocess
 from participants_parser import pars_cours_participants
 from schedule_parser import pars_schedule_file
+from schedule_scraper import schedule_scraper
+from weight_generator import weight_generator
 
 #Get cours participants
 try:
@@ -19,10 +19,12 @@ except TypeError:
     print('Exiting script from schedule parsing!')
     exit()
 
-print('Creating usernames.txt file for Raspored_scraping.')
+#Get schedule for every student
+try:
+    schedule_scraper(cours_participants)
+except Exception as e:
+    print("Error when scraping schedule!")
+    print("Exception: ", e)
+    exit()
 
-os.chdir('Raspored_scraping')
-print('Now in', os.getcwd(), 'directory!')
-subprocess.run(['.\gradlew', 'run'], shell=True)
-os.chdir('..')
-print('Now in', os.getcwd(), 'directory!')
+weight_generator()
