@@ -28,7 +28,7 @@ def pars_cours_participants():
 
     #open csv file
     try:
-        with open(fpath, newline='') as csvfile:
+        with open(fpath, newline='', encoding="utf8") as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             #skip first line
             next(reader)

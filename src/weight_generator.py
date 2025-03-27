@@ -6,7 +6,7 @@ def weight_generator():
     if(len(fpaths) > 1):
         print('Found', len(fpaths), '.csv files.')
     elif(len(fpaths) == 0):
-        print('Error: No .csv file found!')
+        print('Error: No .csv files found!')
         return
 
     Errors=[]
