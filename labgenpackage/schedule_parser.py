@@ -11,7 +11,7 @@ class Group:
 
 
 def pars_schedule_file():
-    groups = []
+    groups: dict[str, Group] = {}
     try:
         with open('data/schedule.txt',"r") as file:
             for line in file:
@@ -20,8 +20,8 @@ def pars_schedule_file():
                 split_line = line.split(",")
                 #Every line contains: group_number, day, time, lab, group_size
                 if(len(split_line)==5):
-                    groups.append(Group(split_line[0], split_line[1], split_line[2], split_line[3], split_line[4]))
-        
+                    group = Group(split_line[0], split_line[1], split_line[2], split_line[3], split_line[4])
+                    groups[group.group_number] = group
         if(len(groups)==0):
             print('Error: Failed to finde groups in \'data/schedule.txt!\'')
             return

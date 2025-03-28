@@ -2,19 +2,22 @@ import csv
 import glob
 
 class Student:
-    def __init__(self, name, surname,email,jmbag):
+    def __init__(self, name: str, surname: str,email: str,jmbag: str):
         self.name = name
         self.surname = surname
         self.fullname = surname + " " + name
         self.email = email
         self.username,_ = email.split("@",1)
         self.jmbag = jmbag
+        self.schedule: dict[str, set] = {}
+        self.weight: int = 0
+        self.groups: dict[str, list] = {}
 
     def __str__(self):
         return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
 
 def pars_cours_participants():
-    cours_participants = []
+    cours_participants:dict[str, Student] = {}
     
     #get path to file
     fpath = glob.glob('data/courseid_*_participants.csv')
@@ -34,7 +37,8 @@ def pars_cours_participants():
             next(reader)
             #Every row contains: ime, prezime, email, jmbag
             for row in reader:
-                cours_participants.append(Student(row[0],row[1],row[2],row[3]))
+                student = Student(row[0],row[1],row[2],row[3])
+                cours_participants[student.username] = student
         return cours_participants
     except IOError:
         print('Error with csv file', IOError)
