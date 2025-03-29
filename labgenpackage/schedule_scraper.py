@@ -29,6 +29,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
 
         print('Creating usernames.txt file for Raspored_scraping.')
         usernames_file = open("data/usernames.txt", "w")
+        student: Student
         for student in cours_participants.values():
             usernames_file.write(f"{student.username}\n")
         usernames_file.close()
@@ -44,15 +45,15 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
 
 
     print("Parsing .csv files containing schedules!")
-    fpaths = glob.glob('Raspored_scraping/data/timetables/*.csv')
+    fpaths: list = glob.glob('Raspored_scraping/data/timetables/*.csv')
     if(len(fpaths) > 1):
         print('Found', len(fpaths), '.csv files.')
     elif(len(fpaths) == 0):
         print('Error: No .csv files found!')
         return
     
-    Errors=[]
-    nocsvError=[]
+    Errors: list = []
+    nocsvError:list = []
     days = {
         "ponedjeljak": "PON",
         "utorak": "UTO",
@@ -61,6 +62,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
         "petak": "PET"
     }
 
+    fpath: str
     for fpath in fpaths:
         #open csv file
         try:
@@ -72,7 +74,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
                 "ČET": [],
                 "PET": []
             }
-            user = fpath.split("\\",1)[1].split("_",1)[0]
+            user: str = fpath.split("\\",1)[1].split("_",1)[0]
             if(user in cours_participants):
                 #print("Found student: ", cours_participants[user])
                 with open(fpath, newline='', encoding="utf8") as csvfile:
@@ -105,14 +107,11 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
                     #print(schedule)
                     #print("----------------------------\n")
                     cours_participants[user].schedule = schedule
-                    #print(cours_participants[user].schedule["ponedjeljak"])
             else:
                 nocsvError.append(user)
         except Exception as e:
             print('Error with csv file', e)
             Errors.append(user)
-            
-    print("Errors with users: ", Errors, "\n")
-    print(".csv file mising for users: ", nocsvError, "\n")
-    #24-02-2025
-    #06-06-2025
+    if Errors or nocsvError:            
+        print("Errors with users: ", Errors, "\n")
+        print(".csv file mising for users: ", nocsvError, "\n")

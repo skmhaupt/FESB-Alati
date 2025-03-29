@@ -2,6 +2,7 @@ from labgenpackage.participants_parser import pars_cours_participants
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
+from labgenpackage.participants_parser import Student
 from labgenpackage.schedule_parser import Group
 import traceback
 import logging
@@ -10,7 +11,7 @@ import logging
 def main(scraper_state: bool):
     #Get cours participants
     try:
-        cours_participants = pars_cours_participants()
+        cours_participants: dict[str, Student] = pars_cours_participants()
         print('Found', len(cours_participants), 'students in participants file.')
     except TypeError:
         print('Exiting script from participants parsing!')
@@ -19,7 +20,13 @@ def main(scraper_state: bool):
     #Get lab group schedule
     try:
         groups: dict[str, list:Group] = pars_schedule_file()
-        print('Found', len(groups), 'groups in schedule file.')
+        numofgroups:int = 0
+        day: str
+        for day in groups:
+            numofgroups += len(groups[day])
+            print('Found', len(groups[day]), 'groups for ', day)
+        print('Found', numofgroups, 'groups in total!')
+        print("=====================================\n")
     except Exception as e:
         print('Exiting script from schedule parsing!')
         print(e)
@@ -33,11 +40,12 @@ def main(scraper_state: bool):
         print("Error when scraping schedule!")
         print("Exception: ", e)
         exit()
+    print("=====================================\n")
 
     weight_generator(cours_participants, groups)
-
+    
     lowest: int = 300
-    counter = 0
+    counter: int = 0
     for username in cours_participants:
         if len(cours_participants[username].groups) < lowest:
             lowest = len(cours_participants[username].groups)
@@ -51,3 +59,5 @@ def main(scraper_state: bool):
 
     print(lowest)
     print(counter)
+    for day in groups:
+        print(*groups[day], sep="\n")
