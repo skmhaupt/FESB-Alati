@@ -2,6 +2,9 @@ from labgenpackage.participants_parser import pars_cours_participants
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
+from labgenpackage.schedule_parser import Group
+import traceback
+import logging
 
 
 def main(scraper_state: bool):
@@ -15,11 +18,13 @@ def main(scraper_state: bool):
 
     #Get lab group schedule
     try:
-        groups = pars_schedule_file()
+        groups: dict[str, list:Group] = pars_schedule_file()
         print('Found', len(groups), 'groups in schedule file.')
-    except TypeError:
+    except Exception as e:
         print('Exiting script from schedule parsing!')
-        exit()
+        print(e)
+        logging.error(traceback.format_exc)
+        return e
 
     #Get schedule for every student
     try:
@@ -29,4 +34,20 @@ def main(scraper_state: bool):
         print("Exception: ", e)
         exit()
 
-    weight_generator(cours_participants)
+    weight_generator(cours_participants, groups)
+
+    lowest: int = 300
+    counter = 0
+    for username in cours_participants:
+        if len(cours_participants[username].groups) < lowest:
+            lowest = len(cours_participants[username].groups)
+            counter = 1
+        elif len(cours_participants[username].groups) == lowest: counter += 1
+        print("User", username, "can join", len(cours_participants[username].groups), "groups!")
+        print("Weight:", cours_participants[username].weight)
+        #print("Can join groups:")
+        #print(*cours_participants[username].groups, sep="\n")
+        print("=====================================\n")
+
+    print(lowest)
+    print(counter)

@@ -50,37 +50,69 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
     elif(len(fpaths) == 0):
         print('Error: No .csv files found!')
         return
-
-    Errors=[]
     
+    Errors=[]
+    nocsvError=[]
+    days = {
+        "ponedjeljak": "PON",
+        "utorak": "UTO",
+        "srijeda": "SRI",
+        "četvrtak": "ČET",
+        "petak": "PET"
+    }
+
     for fpath in fpaths:
         #open csv file
         try:
-            schedule:dict[str, set] = {}
+            tempschedule:dict[str, set] = {}
+            schedule:dict[str, list] = {
+                "PON": [],
+                "UTO": [],
+                "SRI": [],
+                "ČET": [],
+                "PET": []
+            }
             user = fpath.split("\\",1)[1].split("_",1)[0]
             if(user in cours_participants):
-                print("Found student: ", cours_participants[user])
-            with open(fpath, newline='', encoding="utf8") as csvfile:
-                reader = csv.reader(csvfile, delimiter=',')
-                #skip first line
-                next(reader)
-                #Every row contains: id, name, shortName, colorId, professor, eventType, groups, classroom, start, end, description, recurring, recurringType, recurringUntil, studyCode
-                #                    0   1     2          3        4          5          6       7          8      9    10           11         12             13              14
-                for row in reader:
-                    #row[10]: day date hh:mm - hh:mm (3 sata)
-                    day, _, time = row[10].split(" ", 2)
-                    time,_ = time.split("(",1)
-                    time = time.strip()
-                    if not day in schedule:
-                        schedule[day] = set()
-                    schedule[day].add(time)
-                cours_participants[user].schedule = schedule
-                print(cours_participants[user].schedule["ponedjeljak"])
-                    
+                #print("Found student: ", cours_participants[user])
+                with open(fpath, newline='', encoding="utf8") as csvfile:
+                    reader = csv.reader(csvfile, delimiter=',')
+                    #skip first line
+                    next(reader)
+                    #Every row contains: id, name, shortName, colorId, professor, eventType, groups, classroom, start, end, description, recurring, recurringType, recurringUntil, studyCode
+                    #                    0   1     2          3        4          5          6       7          8      9    10           11         12             13              14
+                    for row in reader:
+                        #row[10]: day date hh:mm - hh:mm (3 sata)
+                        day, _, time = row[10].split(" ", 2)
+                        time,_ = time.split("(",1)
+                        time = time.strip()
+                        if not day in tempschedule:
+                            tempschedule[day] = set()
+                        tempschedule[day].add(time)
+                    for day in tempschedule:
+                        #print(day, ": ",tempschedule[day])
+                        for time in tempschedule[day]:
+                            #print(time)
+                            starttime, endtime = time.split(" - ",1)
+                            starttime_h,starttime_m = starttime.split(":",1)
+                            starttime = datetime.time(hour=int(starttime_h), minute=int(starttime_m))
+                            endtime_h,endtime_m = endtime.split(":",1)
+                            endtime = datetime.time(hour=int(endtime_h), minute=int(endtime_m))
+                            #schedule[days[day]].insert(len(schedule), [starttime,endtime])
+                            schedule[days[day]].append([starttime,endtime])
+                            #print("starttime:", starttime, "endtime:", endtime)
+                        #print(day, ": ",schedule[days[day]])
+                    #print(schedule)
+                    #print("----------------------------\n")
+                    cours_participants[user].schedule = schedule
+                    #print(cours_participants[user].schedule["ponedjeljak"])
+            else:
+                nocsvError.append(user)
         except Exception as e:
             print('Error with csv file', e)
             Errors.append(user)
             
     print("Errors with users: ", Errors, "\n")
+    print(".csv file mising for users: ", nocsvError, "\n")
     #24-02-2025
     #06-06-2025

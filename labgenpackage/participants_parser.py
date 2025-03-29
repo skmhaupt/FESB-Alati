@@ -9,9 +9,9 @@ class Student:
         self.email = email
         self.username,_ = email.split("@",1)
         self.jmbag = jmbag
-        self.schedule: dict[str, set] = {}
+        self.schedule: dict[str, list] = {}
         self.weight: int = 0
-        self.groups: dict[str, list] = {}
+        self.groups: list = []
 
     def __str__(self):
         return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
