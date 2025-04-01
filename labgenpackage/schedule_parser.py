@@ -1,4 +1,5 @@
 import datetime
+from labgenpackage.participants_parser import Student
 class Group:
     def __init__(self, group_label, day, time, lab, group_size):
         self.group_label: str = group_label
@@ -6,6 +7,7 @@ class Group:
         self.time: str = time
         self.lab: str = lab
         self.group_size: int = int(group_size)
+        self.students: list[Student] = []
         starttime, endtime = time.split("-",1)
         starttime_h,starttime_m = starttime.split(":",1)
         self.starttime: datetime = datetime.time(hour=int(starttime_h), minute=int(starttime_m))

@@ -2,6 +2,7 @@ from labgenpackage.participants_parser import pars_cours_participants
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
+from labgenpackage.fill_groups import fill_groups
 from labgenpackage.participants_parser import Student
 from labgenpackage.schedule_parser import Group
 import traceback
@@ -43,21 +44,23 @@ def main(scraper_state: bool):
     print("=====================================\n")
 
     weight_generator(cours_participants, groups)
-    
-    lowest: int = 300
-    counter: int = 0
-    for username in cours_participants:
-        if len(cours_participants[username].groups) < lowest:
-            lowest = len(cours_participants[username].groups)
-            counter = 1
-        elif len(cours_participants[username].groups) == lowest: counter += 1
-        print("User", username, "can join", len(cours_participants[username].groups), "groups!")
-        print("Weight:", cours_participants[username].weight)
-        #print("Can join groups:")
-        #print(*cours_participants[username].groups, sep="\n")
-        print("=====================================\n")
 
-    print(lowest)
-    print(counter)
-    for day in groups:
-        print(*groups[day], sep="\n")
+    fill_groups(cours_participants, groups)
+    
+    #lowest: int = 9999999
+    #counter: int = 0
+    #for username in cours_participants:
+    #    if cours_participants[username].weight < lowest:
+    #        lowest = len(cours_participants[username].weight)
+    #        counter = 1
+    #   elif len(cours_participants[username].groups) == lowest: counter += 1
+    #   print("User", username, "can join", len(cours_participants[username].groups), "groups!")
+    #   print("Weight:", cours_participants[username].weight)
+    #    #print("Can join groups:")
+    #   #print(*cours_participants[username].groups, sep="\n")
+    #    print("=====================================\n")
+
+    #print(lowest)
+    #print(counter)
+    #for day in groups:
+    #    print(*groups[day], sep="\n")
