@@ -1,21 +1,27 @@
-#from labgenpackage.schedule_parser import Group
+from labgenpackage.classes import Student
+#from labgenpackage.classes import Group
 import csv
 import glob
 
-class Student:
-    def __init__(self, name: str, surname: str,email: str,jmbag: str):
-        self.name: str = name
-        self.surname: str = surname
-        self.fullname: str = surname + " " + name
-        self.email: str = email
-        self.username,_ = email.split("@",1)
-        self.jmbag: int = int(jmbag)
-        self.schedule: dict[str, list] = {}
-        self.weight: int = 0
-        self.groups: list = []
+# class Student:
+#     def __init__(self, name: str, surname: str,email: str,jmbag: str):
+#         self.name: str = name
+#         self.surname: str = surname
+#         self.fullname: str = surname + " " + name
+#         self.email: str = email
+#         self.username,_ = email.split("@",1)
+#         self.jmbag: int = int(jmbag)
+#         self.schedule: dict[str, list] = {}
+#         self.weight: int = 0
+#         self.groups: list = []
 
-    def __str__(self):
-        return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
+#     def __str__(self):
+#         return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
+    
+#     def set_weight(self):
+#         weight: int = 0
+#         for group in self.groups:
+#             weight = group.group_size
 
 def pars_cours_participants() -> dict[str, Student]:
     cours_participants: dict[str, Student] = {}

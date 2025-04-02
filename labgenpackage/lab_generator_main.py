@@ -3,8 +3,8 @@ from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
 from labgenpackage.fill_groups import fill_groups
-from labgenpackage.participants_parser import Student
-from labgenpackage.schedule_parser import Group
+from labgenpackage.classes import Student
+from labgenpackage.classes import Group
 import traceback
 import logging
 

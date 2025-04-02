@@ -1,6 +1,6 @@
 from datetime import datetime
-from labgenpackage.participants_parser import Student
-from labgenpackage.schedule_parser import Group
+from labgenpackage.classes import Student
+from labgenpackage.classes import Group
 import traceback
 import logging
 
@@ -28,11 +28,11 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                                 canjoin = False
                             elif group.starttime < appendtime <= group.endtime:
                                 canjoin = False
-                    
+
                     if canjoin:
                         cours_participants[username].weight += group.group_size
                         cours_participants[username].groups.append(group)
+
     except Exception as e:
         print('Erro when seting starting weights!', e)
         logging.error(traceback.format_exc)
-        raise e

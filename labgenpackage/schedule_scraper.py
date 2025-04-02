@@ -3,7 +3,7 @@ import subprocess
 import datetime
 import glob
 import csv
-from labgenpackage.participants_parser import Student
+from labgenpackage.classes import Student
 
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool):
     if scraper_state:
@@ -112,6 +112,8 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
         except Exception as e:
             print('Error with csv file', e)
             Errors.append(user)
+            print("Removing", user, "from list. He will not be added to a group!")
+            cours_participants.pop(user)
     if Errors or nocsvError:            
         print("Errors with users: ", Errors, "\n")
         print(".csv file mising for users: ", nocsvError, "\n")
