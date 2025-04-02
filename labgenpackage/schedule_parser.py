@@ -21,7 +21,7 @@ class Group:
 def pars_schedule_file():
     groups: dict[str, list:Group] = {}
     try:
-        with open('data/schedule.txt',"r") as file:
+        with open('data/schedule.txt',"r", encoding="utf8") as file:
             for line in file:
                 line = line.replace('\n', '')
                 line = line.replace(' ', '')

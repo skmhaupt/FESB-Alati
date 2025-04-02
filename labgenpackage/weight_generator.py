@@ -11,7 +11,6 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
     #For 'groups' structure check 'schedule_parser.py'
     #For 'cours_participants' structure check 'participants_parser.py'
     try:
-
         for day in days:
             group: Group
             for group in groups[day]:
@@ -34,6 +33,6 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                         cours_participants[username].weight += group.group_size
                         cours_participants[username].groups.append(group)
     except Exception as e:
-        print('Erro when seting starting weights!')
+        print('Erro when seting starting weights!', e)
         logging.error(traceback.format_exc)
         raise e
