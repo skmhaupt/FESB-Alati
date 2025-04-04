@@ -1,8 +1,5 @@
-import os
-import subprocess
-import datetime
-import glob
-import csv
+import os, subprocess, datetime, glob, csv
+from pathlib import Path
 from labgenpackage.classes import Student
 
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool):
@@ -33,6 +30,15 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
         for student in cours_participants.values():
             usernames_file.write(f"{student.username}\n")
         usernames_file.close()
+
+        print("Deleting old data from data/timetables!")
+        folder =  Path("/data/timetables")
+        for item in folder.rglob("*"):
+            try:
+                item.unlink()
+            except OSError as e:
+                print(f"Failed to delete {item}. {e}")
+                raise
 
         print("Launching schedule scraper!")
         subprocess.run(['.\\gradlew', 'run'], shell=True)
