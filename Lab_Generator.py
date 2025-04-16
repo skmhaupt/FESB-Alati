@@ -15,7 +15,7 @@ console_handler = logging.StreamHandler()
 console_handler.setLevel("DEBUG")
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
-
+logger.info("App started.")
 #file logger
 # formatter = logging.Formatter(
 #    "{levelname}-{name}:{message}",
