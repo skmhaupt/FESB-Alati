@@ -1,4 +1,28 @@
 import datetime
+import logging
+
+class CustomFormatter(logging.Formatter):
+    """Logging Formatter to add colors and count warning / errors"""
+
+    grey = "\x1b[38m"
+    yellow = "\x1b[33m"
+    red = "\x1b[31;4m"
+    bold_red = "\x1b[31;4;1m"
+    reset = "\x1b[0m"
+    format = "{asctime} - {name:<11} - {levelname}\t- {message} ({filename}:{lineno})"
+
+    FORMATS = {
+        logging.DEBUG: grey + format + reset,
+        logging.INFO: grey + format + reset,
+        logging.WARNING: yellow + format + reset,
+        logging.ERROR: red + format + reset,
+        logging.CRITICAL: bold_red + format + reset
+    }
+
+    def format(self, record):
+        log_fmt = self.FORMATS.get(record.levelno)
+        formatter = logging.Formatter(log_fmt,style="{")
+        return formatter.format(record)
 
 class Group:
     def __init__(self, group_label, day, time, lab, group_size):

@@ -10,13 +10,16 @@ import logging
 
 
 def main(scraper_state: bool):
+
+    #Logger
+    logger = logging.getLogger("my_app.main")
+
     #Get cours participants
     try:
         cours_participants: dict[str, Student] = pars_cours_participants()
-        print('Found', len(cours_participants), 'students in participants file.')
+        logger.info(f"Found {len(cours_participants)} students in participants file.")
     except TypeError:
-        print('Exiting script from participants parsing!')
-        exit()
+        raise logger.error("Failed parsing participants!")
 
     #Get lab group schedule
     try:
@@ -28,11 +31,8 @@ def main(scraper_state: bool):
             print('Found', len(groups[day]), 'groups for ', day)
         print('Found', numofgroups, 'groups in total!')
         print("=====================================\n")
-    except Exception as e:
-        print('Exiting script from schedule parsing!')
-        print(e)
-        logging.error(traceback.format_exc)
-        return e
+    except Exception:
+        raise logger.error('Exiting script from schedule parsing!')
 
     #Get schedule for every student
     try:

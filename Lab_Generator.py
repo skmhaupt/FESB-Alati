@@ -1,31 +1,41 @@
 import argparse
-from labgenpackage.lab_generator_main import main
-import traceback
 import logging
+import logging.config
+from labgenpackage.lab_generator_main import main
+from labgenpackage.classes import CustomFormatter
 
 #Logger setup
-logger = logging.getLogger(__name__)
-logger.setLevel("DEBUG")
-#console logger
-formatter = logging.Formatter(
-   "{levelname}-{name}:{message}",
-    style="{"
-)
-console_handler = logging.StreamHandler()
-console_handler.setLevel("DEBUG")
-console_handler.setFormatter(formatter)
-logger.addHandler(console_handler)
+grey = "\\x1b[38;21m"
+yellow = "\\x1b[33;21m"
+red = "\\x1b[31;21m"
+bold_red = "\\x1b[31;1m"
+reset = "\\x1b[0m"
 
-#file logger
-# formatter = logging.Formatter(
-#    "{levelname}-{name}:{message}",
-#     style="{"
-# )
-#file_handler = logging.FileHandler("app.log", mode="a", encoding="utf-8")
-#file_handler.setLevel("WARNING")
-#file_handler.setFormatter(formatter)
-#logger.addHandler(file_handler)
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    # "formatters": {
+    #     "simple": {
+    #         "format": "{levelname} - {name}: {message}",
+    #         "style":"{"
+    #     }
+    # },
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            #"formatter": "simple",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "root": {"level": "DEBUG", "handlers": ["stdout"]}
+    }
+}
 
+logging.config.dictConfig(config=logging_config)
+ch = logging.getHandlerByName("stdout")
+ch.setFormatter(CustomFormatter())
+logger = logging.getLogger("my_app")
 
 #argparse setup
 cli_parser = argparse.ArgumentParser(description='Create schedule for lab groups.')
@@ -40,6 +50,8 @@ elif args.scraper_state == "on":
 
 try:
     main(scraper_state)
-except Exception:
-    logging.exception("Error")
+except:
+    #logging.exception("Error")
+    logger.error("Exiting script!")
+    exit()
 
