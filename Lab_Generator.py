@@ -5,21 +5,15 @@ from labgenpackage.lab_generator_main import main
 from labgenpackage.classes import CustomFormatter
 
 #Logger setup
-grey = "\\x1b[38;21m"
-yellow = "\\x1b[33;21m"
-red = "\\x1b[31;21m"
-bold_red = "\\x1b[31;1m"
-reset = "\\x1b[0m"
-
 logging_config = {
     "version": 1,
     "disable_existing_loggers": False,
-    # "formatters": {
-    #     "simple": {
-    #         "format": "{levelname} - {name}: {message}",
-    #         "style":"{"
-    #     }
-    # },
+     "formatters": {
+         "simple": {
+             "format": "{levelname} - {name}: {message}",
+             "style":"{"
+         }
+     },
     "handlers": {
         "stdout": {
             "class": "logging.StreamHandler",
@@ -31,7 +25,6 @@ logging_config = {
         "root": {"level": "DEBUG", "handlers": ["stdout"]}
     }
 }
-
 logging.config.dictConfig(config=logging_config)
 ch = logging.getHandlerByName("stdout")
 ch.setFormatter(CustomFormatter())
@@ -52,6 +45,6 @@ try:
     main(scraper_state)
 except:
     #logging.exception("Error")
-    logger.error("Exiting script!")
+    logger.exception("Exiting script!")
     exit()
 

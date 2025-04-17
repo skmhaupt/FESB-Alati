@@ -19,8 +19,7 @@ def pars_schedule_file():
                             groups[group.day] = []
                     groups[group.day].append(group)
         if(len(groups)==0):
-            print('Error: Failed to finde groups in \'data/schedule.txt!\'')
-            return
+            raise logger.error("Error: Failed to finde groups in \'data/schedule.txt!\'")    
         return groups
 
     except FileNotFoundError:
