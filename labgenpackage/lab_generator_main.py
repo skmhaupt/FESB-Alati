@@ -31,21 +31,20 @@ def main(scraper_state: bool):
             numofgroups += len(groups[day])
             logger.info(f"Found {len(groups[day])} groups for {day}")
         logger.info(f"Found {numofgroups} groups in total!")
-        #logger.info("=====================================")
     except Exception:
-        raise logger.error('Exiting script from schedule parsing!')
+        raise logger.error('Failed parsing schedule!')
 
     #Get schedule for every student
     try:
         schedule_scraper(cours_participants, scraper_state)
-    except Exception as e:
-        print("Error when scraping schedule!")
-        print("Exception: ", e)
-        exit()
-    print("=====================================\n")
+    except Exception:
+        raise logger.exception("Error when scraping schedule!")
 
-    weight_generator(cours_participants, groups)
-
+    try:
+        weight_generator(cours_participants, groups)
+    except:
+        logger.exception(f"")
+        
     fill_groups(cours_participants, groups)
     
     #lowest: int = 9999999
