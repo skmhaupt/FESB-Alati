@@ -38,15 +38,16 @@ def main(scraper_state: bool):
     try:
         schedule_scraper(cours_participants, scraper_state)
     except Exception:
-        raise logger.exception("Error when scraping schedule!")
+        raise logger.error("Error when scraping schedule!")
 
     try:
         weight_generator(cours_participants, groups)
-    except:
-        raise logger.exception("Error generating starting weights!")
+    except Exception:
+        raise logger.error("Error generating starting weights!")
+    
     try:
         fill_groups(cours_participants, groups)
-    except:
+    except Exception:
         raise logger.error("Error filling groups!")
     #lowest: int = 9999999
     #counter: int = 0

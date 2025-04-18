@@ -1,22 +1,29 @@
 from datetime import datetime
 from labgenpackage.classes import Student
 from labgenpackage.classes import Group
-import traceback
 import logging
 
 def weight_generator(cours_participants: dict[str, Student], groups: dict[str, list:Group]):
-    print("Seting starting weights!")
-    days = ["PON", "UTO", "SRI", "ČET", "PET"]
     
+    logger = logging.getLogger("my_app.weight_generator")
+    logger.setLevel("INFO")
+
+    logger.info("Seting starting weights!")
+
     #For 'groups' structure check 'schedule_parser.py'
     #For 'cours_participants' structure check 'participants_parser.py'
     try:
-        for day in days:
-            group: Group
+        group: Group
+        student: Student
+        weight_errors: list[Student] = []
+
+        for day in groups:
+            logger.debug(f"Working on day: {day}")
             for group in groups[day]:
-                for username in cours_participants:
+                logger.debug(f"Workong on group: {group}")
+                for student in cours_participants.values():
                     canjoin: bool = True
-                    dayappointments: list[list[datetime]] = cours_participants[username].schedule[day]
+                    dayappointments: list[list[datetime]] = student.schedule[day]
                     #check if dayappointments is empty
                     if dayappointments:
                         appointment: list[datetime]
@@ -30,9 +37,16 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                                 canjoin = False
 
                     if canjoin:
-                        cours_participants[username].weight += group.group_size
-                        cours_participants[username].groups.append(group)
+                        student.weight += group.group_size
+                        student.groups.append(group)                    
 
-    except Exception as e:
-        print('Erro when seting starting weights!', e)
-        logging.error(traceback.format_exc)
+        for user in cours_participants:
+            if cours_participants[user].weight == 0:
+                weight_errors.append(cours_participants[user])
+                cours_participants.pop(user)
+        
+        if weight_errors:
+            logger.critical(f"Found students that cant join any group! They will be skiped when filling out groups! The students are: {weight_errors}")
+    
+    except Exception:
+        raise logger.error('Erro when seting starting weights!')
