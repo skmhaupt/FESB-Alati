@@ -1,37 +1,42 @@
 import os, subprocess, datetime, glob, csv
 from pathlib import Path
 from labgenpackage.classes import Student
+import logging
 
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool):
+
+    logger = logging.getLogger("my_app.schedule_scraper")
+    logger.setLevel("INFO")
+
     if scraper_state:
         date = datetime.datetime.now()
         #summer_semester_start_date = datetime.datetime(date.year, 2, 24)
         #winter_semester_start_date = datetime.datetime(date.year, 10, 1)
         os.chdir('Raspored_scraping')
-        print('Now in', os.getcwd(), 'directory!')
+        logger.info(f"Now in {os.getcwd()} directory!")
     
-        print('Creating dates.txt file for Raspored_scraping.')
+        logger.info("Creating dates.txt file for Raspored_scraping.")
         dates_file = open("data/dates.txt", "w")
     
         # Put here the start and end date of the period you want to check in the format DD-MM-YYYY
         if date.month<10 and date.month>=2:
-            print("In summer semester!")
+            logger.info("In summer semester!")
             dates_file.write(f"01-03-{date.year}\n")
             dates_file.write(f"24-04-{date.year}")
         else:
-            print("In winter semester!")
+            logger.info("In winter semester!")
             dates_file.write(f"01-10-{date.year}\n")
             dates_file.write(f"15-12-{date.year}")
         dates_file.close()
 
-        print('Creating usernames.txt file for Raspored_scraping.')
+        logger.info("Creating usernames.txt file for Raspored_scraping.")
         usernames_file = open("data/usernames.txt", "w")
         student: Student
         for student in cours_participants.values():
             usernames_file.write(f"{student.username}\n")
         usernames_file.close()
 
-        print("Deleting old data from data/timetables!")
+        logger.info("Deleting old data from data/timetables!")
         folder =  Path("/data/timetables")
         for item in folder.rglob("*"):
             try:
@@ -40,26 +45,26 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
                 print(f"Failed to delete {item}. {e}")
                 raise
 
-        print("Launching schedule scraper!")
+        logger.info("Launching schedule scraper!")
         subprocess.run(['.\\gradlew', 'run'], shell=True)
 
         os.chdir('..')
-        print('Now in', os.getcwd(), 'directory!\n')
+        logger.info(f"Now in {os.getcwd()} directory!\n")
 
     else:
-        print("Variable scraper_state set to off, skiping schedule scraper!")
+        logger.info("Variable scraper_state set to off, skiping schedule scraper!")
 
 
-    print("Parsing .csv files containing schedules!")
+    logger.info("Parsing .csv files containing schedules!")
     fpaths: list = glob.glob('Raspored_scraping/data/timetables/*.csv')
     if(len(fpaths) > 1):
-        print('Found', len(fpaths), '.csv files.')
+        logger.info(f"Found {len(fpaths)} .csv files.")
     elif(len(fpaths) == 0):
-        print('Error: No .csv files found!')
-        return
+        raise logger.error("No .csv files found!")
+        
     
     Errors: list = []
-    nocsvError:list = []
+    csvError:list = []
     days = {
         "ponedjeljak": "PON",
         "utorak": "UTO",
@@ -82,7 +87,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
             }
             user: str = fpath.split("\\",1)[1].split("_",1)[0]
             if(user in cours_participants):
-                #print("Found student: ", cours_participants[user])
+                #logger.debug(f"Found student: {cours_participants[user]}")
                 with open(fpath, newline='', encoding="utf8") as csvfile:
                     reader = csv.reader(csvfile, delimiter=',')
                     #skip first line
@@ -98,9 +103,9 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
                             tempschedule[day] = set()
                         tempschedule[day].add(time)
                     for day in tempschedule:
-                        #print(day, ": ",tempschedule[day])
+                        #logger.debug(f"{day}: {tempschedule[day]}")
                         for time in tempschedule[day]:
-                            #print(time)
+                            #logger.debug(f"{time}")
                             starttime, endtime = time.split(" - ",1)
                             starttime_h,starttime_m = starttime.split(":",1)
                             starttime = datetime.time(hour=int(starttime_h), minute=int(starttime_m))
@@ -110,16 +115,16 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
                             schedule[days[day]].append([starttime,endtime])
                             #print("starttime:", starttime, "endtime:", endtime)
                         #print(day, ": ",schedule[days[day]])
-                    #print(schedule)
                     #print("----------------------------\n")
                     cours_participants[user].schedule = schedule
             else:
-                nocsvError.append(user)
-        except Exception as e:
-            print('Error with csv file', e)
+                csvError.append(user)
+        except Exception:
+            logger.warningr("Error with parsing a csv file!")
             Errors.append(user)
-            print("Removing", user, "from list. He will not be added to a group!")
+            logger.warning(f"Removing {user} from list. He will not be added to a group!")
             cours_participants.pop(user)
-    if Errors or nocsvError:            
-        print("Errors with users: ", Errors, "\n")
-        print(".csv file mising for users: ", nocsvError, "\n")
+    if Errors:
+        logger.error(f"Errors with users: {Errors}")
+    if csvError:
+        logger.error(f"No user found for following .csv files: {csvError}")

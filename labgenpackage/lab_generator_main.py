@@ -43,10 +43,11 @@ def main(scraper_state: bool):
     try:
         weight_generator(cours_participants, groups)
     except:
-        logger.exception(f"")
-        
-    fill_groups(cours_participants, groups)
-    
+        raise logger.exception("Error generating starting weights!")
+    try:
+        fill_groups(cours_participants, groups)
+    except:
+        raise logger.error("Error filling groups!")
     #lowest: int = 9999999
     #counter: int = 0
     #for username in cours_participants:
