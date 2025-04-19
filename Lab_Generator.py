@@ -47,4 +47,7 @@ except:
     #logging.exception("Error")
     logger.exception("Exiting script!")
     exit()
+finally:
+    logger.info("Exiting script!")
+    exit()
 

@@ -1,9 +1,17 @@
 from labgenpackage.classes import Student
 from labgenpackage.classes import Group
 import random
+import logging
 
+def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:Group]) -> bool:
 
-def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:Group]):
+    logger = logging.getLogger("my_app.fill_groups")
+    logger.setLevel("INFO")
+
+    logger.info("Starting with filling out groups.")
+
+    zero_weight_users: list[Student] = []
+    
     while cours_participants:
         lowestweightusers: list[str] = []
         biggestgroups: list[Group] = []
@@ -20,15 +28,21 @@ def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:G
             elif cours_participants[username].weight == lowest:
                 lowestweightusers.append(username)
 
-        print(len(lowestweightusers))
-        print(lowestweightusers)
+        logger.debug(f"{len(lowestweightusers)} students with lowest weight: {*lowestweightusers,}")
+        if lowest == 0:
+            logger.critical(f"Lowest weight is '0'. Students {*lowestweightusers,} can not be added to any group!")
+            for user in lowestweightusers:
+                zero_weight_users.append(cours_participants[user])
+                logger.warning(f"Removing {user} from cours_participants.")
+                cours_participants.pop(user)
+            continue
         
         #Get one random user with from lowestweightusers
         username = random.choice(lowestweightusers)
+        logger.debug(f"User: {username} weight: {cours_participants[username].weight} chosen at random.")
+        logger.debug(f"Student can join groups: {*cours_participants[username].groups,}")
+        #print(*cours_participants[username].groups, sep="\n")
         #Get the biggest groups the selected user can join
-        print(username, "weight:", cours_participants[username].weight)
-        print("Groups:")
-        print(*cours_participants[username].groups, sep="\n")
         for group in cours_participants[username].groups:
             if group.group_size > highest:
                 highest = group.group_size
@@ -37,24 +51,34 @@ def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:G
             elif group.group_size == highest:
                 biggestgroups.append(group)
         
-        print("Biggest groups are")
-        print(*biggestgroups, sep="\n")
+        logger.debug(f"Biggest groups are: {*biggestgroups,}")
+        #print(*biggestgroups, sep="\n")
         
         #Add user to one of the biggest groups at random
         group = random.choice(biggestgroups)
-        print("Adding", username,"to group:",group)
+        logger.debug(f"Adding {username} to group: {group}. (group is selected at random)")
         group.students.append(cours_participants[username])
+        cours_participants[username].set_group(group)
         group.group_size -= 1
         cours_participants.pop(username)
         
         #Set new weights for all students
+        logger.debug("Seting new weights for all users.")
+        logger.debug("------------------------------------------------------------------")
         for user in cours_participants.values():
             user.set_weight()
-            #print(user, "Weight:", user.weight)
 
     for day in groups:
         for group in groups[day]:
-            print("In group:", group)
-            print(len(group.students), "students:")
-            print(*group.students, sep=", ")
-            print("============================")
+            logger.debug(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+            logger.debug("------------------------------------------------------------------")
+    
+    if zero_weight_users:
+        logger.critical(f"No free group left for students: {*zero_weight_users,}")
+        return False
+    else: return True
+
+
+
+def variable_sort():
+    pass

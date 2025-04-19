@@ -39,8 +39,10 @@ class Group:
         self.endtime: datetime = datetime.time(hour=int(endtime_h), minute=int(endtime_m))
         
     def __str__(self):
-        return f"{self.group_label}, {self.day}, {self.time}, {self.lab}, {self.group_size}"
-
+        return f"{self.group_label}, {self.day}, {self.time}, {self.lab}"
+    
+    def __repr__(self):
+        return f"{self.group_label}"
 
 class Student:
     def __init__(self, name: str, surname: str,email: str,jmbag: str):
@@ -51,11 +53,18 @@ class Student:
         self.username,_ = email.split("@",1)
         self.jmbag: int = int(jmbag)
         self.schedule: dict[str, list] = {}
+        self.position: int = 0
         self.weight: int = 0
+        self.norm_weight: float = 0
+        self.norm_alf_weight: float = 0
         self.groups: list[Group] = []
+        self.group: Group
 
     def __str__(self):
         return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
+    
+    def __repr__(self):
+        return f"{self.fullname}"
     
     def set_weight(self):
         weight: int = 0
@@ -63,3 +72,6 @@ class Student:
         for group in self.groups:
             weight += group.group_size
         self.weight = weight
+    
+    def set_group(self, group: Group):
+        self.group = group
