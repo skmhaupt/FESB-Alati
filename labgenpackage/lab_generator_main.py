@@ -7,6 +7,7 @@ from labgenpackage.classes import Student
 from labgenpackage.classes import Group
 import logging
 import enlighten
+import xlsxwriter
 
 
 def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
@@ -87,3 +88,29 @@ def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
     for day in groups:
         for group in groups[day]:
             logger.info(f"Group: {group} filled with {len(group.students)} students.")
+            logger.info(f"students: {*group.students,}")
+            logger.info("------------------------------------------------------------------")
+
+    workbook = xlsxwriter.Workbook("Filled_Groups.xlsx")
+    worksheet = workbook.add_worksheet()
+    worksheet.write("A1", "Prezime")
+    worksheet.write("B1", "Ime")
+    worksheet.write("C1", "Email")
+    worksheet.write("D1", "ID broj")
+    worksheet.write("E1", "Korisničko ime")
+    worksheet.write("F1", "Grupa")
+
+    row: int = 2
+    for student in cours_participants_copy.values():
+        worksheet.write(f"A{row}", f"{student.surname}")
+        worksheet.write(f"B{row}", f"{student.name}")
+        worksheet.write(f"C{row}", f"{student.email}")
+        worksheet.write(f"D{row}", f"{student.jmbag}")
+        worksheet.write(f"E{row}", f"{student.username}")
+        if hasattr(student, "group"):
+            worksheet.write(f"F{row}", f"{student.group}")
+        else:
+            worksheet.write(f"F{row}", "Jos nisu svrstani")
+        row += 1
+    
+    workbook.close()

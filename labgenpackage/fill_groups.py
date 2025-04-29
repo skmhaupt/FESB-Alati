@@ -53,7 +53,7 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
         username = random.choice(lowestweightusers)
         logger.debug(f"User: {username} weight: {cours_participants[username].weight} chosen at random.")
         logger.debug(f"Student can join groups: {*cours_participants[username].groups,}")
-        #print(*cours_participants[username].groups, sep="\n")
+
         #Get the biggest groups the selected user can join
         for group in cours_participants[username].groups:
             if group.group_size > highest:
@@ -64,7 +64,6 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
                 biggestgroups.append(group)
         
         logger.debug(f"Biggest groups are: {*biggestgroups,}")
-        #print(*biggestgroups, sep="\n")
         
         #Add user to one of the biggest groups at random
         group = random.choice(biggestgroups)
@@ -78,7 +77,7 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
         logger.debug("Seting new weights for all users.")
         logger.debug("------------------------------------------------------------------")
         for user in cours_participants.values():
-            user.set_weight()
+            user.update_weight()
 
     for day in groups:
         for group in groups[day]:
@@ -104,11 +103,11 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
 
         #Get users with lowest weights
         for username in cours_participants:
-            if cours_participants[username].weight < lowest:
-                lowest = cours_participants[username].weight
+            if cours_participants[username].variable_weight < lowest:
+                lowest = cours_participants[username].variable_weight
                 lowestweightusers = []
                 lowestweightusers.append(username)
-            elif cours_participants[username].weight == lowest:
+            elif cours_participants[username].variable_weight == lowest:
                 lowestweightusers.append(username)
 
         logger.debug(f"{len(lowestweightusers)} students with lowest weight: {*lowestweightusers,}")
@@ -119,7 +118,43 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
                 logger.warning(f"Removing {user} from cours_participants.")
                 cours_participants.pop(user)
             continue
+
+        #Get one random user with from lowestweightusers
+        username = random.choice(lowestweightusers)
+        logger.debug(f"User: {username} variable_weight: {cours_participants[username].variable_weight} chosen at random.")
+        logger.debug(f"Student can join groups: {*cours_participants[username].groups,}")
+
+        #Get the first group that hase room the selected user can join
+        for group in cours_participants[username].groups:
+            if group.group_size > 0:
+                break
         
+        logger.debug(f"Selected group is: {group}.")
+
+        #Add user to selected group
+        logger.debug(f"Adding {username} to group: {group}.")
+        group.students.append(cours_participants[username])
+        cours_participants[username].set_group(group)
+        group.group_size -= 1
+        cours_participants.pop(username)
+        
+        #Set new weights for all students
+        logger.debug("Seting new weights for all users.")
+        logger.debug("------------------------------------------------------------------")
+        for user in cours_participants.values():
+            user.update_weight()
+            user.update_var_weight()
+
+    for day in groups:
+        for group in groups[day]:
+            logger.debug(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+            logger.debug("------------------------------------------------------------------")
+    
+    if zero_weight_users:
+        logger.critical(f"No free group left for students: {*zero_weight_users,}")
+        return False
+    else: return True
+
 #----------------------------------------------------------------
 def alf_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger):
     pass

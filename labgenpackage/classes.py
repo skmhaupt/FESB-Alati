@@ -39,7 +39,11 @@ class Group:
         self.endtime: datetime = datetime.time(hour=int(endtime_h), minute=int(endtime_m))
         
     def __str__(self):
-        return f"{self.group_label}, {self.day}, {self.time}, {self.lab}"
+        #Fix time string
+        self.time = self.time.replace(' ', '')
+        a,b = self.time.split("-")
+        self.time = f"{a} - {b}"
+        return f"{self.group_label} - {self.day} {self.time} ({self.lab})"
     
     def __repr__(self):
         return f"{self.group_label}"
@@ -71,7 +75,7 @@ class Student:
     def __repr__(self):
         return f"{self.fullname}"
     
-    def set_weight(self):
+    def update_weight(self):
         weight: int = 0
         group: Group
         for group in self.groups:

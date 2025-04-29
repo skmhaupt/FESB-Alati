@@ -56,7 +56,7 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
         logger.error("Erro when seting group weights!")
         raise
     
-    #Setting up alfabetical weights
+    #Setting up variable weights
     try:
         counter: int = 1
         for student in cours_participants.values():
@@ -67,5 +67,5 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
             counter += 1
             #logger.info(f"{*cours_participants,}")
     except Exception:
-        logger.error('Erro when seting alfabetical weights!')
+        logger.error('Erro when seting variable weights!')
         raise
