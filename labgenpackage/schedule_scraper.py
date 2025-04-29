@@ -6,7 +6,7 @@ import logging
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool):
 
     logger = logging.getLogger("my_app.schedule_scraper")
-    logger.setLevel("INFO")
+    logger.setLevel("DEBUG")
 
     if scraper_state:
         date = datetime.datetime.now()
@@ -37,12 +37,12 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
         usernames_file.close()
 
         logger.info("Deleting old data from data/timetables!")
-        folder =  Path("/data/timetables")
+        folder =  Path("data/timetables")
         for item in folder.rglob("*"):
             try:
                 item.unlink()
-            except OSError as e:
-                print(f"Failed to delete {item}. {e}")
+            except Exception:
+                logger.critical(f"Failed to delete {item}")
                 raise
 
         logger.info("Launching schedule scraper!")
