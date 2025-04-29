@@ -46,6 +46,7 @@ class Group:
 
 class Student:
     def __init__(self, name: str, surname: str,email: str,jmbag: str):
+        #student data
         self.name: str = name
         self.surname: str = surname
         self.fullname: str = surname + " " + name
@@ -53,12 +54,16 @@ class Student:
         self.username,_ = email.split("@",1)
         self.jmbag: int = int(jmbag)
         self.schedule: dict[str, list] = {}
-        self.position: int = 0
-        self.weight: int = 0
-        self.norm_weight: float = 0
-        self.norm_alf_weight: float = 0
-        self.groups: list[Group] = []
-        self.group: Group
+        #data for sorting
+        self.total_places: int = 0      #total places provided by groups
+        self.weight: int = 0            #weight based on total places
+        self.norm_weight: float = 0     #weight/total_places
+        self.position: int = 0          #position amongst students based on alfabetical order
+        self.norm_alf_weight: float = 0 #normalised alfabetical weight = position/total_num_of_students
+        self.variable_weight: float = 0 #variable_weight = norm_weight*(100-alf_prio_lvl) + norm_alf_weight*alf_prio_lvl
+        self.alf_prio_lvl: int = 0      #defines the priority level for alfabetical sorting
+        self.groups: list[Group] = []   #all groups the student can be assigned to
+        self.group: Group               #the group the student has been assigned to
 
     def __str__(self):
         return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
@@ -72,6 +77,21 @@ class Student:
         for group in self.groups:
             weight += group.group_size
         self.weight = weight
+        self.norm_weight = self.weight / self.total_places
     
     def set_group(self, group: Group):
         self.group = group
+    
+    def set_alf_weight(self, total_num_of_students):
+        self.norm_alf_weight = self.position / total_num_of_students
+    
+    def set_group_weight(self, total_places:int):
+        self.total_places = total_places
+        self.norm_weight = self.weight / total_places
+    
+    def set_var_weight(self, alf_prio_lvl: int):
+        self.alf_prio_lvl = alf_prio_lvl
+        self.variable_weight = (self.norm_weight * (100-self.alf_prio_lvl)) + (self.norm_alf_weight * self.alf_prio_lvl)
+
+    def update_var_weight(self):
+        self.variable_weight = (self.norm_weight * (100-self.alf_prio_lvl)) + (self.norm_alf_weight * self.alf_prio_lvl)

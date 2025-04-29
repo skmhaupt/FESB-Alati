@@ -9,7 +9,7 @@ import logging
 import enlighten
 
 
-def main(scraper_state: bool):
+def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
 
     #Logger
     logger = logging.getLogger("my_app.main")
@@ -43,21 +43,24 @@ def main(scraper_state: bool):
                 logger.info(f"Found {len(groups[day])} groups for {day}")
             logger.info(f"Found {numofgroups} groups in total!")
         except Exception:
-            raise logger.error('Failed parsing schedule!')
+            logger.error('Failed parsing schedule!')
+            raise
 
         #Get schedule for every student
         try:
             schedule_scraper(cours_participants, scraper_state)
         except Exception:
-            raise logger.error("Error when scraping schedule!")
+            logger.error("Error when scraping schedule!")
+            raise
 
         try:
-            weight_generator(cours_participants, groups)
+            weight_generator(cours_participants, groups, alf_prio_lvl)
         except Exception:
-            raise logger.error("Error generating starting weights!")
+            logger.error("Error generating starting weights!")
+            raise
         
         try:
-            successfule: bool = fill_groups(cours_participants, groups)
+            successfule: bool = fill_groups(cours_participants, groups, mode)
             if successfule:
                 running = False
                 logger.info("Successfully filled out all groups with no students remaining!")
@@ -69,24 +72,18 @@ def main(scraper_state: bool):
                 counter += 1
                 pbar.update()
         except Exception:
-            raise logger.error("Error filling groups!")
-
-    for student in cours_participants_copy.values():
-        logger.info(f"{student} is in group: {student.group}")
-    #lowest: int = 9999999
-    #counter: int = 0
-    #for username in cours_participants:
-    #    if cours_participants[username].weight < lowest:
-    #        lowest = len(cours_participants[username].weight)
-    #        counter = 1
-    #   elif len(cours_participants[username].groups) == lowest: counter += 1
-    #   print("User", username, "can join", len(cours_participants[username].groups), "groups!")
-    #   print("Weight:", cours_participants[username].weight)
-    #    #print("Can join groups:")
-    #   #print(*cours_participants[username].groups, sep="\n")
-    #    print("=====================================\n")
-
-    #print(lowest)
-    #print(counter)
-    #for day in groups:
-    #    print(*groups[day], sep="\n")
+            logger.error("Error filling groups!")
+            raise
+    
+        counter = 0
+        for student in cours_participants_copy.values():
+            try:
+                counter += 1
+                logger.debug(f"{counter}:{student} is in group: {student.group}")
+            except AttributeError:
+                logger.warning(f"{counter}:{student} was not assigned a group. {student.fullname} can join groups: {student.groups}")
+    
+    logger.info("Execution recap:")
+    for day in groups:
+        for group in groups[day]:
+            logger.info(f"Group: {group} filled with {len(group.students)} students.")
