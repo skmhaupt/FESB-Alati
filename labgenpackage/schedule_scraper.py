@@ -21,8 +21,10 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
         # Put here the start and end date of the period you want to check in the format DD-MM-YYYY
         if date.month<10 and date.month>=2:
             logger.info("In summer semester!")
-            dates_file.write(f"01-03-{date.year}\n")
-            dates_file.write(f"24-04-{date.year}")
+            dates_file.write(f"05-05-{date.year}\n")
+            dates_file.write(f"09-05-{date.year}\n")
+            #dates_file.write(f"01-03-{date.year}\n")
+            #dates_file.write(f"24-04-{date.year}")
         else:
             logger.info("In winter semester!")
             dates_file.write(f"01-10-{date.year}\n")

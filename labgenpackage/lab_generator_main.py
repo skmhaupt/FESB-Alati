@@ -50,6 +50,7 @@ def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
         #Get schedule for every student
         try:
             schedule_scraper(cours_participants, scraper_state)
+            scraper_state = False
         except Exception:
             logger.error("Error when scraping schedule!")
             raise
@@ -76,13 +77,13 @@ def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
             logger.error("Error filling groups!")
             raise
     
-        counter = 0
-        for student in cours_participants_copy.values():
-            try:
-                counter += 1
-                logger.debug(f"{counter}:{student} is in group: {student.group}")
-            except AttributeError:
-                logger.warning(f"{counter}:{student} was not assigned a group. {student.fullname} can join groups: {student.groups}")
+    counter = 0
+    for student in cours_participants_copy.values():
+        try:
+            counter += 1
+            logger.debug(f"{counter}:{student} is in group: {student.group}")
+        except AttributeError:
+            logger.warning(f"{counter}:{student} was not assigned a group. {student.fullname} can join groups: {student.groups}")
     
     logger.info("Execution recap:")
     for day in groups:

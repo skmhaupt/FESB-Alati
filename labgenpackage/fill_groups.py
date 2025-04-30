@@ -10,18 +10,21 @@ def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:G
 
     logger.info("Starting with filling out groups.")
 
+    ret_value: bool = False
+
     if mode == 0:
-        size_sort(cours_participants,groups,logger)
+        ret_value = size_sort(cours_participants,groups,logger)
     elif mode == 1:
-        variable_sort(cours_participants,groups,logger)
+        ret_value = variable_sort(cours_participants,groups,logger)
     elif mode == 2:
-        alf_sort(cours_participants,groups,logger)
+        ret_value = alf_sort(cours_participants,groups,logger)
     else:
         logger.critical("Error with mode selection!")
         raise
+    return ret_value
 
 #----------------------------------------------------------------
-def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger):
+def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger) -> bool:
     zero_weight_users: list[Student] = []
     
     while cours_participants:
@@ -87,10 +90,11 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
     if zero_weight_users:
         logger.critical(f"No free group left for students: {*zero_weight_users,}")
         return False
-    else: return True
+    else: 
+        return True
 
 #----------------------------------------------------------------
-def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger):
+def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger) -> bool:
     zero_weight_users: list[Student] = []
     
     while cours_participants:
