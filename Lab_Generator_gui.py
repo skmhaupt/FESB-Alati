@@ -1,19 +1,238 @@
-import tkinter as tk
-from tkinter import filedialog
+from customtkinter import filedialog
+from pathlib import Path
+from shutil import copy
+from labgenpackage.classes import Student
+from labgenpackage.classes import CustomFormatter
+from labgenpackage.participants_parser import pars_cours_participants
+import customtkinter as ctk
+import logging
+import logging.config
+import glob
+from os import path
 
-def UploadAction(event=None):
-    filename = filedialog.askopenfilename()
-    print("Selected:", filename)
+#Logger setup
+logging_config = {
+    "version": 1,
+    "disable_existing_loggers": False,
+     "formatters": {
+         "simple": {
+             "format": "{levelname} - {name}: {message}",
+             "style":"{"
+         }
+     },
+    "handlers": {
+        "stdout": {
+            "class": "logging.StreamHandler",
+            #"formatter": "simple",
+            "stream": "ext://sys.stdout"
+        }
+    },
+    "loggers": {
+        "root": {"level": "DEBUG", "handlers": ["stdout"]}
+    }
+}
+logging.config.dictConfig(config=logging_config)
+ch = logging.getHandlerByName("stdout")
+ch.setFormatter(CustomFormatter())
+logger = logging.getLogger("my_app")
+
+
+class ScheduleFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.label_1 = ctk.CTkLabel(self, text="Raspored grupa")
+        self.label_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
+        self.label_2 = ctk.CTkLabel(self, text="Grupa 1")
+        self.label_2.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="w")
+
+#Contains the right side of the UI: CoursFrame, ParticipantsFrame, ...
+class RightFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.cours_frame = CoursFrame(self)
+        self.cours_frame.grid(row=0, column=1, padx=10, pady=10, sticky="new")
+
+        self.participants_frame = ParticipantsFrame(self)
+        self.participants_frame.grid(row=1, column=1, padx=10, pady=10, sticky="ew")
+
+#First segment of the right side of the UI. Hold the section for cours data
+class CoursFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.label_1 = ctk.CTkLabel(self, text="Predmet:")
+        self.label_1.grid(row=0, column=0, padx=(10, 5), pady=(10, 10), sticky="w")
+        self.entry_1 = ctk.CTkEntry(self, placeholder_text="npr: PDS, SDOS, itd.")
+        self.entry_1.grid(row=0, column=1, padx=(0, 10), pady=(10, 10), sticky="e")
+
+        self.label_2 = ctk.CTkLabel(self, text="Smjer:")
+        self.label_2.grid(row=0, column=2, padx=(10, 5), pady=(10, 10), sticky="w")
+        self.entry_2 = ctk.CTkEntry(self, placeholder_text="npr: 112, 222 itd.")
+        self.entry_2.grid(row=0, column=3, padx=(0, 10), pady=(10, 10), sticky="e")
+
+#
+class ParticipantsFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.label_1 = ctk.CTkLabel(self, text="Sudionici", font=("Helvetica", 23))
+        self.label_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="w")
+
+        self.label_2 = ctk.CTkLabel(self, text="Ulazna datoteka:")
+        self.label_2.grid(row=1, column=0, padx=(10, 5), pady=(10, 0), sticky="w")
+        self.entry_1 = ctk.CTkEntry(self, width=500, placeholder_text=".csv datoteka")
+        self.entry_1.configure(state="readonly")
+        self.entry_1.grid(row=1, column=1, padx=(0, 5), pady=(10, 0), sticky="we")
+        self.button_1 = ctk.CTkButton(self,width=100 , text="Pretrazi", command=self.BrowseAction)
+        self.button_1.grid(row=1, column=2, padx=(0, 10), pady=(10, 0), sticky="e")
+
+        self.button_2 = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)
+        self.button_2.grid(row=2, column=1, padx=10, pady=(10, 0))
+
+        self.subframe = ctk.CTkFrame(self)
+        self.subframe.grid(row=3, column=0, columnspan=3, padx=10, pady=10)
+        self.label_3 = ctk.CTkLabel(self.subframe, text="Ucitana datoteka:")
+        self.label_3.grid(row=0, column=0, padx=(10, 5), pady=(10, 0), sticky="w")
+        self.label_4 = ctk.CTkLabel(self.subframe, text="Trenutno nije ucitana .csv datoteka!")
+        self.label_4.grid(row=0, column=1, padx=(10, 10), pady=(10, 0), sticky="w")
+        self.label_5 = ctk.CTkLabel(self.subframe, text="Broj ucitanih studenta:")
+        self.label_5.grid(row=1, column=0, padx=(10, 5), pady=(0, 10), sticky="w")
+        self.label_6 = ctk.CTkLabel(self.subframe, text="Trenutno nije ucitana .csv datoteka!")
+        self.label_6.grid(row=1, column=1, padx=(10, 10), pady=(0, 10), sticky="w")
+
+        self.LoadParticipants()
+        
+
+    def LoadParticipants(self)->str:
+        #open csv file
+        global cours_participants
+        try:
+            cours_participants, fpath = pars_cours_participants()
+        except Exception:
+            logger.error("Failed parcing participants!")
+            raise
+
+        logger.info(f"Found {len(cours_participants)} students!")
+        if(cours_participants):
+            self.label_4.configure(text=f"{path.basename(fpath)}")
+            self.label_6.configure(text=f"{len(cours_participants)}")
+
+
+    def BrowseAction(self):
+        filename = filedialog.askopenfilename()
+        self.entry_1.configure(state="normal")
+        self.entry_1.delete(0, "end")
+        self.entry_1.insert(0,filename)
+        self.entry_1.configure(state="readonly")
+        logger.info(f"Selected file: {filename}")
+
+
+    def UploadAction(self):
+        input_csv_file = self.entry_1.get()
+        if(input_csv_file==""):
+            logger.warning("Select a .csv file befor uploading.")
+            return
+        elif input_csv_file.endswith(".csv"):
+            logger.info(f"{self.entry_1.get()}")
+        else:
+            logger.warning("Input file hase to be a .csv file.")
+            return
+        
+        #get path to old existing .csv file
+        fpath: Path
+        fpaths: list = glob.glob("data/*.csv")
+        if(len(fpaths) > 1):
+            logger.critical(f"Found {len(fpaths)} .csv files, there has to be only one!")
+            raise Exception
+        elif(len(fpaths) == 0):
+            logger.warning("No .csv file found!")
+        else:
+            fpath = Path(fpaths[0])
+            try:
+                fpath.unlink()
+                logger.info(f"Deleted {fpath}!")
+            except Exception:
+                logger.critical(f"Failed to delete {fpath}")
+                raise
+        
+        #get new selected .csv file
+        fpath = Path(input_csv_file)
+        try:
+            copy(fpath, "data/")
+            logger.info(f"Uploaded file: {fpath}!")
+        except Exception:
+            logger.critical(f"Failed to copy file: {fpath}!")
+            raise
+
+        self.LoadParticipants()
+        
+
+class App(ctk.CTk):
+    def __init__(self):
+        super().__init__()
+
+        self.title("Lab generator")
+        self.geometry("900x600")
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+
+        self.schedule_frame = ScheduleFrame(self)
+        self.schedule_frame.grid(row=0, column=0, padx=10, pady=10, sticky="nsw")
+
+        self.right_frame = RightFrame(self)
+        self.right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
 
 
 
 
-root = tk.Tk(screenName="Lab generator")
+def main():
+    app = App()
+    try:
+        app.mainloop()
+    except Exception:
+        logger.exception("Exiting app!")
+        exit()
+
+if __name__ == "__main__":
+    cours_participants: dict[str, Student] = {}
+    main()
+
+# def setScheduleUISection():
+#     scheduleSection = ctk.CTkFrame(master=app, width=100, height=400)
+#     scheduleSection.grid(row=0, column=0, padx=20, pady=20)
+#     label = ctk.CTkLabel(scheduleSection, text="Raspored grupa", font=("Helvetica", 20))
+#     label.grid(row=0, column=0, padx=20)
+
+
+
+
+
+# ctk.set_default_color_theme("dark-blue")
+# ctk.set_appearance_mode("system")
+
+# #Main window
+# app = ctk.CTk(screenName="Lab generator")
+# app.title("Lab generator")
+# app.geometry("800x600")
+
+# Configure grid layout
+# app.grid_columnconfigure(0, weight=1)
+# app.grid_columnconfigure(1, weight=3)
+# app.grid_rowconfigure(0, weight=1)
+
+
+#Schedule section
+#setScheduleUISection()
+
 
 #Input data fields
-button = tk.Button(root, text="'Load participants file.'", command=UploadAction)
-button.pack()
+# button = ctk.CTkButton(app, text="'Load participants file.'", command=UploadAction)
+# button.grid(row=0, column=2, padx=20, pady=20)
+#button.pack()
 
 
 
-root.mainloop()
+#app.mainloop()

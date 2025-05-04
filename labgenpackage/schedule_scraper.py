@@ -129,4 +129,5 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
     if Errors:
         logger.error(f"Errors with users: {Errors}")
     if csvError:
-        logger.error(f"No user found for following .csv files: {csvError}")
+        logger.error(f"Users and .csv files in 'data/timetables/' are out of sync. Found following .csv files that dont have a user: {csvError}")
+        raise FileNotFoundError

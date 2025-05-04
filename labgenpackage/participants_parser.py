@@ -3,7 +3,7 @@ import csv
 import glob
 import logging
 
-def pars_cours_participants() -> dict[str, Student]:
+def pars_cours_participants() -> tuple[dict[str, Student], str]:
     
     logger = logging.getLogger("my_app.participants_parsere")
 
@@ -11,12 +11,13 @@ def pars_cours_participants() -> dict[str, Student]:
     
     #get path to file
     fpath: str
-    fpaths: list = glob.glob("data/courseid_*_participants.csv")
+    fpaths: list = glob.glob("data/*.csv")
     if(len(fpaths) > 1):
-        logger.error(f"Found {len(fpaths)} courseid_#number_participants.csv files, make sure there is only one!")
-        return
+        logger.critical(f"Found {len(fpaths)} .csv files, there can only be one!")
+        raise FileNotFoundError
+        #return
     elif(len(fpaths) == 0):
-        logger.error("No courseid_#number_participants.csv file found!")
+        logger.error("No .csv file found!")
         return
     fpath = fpaths[0]
 
@@ -30,6 +31,7 @@ def pars_cours_participants() -> dict[str, Student]:
             for row in reader:
                 student: Student = Student(row[0],row[1],row[2],row[3])
                 cours_participants[student.username] = student
-        return cours_participants
+        return (cours_participants, fpath)
     except Exception:
-        raise logger.exception('Error with csv file!')
+        logger.critical('Error with csv file!')
+        raise

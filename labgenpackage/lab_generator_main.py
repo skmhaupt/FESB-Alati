@@ -27,7 +27,8 @@ def main(scraper_state: bool, mode: int, alf_prio_lvl: int):
         #Get cours participants
         try:
             logger.info("Starting participants parser!")
-            cours_participants: dict[str, Student] = pars_cours_participants()
+            cours_participants: dict[str, Student] 
+            cours_participants, _ = pars_cours_participants()
             cours_participants_copy: dict[str, Student] = cours_participants.copy()
             logger.info(f"Found {len(cours_participants)} students in participants file.")
         except TypeError:
