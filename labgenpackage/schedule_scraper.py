@@ -3,13 +3,13 @@ from pathlib import Path
 from labgenpackage.classes import Student
 import logging
 
-def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool):
+def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool, startdate:str="", enddate:str=""):
 
     logger = logging.getLogger("my_app.schedule_scraper")
     logger.setLevel("DEBUG")
 
     if scraper_state:
-        date = datetime.datetime.now()
+        #date = datetime.datetime.now()
         #summer_semester_start_date = datetime.datetime(date.year, 2, 24)
         #winter_semester_start_date = datetime.datetime(date.year, 10, 1)
         os.chdir('Raspored_scraping')
@@ -17,18 +17,21 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool)
     
         logger.info("Creating dates.txt file for Raspored_scraping.")
         dates_file = open("data/dates.txt", "w")
-    
+
+        dates_file.write(f"{startdate}\n")
+        dates_file.write(f"{enddate}\n")
+
         # Put here the start and end date of the period you want to check in the format DD-MM-YYYY
-        if date.month<10 and date.month>=2:
-            logger.info("In summer semester!")
-            dates_file.write(f"05-05-{date.year}\n")
-            dates_file.write(f"09-05-{date.year}\n")
-            #dates_file.write(f"01-03-{date.year}\n")
-            #dates_file.write(f"24-04-{date.year}")
-        else:
-            logger.info("In winter semester!")
-            dates_file.write(f"01-10-{date.year}\n")
-            dates_file.write(f"15-12-{date.year}")
+        # if date.month<10 and date.month>=2:
+        #     logger.info("In summer semester!")
+        #     dates_file.write(f"05-05-{date.year}\n")
+        #     dates_file.write(f"09-05-{date.year}\n")
+        #     #dates_file.write(f"01-03-{date.year}\n")
+        #     #dates_file.write(f"24-04-{date.year}")
+        # else:
+        #     logger.info("In winter semester!")
+        #     dates_file.write(f"01-10-{date.year}\n")
+        #     dates_file.write(f"15-12-{date.year}")
         dates_file.close()
 
         logger.info("Creating usernames.txt file for Raspored_scraping.")
