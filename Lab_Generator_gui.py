@@ -52,7 +52,8 @@ class GroupsFrame(ctk.CTkFrame):
         self.grid_rowconfigure(1, weight=0)
         self.grid_rowconfigure(2, weight=0)
         self.grid_rowconfigure(3, weight=0)
-        self.grid_rowconfigure(4, weight=1)
+        self.grid_rowconfigure(4, weight=0)
+        self.grid_rowconfigure(5, weight=1)
 
         self.label_1 = ctk.CTkLabel(self, text="Grupe", font=("Helvetica", 23))
         self.label_1.grid(row=0, column=0, padx=10, pady=(10, 0), sticky="we")
@@ -68,9 +69,14 @@ class GroupsFrame(ctk.CTkFrame):
 
         self.button_2 = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)
         self.button_2.grid(row=3, column=0, columnspan=3, padx=10, pady=(10, 0), sticky="")
+        
+        self.label_num_of_groups = ctk.CTkLabel(self, text="Broj grupa nepoznat")
+        self.label_num_of_groups.grid(row=4, column=0, padx=(10,0), pady=(5, 0), sticky="we")
+        self.label_num_of_places = ctk.CTkLabel(self, text="Broj dostupnih mjesta nije poznat.")
+        self.label_num_of_places.grid(row=4, column=1, columnspan=2, padx=(0,5), pady=(5, 0), sticky="we")
 
         self.subframe = ctk.CTkScrollableFrame(self)
-        self.subframe.grid(row=4, column=0, columnspan=3, padx=10, pady=10,sticky="wens")
+        self.subframe.grid(row=5, column=0, columnspan=3, padx=10, pady=10,sticky="wens")
         self.label_3 = ctk.CTkLabel(self.subframe, text="Grupe nisu ucitane.")
         self.label_3.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="we")
 
@@ -87,18 +93,18 @@ class GroupsFrame(ctk.CTkFrame):
         for widget in self.subframe.winfo_children():
             widget.destroy()  # deleting widget
 
-        row:int = 0
+        row:int = 2
+        total_places:int = 0
+        group:Group
         for groups_in_day in groups.values():
             for group in groups_in_day:
                 self.AddGrouplabel(row,group)
+                total_places+=group.group_size
                 row+=1
-                
-        return
-    
-        logger.info(f"Found {len(cours_participants)} students!")
-        if(cours_participants):
-            self.label_4.configure(text=f"{path.basename(fpath)}")
-            self.label_6.configure(text=f"{len(cours_participants)}")
+        logger.info(f"Found {row-1} groups. With {total_places} places in total.")
+        
+        self.label_num_of_groups.configure(text=f"Broj grupa: {row-2}")
+        self.label_num_of_places.configure(text=f"Broj dostupnih mjesat: {total_places}")
 
     def AddGrouplabel(self, row:int, group:Group):
         self.group_label1 = ctk.CTkLabel(self.subframe, text=f"{group.group_label}")
@@ -173,6 +179,9 @@ class RightFrame(ctk.CTkFrame):
         self.scraper_frame = ScraperFrame(self)
         self.scraper_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
 
+        self.fill_groups_frame = FillGroupsFrame(self)
+        self.fill_groups_frame.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+
 
 #First segment of the right side of the UI. Hold the section for cours data
 class CoursFrame(ctk.CTkFrame):
@@ -192,6 +201,8 @@ class CoursFrame(ctk.CTkFrame):
 class ParticipantsFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
+
+        self.grid_columnconfigure(1, weight=1)
 
         self.label_1 = ctk.CTkLabel(self, text="Sudionici", font=("Helvetica", 23))
         self.label_1.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="w")
@@ -233,7 +244,6 @@ class ParticipantsFrame(ctk.CTkFrame):
         if(cours_participants):
             self.label_4.configure(text=f"{path.basename(fpath)}")
             self.label_6.configure(text=f"{len(cours_participants)}")
-
 
     def BrowseAction(self):
         filename = filedialog.askopenfilename()
@@ -390,6 +400,28 @@ class ScraperFrame(ctk.CTkFrame):
         else:
             return True
         
+class FillGroupsFrame(ctk.CTkFrame):
+    def __init__(self, master):
+        super().__init__(master)
+
+        self.grid_columnconfigure(0, weight=1)
+
+        self.label_1 = ctk.CTkLabel(self, text="Ispuna grupa", font=("Helvetica", 23))
+        self.label_1.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="w")
+
+        self.button_1 = ctk.CTkButton(self,width=60 , text="Pokreni", command=self.StartMainTask)
+        self.button_1.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="")
+
+        self.subframe = ctk.CTkFrame(self)
+        self.subframe.grid(row=2, column=0, padx=10, pady=10,sticky="wens")
+        self.label_2 = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
+        self.label_2.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+
+    def StartMainTask():
+        global cours_participants
+        global groups
+        pass
+        
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
@@ -397,7 +429,7 @@ class App(ctk.CTk):
         self.title("Lab generator")
         self.geometry("1070x600")
         ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
