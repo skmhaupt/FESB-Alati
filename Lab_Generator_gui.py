@@ -12,6 +12,7 @@ import customtkinter as ctk
 import logging.config
 import logging
 import glob
+import os
 
 #Logger setup
 logging_config = {
@@ -188,7 +189,6 @@ class CoursFrame(ctk.CTkFrame):
         self.entry_2 = ctk.CTkEntry(self, placeholder_text="npr: 112, 222 itd.")
         self.entry_2.grid(row=0, column=3, padx=(0, 10), pady=(10, 10), sticky="e")
 
-#
 class ParticipantsFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
@@ -306,12 +306,30 @@ class ScraperFrame(ctk.CTkFrame):
         self.entry_2.grid(row=1, column=4, padx=(0, 5), pady=(10, 0), sticky="we")
 
         self.button_1 = ctk.CTkButton(self,width=60 , text="Preuzmi raspored", command=self.ScrapeSchedule)
-        self.button_1.grid(row=2, column=0, padx=(10,0), pady=(10, 0), sticky="w")
+        self.button_1.grid(row=2, column=0, padx=(10,0), pady=10, sticky="w")
 
         self.subframe = ctk.CTkFrame(self)
-        self.subframe.grid(row=3, column=0, columnspan=5, padx=10, pady=10,sticky="wens")
+        self.subframe.grid(row=2, column=1, columnspan=4, padx=(5,5), pady=10,sticky="wens")
         self.label_3 = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
         self.label_3.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+
+        global cours_participants
+        try:
+            schedule_scraper(cours_participants,False)
+        except FileNotFoundError:
+            logger.warning("Pleas load a new cours participants .csv file or scrape for a new student schedule data.")
+            return
+        
+        self.LoadedStatus()
+        
+    def LoadedStatus(self):
+        #len([name for name in os.listdir('.') if os.path.isfile(name)])
+
+        for widget in self.subframe.winfo_children():
+            widget.destroy()
+
+        self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta preuzet.")
+        self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
     
     def ScrapeSchedule(self):
         startdate:str = self.entry_1.get()
@@ -330,18 +348,31 @@ class ScraperFrame(ctk.CTkFrame):
         yyyy=int(yyyy)
         startdate = f"{dd:02}-{mm:02}-{yyyy:04}"
 
-        dd,mm,yyyy=enddate.split(".")
-        dd=int(dd)
-        mm=int(mm)
-        yyyy=int(yyyy)
-        enddate = f"{dd:02}-{mm:02}-{yyyy:04}"
+        dd2,mm2,yyyy2=enddate.split(".")
+        dd2=int(dd2)
+        mm2=int(mm2)
+        yyyy2=int(yyyy2)
+        enddate = f"{dd2:02}-{mm2:02}-{yyyy2:04}"
+
+        if not yyyy2 <= yyyy:
+            pass
+        elif not mm2 <= mm:
+            pass
+        elif not dd2 <= dd:
+            pass
+        else: 
+            logger.warning("Start date is later than end date.")
+            return
+
         
         logger.info(f"Start date: {startdate}")
         logger.info(f"End date: {enddate}")
         global cours_participants
-        for stutdent in cours_participants.values():
-            print(stutdent)
-        schedule_scraper(cours_participants,False,startdate,enddate)
+        # for stutdent in cours_participants.values():
+        #     print(stutdent)
+        schedule_scraper(cours_participants,True,startdate,enddate)
+
+        self.LoadedStatus()
 
     def ValidateDate(self, date:str)->bool:
         if not len(date.split("."))==3:
@@ -350,25 +381,24 @@ class ScraperFrame(ctk.CTkFrame):
         if not dd.isdigit() or not 0 < int(dd) <= 31:
             logger.warning(f"Error with dd: {dd}")
             return False
-        if not mm.isdigit() or not 0 < int(mm) <= 12:
+        elif not mm.isdigit() or not 0 < int(mm) <= 12:
             logger.warning(f"Error with mm: {mm}")
             return False
-        if not yyyy.isdigit() or not 2024 < int(yyyy) < 2100:
+        elif not yyyy.isdigit() or not 2024 < int(yyyy) < 2100:
             logger.warning(f"Error with yyyy: {yyyy}")
             return False
         else:
             return True
-        
         
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("Lab generator")
-        self.geometry("1040x600")
+        self.geometry("1070x600")
         ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(1, weight=2)
+        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
         self.schedule_frame = GroupsFrame(self)
@@ -376,6 +406,7 @@ class App(ctk.CTk):
 
         self.right_frame = RightFrame(self)
         self.right_frame.grid(row=0, column=1, padx=10, pady=10, sticky="nsew")
+        self.right_frame.grid_columnconfigure(0, weight=1)
 
 def main():
     app = App()

@@ -3,7 +3,7 @@ from labgenpackage.classes import Student
 from labgenpackage.classes import Group
 import logging
 
-def weight_generator(cours_participants: dict[str, Student], groups: dict[str, list:Group],alf_prio_lvl: int):
+def weight_generator(cours_participants: dict[str, Student], groups: dict[str, list:Group],alf_prio_lvl: int)->list[Student]:
     
     logger = logging.getLogger("my_app.weight_generator")
     logger.setLevel("INFO")
@@ -51,7 +51,7 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
         
         if weight_errors:
             logger.critical(f"Found students that cant join any group! They will be skiped when filling out groups! The number of students is: {len(weight_errors)}. The students are: {weight_errors}")
-    
+
     except Exception:
         logger.error("Erro when seting group weights!")
         raise
@@ -66,6 +66,7 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
             student.set_var_weight(alf_prio_lvl)
             counter += 1
             #logger.info(f"{*cours_participants,}")
+            return weight_errors
     except Exception:
         logger.error('Erro when seting variable weights!')
         raise
