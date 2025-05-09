@@ -65,8 +65,7 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
             student.set_group_weight(total_places)
             student.set_var_weight(alf_prio_lvl)
             counter += 1
-            #logger.info(f"{*cours_participants,}")
-            return weight_errors
+        return weight_errors
     except Exception:
         logger.error('Erro when seting variable weights!')
         raise

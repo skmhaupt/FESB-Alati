@@ -96,7 +96,7 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
 #----------------------------------------------------------------
 def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger) -> bool:
     zero_weight_users: list[Student] = []
-    
+
     while cours_participants:
         lowestweightusers: list[str] = []
         biggestgroups: list[Group] = []
@@ -125,11 +125,12 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
 
         #Get one random user with from lowestweightusers
         username = random.choice(lowestweightusers)
-        logger.debug(f"User: {username} variable_weight: {cours_participants[username].variable_weight} chosen at random.")
-        logger.debug(f"Student can join groups: {*cours_participants[username].groups,}")
+        logger.info(f"User: {username} variable_weight: {cours_participants[username].variable_weight} chosen at random.")
+        logger.info(f"Student can join groups: {*cours_participants[username].groups,}")
 
         #Get the first group that hase room the selected user can join
         for group in cours_participants[username].groups:
+            logger.debug(f"Testing group {group} with size {group.group_size}")
             if group.group_size > 0:
                 break
         

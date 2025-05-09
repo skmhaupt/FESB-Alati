@@ -1,16 +1,20 @@
 from labgenpackage.participants_parser import pars_cours_participants
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
+from labgenpackage.weight_generator import weight_generator
 from labgenpackage.classes import CustomFormatter
+from labgenpackage.fill_groups import fill_groups
 from labgenpackage.classes import Student
 from labgenpackage.classes import Group
 from customtkinter import filedialog
+from threading import Thread, Lock
 from pathlib import Path
 from shutil import copy
 from os import path
 import customtkinter as ctk
 import logging.config
 import logging
+import xlsxwriter
 import glob
 import os
 
@@ -315,8 +319,8 @@ class ScraperFrame(ctk.CTkFrame):
         self.entry_2.configure(state="normal")
         self.entry_2.grid(row=1, column=4, padx=(0, 5), pady=(10, 0), sticky="we")
 
-        self.button_1 = ctk.CTkButton(self,width=60 , text="Preuzmi raspored", command=self.ScrapeSchedule)
-        self.button_1.grid(row=2, column=0, padx=(10,0), pady=10, sticky="w")
+        self.schedule_scrapper_button = ctk.CTkButton(self,width=60 , text="Preuzmi raspored", command=self.ScrapSchedule_thread)
+        self.schedule_scrapper_button.grid(row=2, column=0, padx=(10,0), pady=10, sticky="")
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=2, column=1, columnspan=4, padx=(5,5), pady=10,sticky="wens")
@@ -333,15 +337,13 @@ class ScraperFrame(ctk.CTkFrame):
         self.LoadedStatus()
         
     def LoadedStatus(self):
-        #len([name for name in os.listdir('.') if os.path.isfile(name)])
-
         for widget in self.subframe.winfo_children():
             widget.destroy()
 
         self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta preuzet.")
         self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
     
-    def ScrapeSchedule(self):
+    def ScrapSchedule_thread(self):
         startdate:str = self.entry_1.get()
         enddate:str = self.entry_2.get()
         if not self.ValidateDate(startdate):
@@ -374,15 +376,29 @@ class ScraperFrame(ctk.CTkFrame):
             logger.warning("Start date is later than end date.")
             return
 
-        
         logger.info(f"Start date: {startdate}")
         logger.info(f"End date: {enddate}")
-        global cours_participants
-        # for stutdent in cours_participants.values():
-        #     print(stutdent)
-        schedule_scraper(cours_participants,True,startdate,enddate)
 
+        self.SetProgressBar()
+        self.scrapper_progressbar.start()
+
+        scrapper_thread = Thread(target=self.ScrapeSchedule, args=(startdate,enddate))
+        scrapper_thread.start()
+
+    def ScrapeSchedule(self, startdate:str, enddate:str):
+        global cours_participants
+        logger.info("Started thread for scraping schedule.")
+        schedule_scraper(cours_participants,True,startdate,enddate)
         self.LoadedStatus()
+        logger.info("Ending thread for scraping schedule.")
+
+
+    def SetProgressBar(self):
+        global scrapper_progressbar
+        for widget in self.subframe.winfo_children():
+            widget.destroy()
+        self.scrapper_progressbar = ctk.CTkProgressBar(self.subframe, orientation="horizontal", mode="determinate", determinate_speed=2)
+        self.scrapper_progressbar.grid(row=0, column=0, padx=5, pady=10, sticky="we")
 
     def ValidateDate(self, date:str)->bool:
         if not len(date.split("."))==3:
@@ -409,18 +425,89 @@ class FillGroupsFrame(ctk.CTkFrame):
         self.label_1 = ctk.CTkLabel(self, text="Ispuna grupa", font=("Helvetica", 23))
         self.label_1.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="w")
 
-        self.button_1 = ctk.CTkButton(self,width=60 , text="Pokreni", command=self.StartMainTask)
+        self.button_1 = ctk.CTkButton(self,width=60 , text="Pokreni", command=self.StartMainTask_thread)
         self.button_1.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="")
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=2, column=0, padx=10, pady=10,sticky="wens")
-        self.label_2 = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
+        self.label_2 = ctk.CTkLabel(self.subframe, text="Postavite sve ulazne podatke za pokrenuti.")
         self.label_2.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
 
-    def StartMainTask():
+    def LoadedStatus(self,success:bool):
+        for widget in self.subframe.winfo_children():
+            widget.destroy()
+        if success:
+            self.label_2 = ctk.CTkLabel(self.subframe, text="Grupe popunjene.")
+        else:
+            self.label_2 = ctk.CTkLabel(self.subframe, text="Pogreska pri punjenju grupa.")
+        self.label_2.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+
+    def StartMainTask_thread(self):
+        global cours_participants, groups, cours_participants_copy
+        self.SetProgressBar()
+        self.main_task_progressbar.start()
+
+        weight_generator(cours_participants,groups,100)
+
+        scrapper_thread = Thread(target=self.FillGroups_thread, args=())
+        scrapper_thread.start()
+    
+    def FillGroups_thread(self):
+        global cours_participants, cours_participants_copy, groups
+        running: bool = True
+        counter: int = 0
+        try:
+            while running and counter<=100:
+                logger.info(f"Now running attempt {counter}.")
+                cours_participants_copy = cours_participants.copy()
+                success = fill_groups(cours_participants_copy,groups,1)
+                if success:
+                    running = False
+                    logger.info("Successfully filled out all groups with no students remaining!")
+                    for day in groups:
+                        for group in groups[day]:
+                            logger.info(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+                            logger.info("------------------------------------------------------------------")
+                    self.CreateExcelWorkbook()
+                else:
+                    counter += 1
+        except Exception:
+            logger.error("Error filling groups!")
+            raise
+        self.LoadedStatus(success)
+
+    def SetProgressBar(self):
+        global main_task_progressbar
+        for widget in self.subframe.winfo_children():
+            widget.destroy()
+        self.main_task_progressbar = ctk.CTkProgressBar(self.subframe, orientation="horizontal", mode="determinate", determinate_speed=2)
+        self.main_task_progressbar.grid(row=0, column=0, padx=5, pady=10, sticky="we")
+    
+    def CreateExcelWorkbook(self):
         global cours_participants
-        global groups
-        pass
+        workbook = xlsxwriter.Workbook("Filled_Groups.xlsx")
+        worksheet = workbook.add_worksheet()
+        worksheet.write("A1", "Prezime")
+        worksheet.write("B1", "Ime")
+        worksheet.write("C1", "Email")
+        worksheet.write("D1", "ID broj")
+        worksheet.write("E1", "Korisničko ime")
+        worksheet.write("F1", "Grupa")
+
+        row: int = 2
+        for student in cours_participants.values():
+            worksheet.write(f"A{row}", f"{student.surname}")
+            worksheet.write(f"B{row}", f"{student.name}")
+            worksheet.write(f"C{row}", f"{student.email}")
+            worksheet.write(f"D{row}", f"{student.jmbag}")
+            worksheet.write(f"E{row}", f"{student.username}")
+            if hasattr(student, "group"):
+                worksheet.write(f"F{row}", f"{student.group}")
+            else:
+                worksheet.write(f"F{row}", "Jos nisu svrstani")
+            row += 1
+        
+        workbook.close()
         
 class App(ctk.CTk):
     def __init__(self):
@@ -451,4 +538,5 @@ def main():
 if __name__ == "__main__":
     cours_participants: dict[str, Student] = {}
     groups: dict[str, list:Group] = {}
+    cours_participants_copy: dict[str, Student] = {}
     main()
