@@ -3,7 +3,7 @@ from labgenpackage.classes import Student
 from labgenpackage.classes import Group
 import logging
 
-def weight_generator(cours_participants: dict[str, Student], groups: dict[str, list:Group],alf_prio_lvl: int)->list[Student]:
+def weight_generator(cours_participants: dict[str, Student], groups: dict[str, list[Group]],alf_prio_lvl: int)->list[Student]:
     
     logger = logging.getLogger("my_app.weight_generator")
     logger.setLevel("INFO")

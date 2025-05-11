@@ -3,14 +3,14 @@ from labgenpackage.classes import Group
 import random
 import logging
 
-def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:Group], mode: int) -> bool:
+def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list[Group]], mode: int) -> tuple[bool,list[Student]]:
 
     logger = logging.getLogger("my_app.fill_groups")
     logger.setLevel("INFO")
 
     logger.info("Starting with filling out groups.")
 
-    ret_value: bool = False
+    ret_value: tuple[bool,list[Student]]
 
     if mode == 0:
         ret_value = size_sort(cours_participants,groups,logger)
@@ -24,7 +24,7 @@ def fill_groups(cours_participants: dict[str, Student], groups: dict[str, list:G
     return ret_value
 
 #----------------------------------------------------------------
-def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger) -> bool:
+def size_sort(cours_participants: dict[str, Student], groups: dict[str, list[Group]], logger: logging.Logger) -> bool:
     zero_weight_users: list[Student] = []
     
     while cours_participants:
@@ -94,7 +94,7 @@ def size_sort(cours_participants: dict[str, Student], groups: dict[str, list:Gro
         return True
 
 #----------------------------------------------------------------
-def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger) -> bool:
+def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list[Group]], logger: logging.Logger) -> tuple[bool,list]:
     zero_weight_users: list[Student] = []
 
     while cours_participants:
@@ -115,6 +115,7 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
                 lowestweightusers.append(username)
 
         logger.debug(f"{len(lowestweightusers)} students with lowest weight: {*lowestweightusers,}")
+        logger.debug(f"lowest={lowest}")
         if lowest == 0:
             logger.critical(f"Lowest weight is '0'. Students {*lowestweightusers,} can not be added to any group!")
             for user in lowestweightusers:
@@ -125,14 +126,23 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
 
         #Get one random user with from lowestweightusers
         username = random.choice(lowestweightusers)
-        logger.info(f"User: {username} variable_weight: {cours_participants[username].variable_weight} chosen at random.")
-        logger.info(f"Student can join groups: {*cours_participants[username].groups,}")
+        logger.debug(f"User: {username} variable_weight: {cours_participants[username].variable_weight} chosen at random.")
+        logger.debug(f"Student can join groups: {*cours_participants[username].groups,}")
 
         #Get the first group that hase room the selected user can join
+        found_group: bool = False
         for group in cours_participants[username].groups:
             logger.debug(f"Testing group {group} with size {group.group_size}")
             if group.group_size > 0:
+                found_group = True
                 break
+        #Check if even last group has size 0
+        if not found_group:
+            logger.critical(f"Selected lowest weight user {cours_participants[username]} can not be added to any group!")
+            zero_weight_users.append(cours_participants[username])
+            logger.warning(f"Removing {cours_participants[username]} from cours_participants.")
+            cours_participants.pop(username)
+            continue
         
         logger.debug(f"Selected group is: {group}.")
 
@@ -152,13 +162,13 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
 
     for day in groups:
         for group in groups[day]:
-            logger.debug(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
-            logger.debug("------------------------------------------------------------------")
+            logger.info(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+            logger.info("------------------------------------------------------------------")
     
     if zero_weight_users:
         logger.critical(f"No free group left for students: {*zero_weight_users,}")
-        return False
-    else: return True
+        return (False,zero_weight_users)
+    else: return (True,[])
 
 #----------------------------------------------------------------
 def alf_sort(cours_participants: dict[str, Student], groups: dict[str, list:Group], logger: logging.Logger):
