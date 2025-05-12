@@ -35,15 +35,24 @@ logging_config = {
             "class": "logging.StreamHandler",
             #"formatter": "simple",
             "stream": "ext://sys.stdout"
+        },
+        "debug_rotating_file_handler": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "mode": "a",
+            'filename': "debug.log",
+            "maxBytes": 10000,
+            "backupCount": 3
         }
     },
     "loggers": {
-        "root": {"level": "INFO", "handlers": ["stdout"]}
+        "root": {"level": "INFO", "handlers": ["stdout", "debug_rotating_file_handler"]}
     }
 }
 logging.config.dictConfig(config=logging_config)
 ch = logging.getHandlerByName("stdout")
+ch1 = logging.getHandlerByName("debug_rotating_file_handler")
 ch.setFormatter(CustomFormatter())
+ch1.setFormatter(CustomFormatter())
 logger = logging.getLogger("my_app")
 
 
