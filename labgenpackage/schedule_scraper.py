@@ -6,7 +6,7 @@ import logging
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool, startdate:str="", enddate:str=""):
 
     logger = logging.getLogger("my_app.schedule_scraper")
-    logger.setLevel("DEBUG")
+    logger.setLevel("INFO")
 
     if scraper_state:
         #date = datetime.datetime.now()
@@ -20,26 +20,18 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
 
         dates_file.write(f"{startdate}\n")
         dates_file.write(f"{enddate}\n")
-
-        # Put here the start and end date of the period you want to check in the format DD-MM-YYYY
-        # if date.month<10 and date.month>=2:
-        #     logger.info("In summer semester!")
-        #     dates_file.write(f"05-05-{date.year}\n")
-        #     dates_file.write(f"09-05-{date.year}\n")
-        #     #dates_file.write(f"01-03-{date.year}\n")
-        #     #dates_file.write(f"24-04-{date.year}")
-        # else:
-        #     logger.info("In winter semester!")
-        #     dates_file.write(f"01-10-{date.year}\n")
-        #     dates_file.write(f"15-12-{date.year}")
         dates_file.close()
 
         logger.info("Creating usernames.txt file for Raspored_scraping.")
         usernames_file = open("data/usernames.txt", "w")
         student: Student
-        for student in cours_participants.values():
-            usernames_file.write(f"{student.username}\n")
-        usernames_file.close()
+        if cours_participants:
+            for student in cours_participants.values():
+                usernames_file.write(f"{student.username}\n")
+            usernames_file.close()
+        else:
+            logger.error("Coursparticipants not loaded.")
+            raise FileNotFoundError
 
         logger.info("Deleting old data from data/timetables!")
         folder =  Path("data/timetables")
@@ -65,8 +57,8 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     if(len(fpaths) > 1):
         logger.info(f"Found {len(fpaths)} .csv files.")
     elif(len(fpaths) == 0):
-        raise logger.error("No .csv files found!")
-        
+        logger.error("No .csv files found!")
+ 
     
     Errors: list = []
     csvError:list = []

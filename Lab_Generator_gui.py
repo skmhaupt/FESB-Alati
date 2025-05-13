@@ -39,9 +39,10 @@ logging_config = {
         "debug_rotating_file_handler": {
             "class": "logging.handlers.RotatingFileHandler",
             "mode": "a",
-            'filename': "debug.log",
-            "maxBytes": 10000,
-            "backupCount": 3
+            "filename": "debug.log",
+            "maxBytes": 150000,
+            "backupCount": 3,
+            "encoding":"utf-8"
         }
     },
     "loggers": {
@@ -80,23 +81,30 @@ class GroupsFrame(ctk.CTkFrame):
 
         self.label_loaded_schedule = ctk.CTkLabel(self, text="Nije ucitan raspored grupa.")    
         self.label_loaded_schedule.grid(row=4, column=0,columnspan=3, padx=(10,0), pady=(10, 0), sticky="")
-        self.label_num_of_groups = ctk.CTkLabel(self, text="Broj grupa nepoznat")
+        self.label_num_of_groups = ctk.CTkLabel(self, text="Broj grupa: N/A")
         self.label_num_of_groups.grid(row=5, column=0, padx=(10,0), pady=0, sticky="")
-        self.label_num_of_places = ctk.CTkLabel(self, text="Broj dostupnih mjesta nije poznat.")
+        self.label_num_of_places = ctk.CTkLabel(self, text="Broj dostupnih mjesta: N/A.")
         self.label_num_of_places.grid(row=5, column=1, columnspan=2, padx=(0,20), pady=0, sticky="")
 
         self.subframe = ctk.CTkScrollableFrame(self)
         self.subframe.grid(row=6, column=0, columnspan=3, padx=10, pady=(0,10),sticky="wens")
         self.label_3 = ctk.CTkLabel(self.subframe, text="Grupe nisu ucitane.")
         self.label_3.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="we")
-
-        self.LoadGroups()
+        try:
+            self.LoadGroups()
+        except FileNotFoundError:
+            return
+        except Exception:
+            logger.error("Error when loading groups on startup!")
+            raise
     
     def LoadGroups(self)->str:
         global total_places
         total_places = 0
         try:
             groups, filename = pars_schedule_file()
+        except FileNotFoundError:
+            return
         except Exception:
             logger.error("Failed parcing participants!")
             raise
@@ -188,8 +196,20 @@ class RightFrame(ctk.CTkFrame):
         #self.grid_rowconfigure(3, weight=1)
 
         #Expected data is dict {"cours", "cours_number", "startdate", "enddate"}
-        with open("data/data.json", "r") as file:
-            data:dict[str:str] = json.load(file)
+        try:
+            with open("data/data.json", "r") as file:
+                data:dict[str:str] = json.load(file)
+        except FileNotFoundError:
+            logger.warning("The file 'data/data.json' was not found.")
+            data = {"cours":"", "cours_number":"", "startdate":"","enddate":""}
+            pass
+        except IOError:
+            logger.critical("Error opening data.json file!")
+            raise
+        except Exception:
+            logger.critical("Unexpected error with data.jsonfile !")
+            raise
+            
 
         self.cours_frame = CoursFrame(self,data["cours"], data["cours_number"])
         self.cours_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
@@ -261,6 +281,10 @@ class ParticipantsFrame(ctk.CTkFrame):
         global cours_participants_global
         try:
             cours_participants_global, fpath = pars_cours_participants()
+        except FileNotFoundError:
+            logger.warning("File not founde. Returning from LoadParticipants()!")
+            cours_participants_global = None
+            return
         except Exception:
             logger.error("Failed parcing participants!")
             raise
@@ -355,19 +379,23 @@ class ScraperFrame(ctk.CTkFrame):
 
         global cours_participants_global
         try:
-            schedule_scraper(cours_participants_global,False)
+            if cours_participants_global:
+                schedule_scraper(cours_participants_global,False)
         except FileNotFoundError:
             logger.warning("Pleas load a new cours participants .csv file or scrape for a new student schedule data.")
             return
         
-        self.LoadedStatus()
+        self.LoadedStatus(error="")
         
-    def LoadedStatus(self):
+    def LoadedStatus(self, error:str):
         for widget in self.subframe.winfo_children():
             widget.destroy()
-
-        self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta preuzet.")
-        self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+        if error=="":
+            self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta preuzet.")
+            self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+        if error=="FileNotFoundError":
+            self.label = ctk.CTkLabel(self.subframe, text="Pogreska! Nije zadana .csv datoteka sa studentima.")
+            self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
     
     def ScrapSchedule_thread(self):
         startdate:str = self.entry_1.get()
@@ -403,12 +431,15 @@ class ScraperFrame(ctk.CTkFrame):
         else: 
             logger.warning("Start date is later than end date.")
             return
-
-        with open("data/data.json", "r") as file:
-            data:dict[str:str] = json.load(file)
-
-        data["startdate"] = jsonstartdate
-        data["enddate"] = jsonenddate
+        try:
+            with open("data/data.json", "r") as file:
+                data:dict[str:str] = json.load(file)
+                data["startdate"] = jsonstartdate
+                data["enddate"] = jsonenddate
+        except FileNotFoundError:
+            data = {"cours":"","cours_number":"","startdate":jsonstartdate, "enddate":jsonenddate}
+            pass
+        
         json_object = json.dumps(data, indent=4)
         logger.info(f"Saving scraper dates: {jsonstartdate} - {jsonenddate}")
         with open("data/data.json", "w") as file:
@@ -426,8 +457,13 @@ class ScraperFrame(ctk.CTkFrame):
     def ScrapeSchedule(self, startdate:str, enddate:str):
         global cours_participants_global
         logger.info("Started thread for scraping schedule.")
-        schedule_scraper(cours_participants_global,True,startdate,enddate)
-        self.LoadedStatus()
+        try:
+            schedule_scraper(cours_participants_global,True,startdate,enddate)
+            self.LoadedStatus(error="")
+        except FileNotFoundError:
+            logger.warning("Stoped schedule scraper.")
+            self.LoadedStatus(error="FileNotFoundError")
+            
         logger.info("Ending thread for scraping schedule.")
 
 

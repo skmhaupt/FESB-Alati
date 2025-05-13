@@ -6,6 +6,7 @@ from os import path
 def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
 
     logger = logging.getLogger("my_app.schedule_parsere")
+    logger.setLevel("INFO")
 
     groups: dict[str, list:Group] = {}
     try:
@@ -15,7 +16,6 @@ def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
             logger.critical(f"Found {len(fpaths)} .txt files, there can only be one!")
             raise FileNotFoundError
         elif(len(fpaths) == 0):
-            logger.error("No .txt file found!")
             raise FileNotFoundError
         fpath = fpaths[0]
         file_name = path.basename(fpath)
@@ -37,9 +37,11 @@ def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
         return (groups,file_name)
 
     except FileNotFoundError:
-        raise logger.exception("The file 'data/schedule.txt' was not found.")
+        logger.warning("The file 'data/schedule.txt' was not found.")
+        raise
     except IOError:
-        raise logger.exception("Error opening schedule file!")
+        logger.critical("Error opening schedule file!")
+        raise
     except Exception:
-        logger.critical("Unexpected error in schedule parser!", exc_info=True)
+        logger.critical("Unexpected error in schedule parser!")
         raise
