@@ -187,6 +187,10 @@ class GroupsFrame(ctk.CTkFrame):
             logger.info(f"{self.entry_1.get()}")
         else:
             logger.warning("Input file hase to be a .txt file.")
+            for widget in self.subframe.winfo_children():
+                widget.destroy()  # deleting widget
+            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Odabrana pogresna datoteka.")
+            self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             return
         
         #get path to old existing .txt file
@@ -902,6 +906,8 @@ class FillGroupsFrame(ctk.CTkFrame):
 class App(ctk.CTk):
     def __init__(self):
         super().__init__()
+
+        Path("data").mkdir(exist_ok=True)
 
         self.title("Lab generator")
         #self.geometry("1070x700")
