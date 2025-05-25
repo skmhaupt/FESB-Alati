@@ -188,6 +188,7 @@ Raspored_scraping/.gradle
 **/build/
 **/data/timetables
 **/data/freeTimes
+**/data/usernames.txt
 !Raspored_scraping/gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

@@ -9,6 +9,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     logger.setLevel("INFO")
 
     if scraper_state:
+        print("test")
         #date = datetime.datetime.now()
         #summer_semester_start_date = datetime.datetime(date.year, 2, 24)
         #winter_semester_start_date = datetime.datetime(date.year, 10, 1)
@@ -31,6 +32,8 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
             usernames_file.close()
         else:
             logger.error("Coursparticipants not loaded.")
+            os.chdir('..')
+            logger.info(f"Now in {os.getcwd()} directory!\n")
             raise FileNotFoundError
 
         logger.info("Deleting old data from data/timetables!")
@@ -40,6 +43,8 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
                 item.unlink()
             except Exception:
                 logger.critical(f"Failed to delete {item}")
+                os.chdir('..')
+                logger.info(f"Now in {os.getcwd()} directory!\n")
                 raise
 
         logger.info("Launching schedule scraper!")
@@ -57,7 +62,9 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     if(len(fpaths) > 1):
         logger.info(f"Found {len(fpaths)} .csv files.")
     elif(len(fpaths) == 0):
-        logger.error("No .csv files found!")
+        logger.error("No .csv files found in Raspored_scraping/data/timetables/!")
+        raise FileNotFoundError
+    
  
     
     Errors: list = []
@@ -125,4 +132,4 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
         logger.error(f"Errors with users: {Errors}")
     if csvError:
         logger.error(f"Users and .csv files in 'data/timetables/' are out of sync. Found following .csv files that dont have a user: {csvError}")
-        raise FileNotFoundError
+        raise ValueError

@@ -83,7 +83,7 @@ class GroupsFrame(ctk.CTkFrame):
         self.label_loaded_schedule.grid(row=4, column=0,columnspan=3, padx=(10,0), pady=(10, 0), sticky="")
         self.label_num_of_groups = ctk.CTkLabel(self, text="Broj grupa: N/A")
         self.label_num_of_groups.grid(row=5, column=0, padx=(10,0), pady=0, sticky="")
-        self.label_num_of_places = ctk.CTkLabel(self, text="Broj dostupnih mjesta: N/A.")
+        self.label_num_of_places = ctk.CTkLabel(self, text="Broj dostupnih mjesta: N/A")
         self.label_num_of_places.grid(row=5, column=1, columnspan=2, padx=(0,20), pady=0, sticky="")
 
         self.subframe = ctk.CTkScrollableFrame(self)
@@ -99,12 +99,19 @@ class GroupsFrame(ctk.CTkFrame):
             raise
     
     def LoadGroups(self)->str:
-        global total_places
+        global total_places, loaded_data
         total_places = 0
+
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        loaded_data[0] = False
+
         try:
             groups, filename = pars_schedule_file()
-        except FileNotFoundError:
+        except ValueError:
+            self.NoGroupsInUploadedFile()
             return
+        except FileNotFoundError:
+            raise
         except Exception:
             logger.error("Failed parcing participants!")
             raise
@@ -125,6 +132,31 @@ class GroupsFrame(ctk.CTkFrame):
         self.label_loaded_schedule.configure(text=f"Ucitani raspored: {filename}")
         self.label_num_of_groups.configure(text=f"Broj grupa: {row-2}")
         self.label_num_of_places.configure(text=f"Broj dostupnih mjesat: {total_places}")
+        loaded_data[0] = True
+
+    
+    def NoGroupsInUploadedFile(self):
+        self.label_loaded_schedule.configure(text=f"Nije ucitan raspored grupa.")
+        self.label_num_of_groups.configure(text=f"Broj grupa: N/A")
+        self.label_num_of_places.configure(text=f"Broj dostupnih mjesta: N/A")
+
+        for widget in self.subframe.winfo_children():
+            widget.destroy()  # deleting widget
+
+        self.warning_label = ctk.CTkLabel(self.subframe, text=f"Ispravni format zapisa grupa u datoteci:")
+        self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label2 = ctk.CTkLabel(self.subframe, text=f"grupa, dan, od - do, dvorana, broj studenta")
+        self.warning_label2.grid(row=3, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label3 = ctk.CTkLabel(self.subframe, text=f"G1, PON, 09:30 - 11:00, B419, 12")
+        self.warning_label3.grid(row=4, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label4 = ctk.CTkLabel(self.subframe, text=f"G2, UTO, 09:30 - 11:00, B419, 12")
+        self.warning_label4.grid(row=5, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label5 = ctk.CTkLabel(self.subframe, text=f"GC, SRI, 09:30 - 11:00, B419, 12")
+        self.warning_label5.grid(row=6, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label6 = ctk.CTkLabel(self.subframe, text=f"GD, ČET, 09:30 - 11:00, B419, 12")
+        self.warning_label6.grid(row=7, column=0, padx=5, pady=(5, 0), sticky="w")
+        self.warning_label7 = ctk.CTkLabel(self.subframe, text=f"Grupa5, PET, 09:30 - 11:00, B419, 12")
+        self.warning_label7.grid(row=8, column=0, padx=5, pady=(5, 0), sticky="w")
 
     def AddGrouplabel(self, row:int, group:Group):
         self.group_label1 = ctk.CTkLabel(self.subframe, text=f"{group.group_label}")
@@ -162,6 +194,11 @@ class GroupsFrame(ctk.CTkFrame):
         fpaths: list = glob.glob("data/*.txt")
         if(len(fpaths) > 1):
             logger.critical(f"Found {len(fpaths)} .txt files, there has to be only one!")
+            logger.critical(f"Erasing all \'.txt\' files!")
+            for pathstr in fpaths:
+                logger.critical(f"Erasing {pathstr}")
+                delpath = Path(pathstr)
+                delpath.unlink()
             raise Exception
         elif(len(fpaths) == 0):
             logger.warning("No .txt file found!")
@@ -247,6 +284,8 @@ class ParticipantsFrame(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master)
 
+        self.controller = master
+
         self.grid_columnconfigure(1, weight=1)
 
         self.label_1 = ctk.CTkLabel(self, text="Sudionici", font=("Helvetica", 23))
@@ -262,6 +301,8 @@ class ParticipantsFrame(ctk.CTkFrame):
 
         self.button_2 = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)
         self.button_2.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 0), sticky="")
+        self.label_error = ctk.CTkLabel(self, text="")
+        self.label_error.grid(row=2, column=1, columnspan=2, padx=10, pady=(10, 0), sticky="w")
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=3, column=0, columnspan=3, padx=10, pady=10,sticky="")
@@ -274,25 +315,40 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.label_6 = ctk.CTkLabel(self.subframe, text="Trenutno nije ucitana .csv datoteka!")
         self.label_6.grid(row=1, column=1, padx=(10, 10), pady=(0, 10), sticky="w")
 
+        self.first_load = True
         self.LoadParticipants()
+        self.first_load = False
         
 
-    def LoadParticipants(self)->str:
-        global cours_participants_global
+    def LoadParticipants(self):
+        global cours_participants_global, loaded_data
+
+        cours_participants_global = None
+
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        loaded_data[2] = False
+
         try:
             cours_participants_global, fpath = pars_cours_participants()
+            logger.info(f"Found {len(cours_participants_global)} students!")
+            self.label_error.configure(text="")
         except FileNotFoundError:
             logger.warning("File not founde. Returning from LoadParticipants()!")
             cours_participants_global = None
             return
+        except ValueError as error:
+            fpath = error.args[0]
+            if not self.first_load:
+                self.label_error.configure(text="Neispravna datoteka.", text_color="red")
         except Exception:
-            logger.error("Failed parcing participants!")
+            logger.critical("Failed parcing participants!")
+            self.label_error.configure(text="Nastupila pogreska!")
             raise
 
-        logger.info(f"Found {len(cours_participants_global)} students!")
         if(cours_participants_global):
             self.label_4.configure(text=f"{path.basename(fpath)}")
             self.label_6.configure(text=f"{len(cours_participants_global)}")
+            loaded_data[2] = True
 
     def BrowseAction(self):
         filename = filedialog.askopenfilename()
@@ -341,10 +397,13 @@ class ParticipantsFrame(ctk.CTkFrame):
             raise
 
         self.LoadParticipants()
+        self.controller.scraper_frame.Update_label()
     
 class ScraperFrame(ctk.CTkFrame):
     def __init__(self, master, startdate:str, enddate:str):
         super().__init__(master)
+
+        self.controller = master
 
         self.label_1 = ctk.CTkLabel(self, text="Raspored studenta", font=("Helvetica", 23))
         self.label_1.grid(row=0, column=0, columnspan=3, padx=10, pady=(15, 0), sticky="w")
@@ -369,33 +428,37 @@ class ScraperFrame(ctk.CTkFrame):
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=2, column=1, columnspan=4, padx=(5,5), pady=10,sticky="wens")
-        self.label_3 = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
-        self.label_3.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+        self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
+        self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
 
         if not startdate=="":
             self.entry_1.insert(0,startdate)
         if not enddate=="":
             self.entry_2.insert(0,enddate)        
 
-        global cours_participants_global
+        self.Update_label()
+
+    def Update_label(self):
+        global cours_participants_global, loaded_data
+
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        loaded_data[3] = False
+
         try:
             if cours_participants_global:
                 schedule_scraper(cours_participants_global,False)
+                self.LoadedStatus(error="")
+                loaded_data[3] = True
         except FileNotFoundError:
-            logger.warning("Pleas load a new cours participants .csv file or scrape for a new student schedule data.")
-            return
-        
-        self.LoadedStatus(error="")
+            logger.warning("Pleas scrape for new student schedule data.")
+        except ValueError:
+            self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.")
         
     def LoadedStatus(self, error:str):
-        for widget in self.subframe.winfo_children():
-            widget.destroy()
         if error=="":
-            self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta preuzet.")
-            self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+            self.label.configure(text="Raspored studenta preuzet.")
         if error=="FileNotFoundError":
-            self.label = ctk.CTkLabel(self.subframe, text="Pogreska! Nije zadana .csv datoteka sa studentima.")
-            self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+            self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.")
     
     def ScrapSchedule_thread(self):
         startdate:str = self.entry_1.get()
@@ -459,18 +522,21 @@ class ScraperFrame(ctk.CTkFrame):
         logger.info("Started thread for scraping schedule.")
         try:
             schedule_scraper(cours_participants_global,True,startdate,enddate)
+            self.scrapper_progressbar.stop()
+            self.scrapper_progressbar.grid_remove()
+            self.label.grid()
             self.LoadedStatus(error="")
         except FileNotFoundError:
             logger.warning("Stoped schedule scraper.")
+            self.scrapper_progressbar.stop()
+            self.scrapper_progressbar.grid_remove()
+            self.label.grid()
             self.LoadedStatus(error="FileNotFoundError")
-            
+        
         logger.info("Ending thread for scraping schedule.")
 
-
     def SetProgressBar(self):
-        global scrapper_progressbar
-        for widget in self.subframe.winfo_children():
-            widget.destroy()
+        self.label.grid_remove()
         self.scrapper_progressbar = ctk.CTkProgressBar(self.subframe, orientation="horizontal", mode="determinate", determinate_speed=2)
         self.scrapper_progressbar.grid(row=0, column=0, padx=5, pady=10, sticky="we")
 
@@ -567,9 +633,42 @@ class FillGroupsFrame(ctk.CTkFrame):
         #self.subframe.grid_columnconfigure(1, weight=1)
         self.subframe.grid_rowconfigure(0, weight=1)
 
+    def MissingData(self):
+        global loaded_data
+        #Clear subframe
+        for widget in self.subframe.winfo_children():
+            widget.destroy()
+        
+        self.warning_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani potrebni podatci za pokretanje!")
+        self.warning_label.grid(row=0,column=0, padx=10, pady=5, sticky="w")
+
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        row: int = 1
+        if not loaded_data[0]:
+            self.groups_not_loaded_label = ctk.CTkLabel(self.subframe, text="Grupe nisu ucitane!")
+            self.groups_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
+            row += 1
+        # if not loaded_data[1]:
+        #     self.cours_not_loaded_label = ctk.CTkLabel(self.subframe, text="Naziv predmeta nije zadan!")
+        #     self.cours_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
+        #     row += 1
+        if not loaded_data[2]:
+            self.participants_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani studenti!")
+            self.participants_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
+            row += 1
+        if not loaded_data[3]:
+            self.student_schedule_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani rasporedi studenta!")
+            self.student_schedule_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
+            row += 1
+
     def StartMainTask_thread(self):
-        global total_places, cours_participants_global, continue_answer
-        print(continue_answer)
+        global total_places, cours_participants_global, continue_answer, loaded_data
+
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        if not loaded_data[0] or not loaded_data[2] or not loaded_data[3]:
+            self.MissingData()
+            return
+
         cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
         cours_name = cours_name_entry.get()
 
@@ -811,6 +910,10 @@ class App(ctk.CTk):
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(1, weight=1)
         self.grid_rowconfigure(0, weight=1)
+
+        global loaded_data
+        #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
+        loaded_data = [False, False, False, False]
 
         self.schedule_frame = GroupsFrame(self)
         self.schedule_frame.grid(row=0, column=0, padx=(10, 5), pady=10, sticky="nswe")
