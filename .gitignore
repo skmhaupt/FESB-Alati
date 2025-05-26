@@ -8,7 +8,7 @@
 
 #local data
 data/
-Raspored_scraping/data
+#Raspored_scraping/data
 
 # Distribution / packaging
 .Python

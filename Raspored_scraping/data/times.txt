@@ -1,4 +1,0 @@
-# Put here the start and end time of the day you want to analyze in the format HH:mm
-
-08:00
-20:00
