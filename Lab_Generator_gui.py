@@ -465,6 +465,9 @@ class ScraperFrame(ctk.CTkFrame):
             self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.")
     
     def ScrapSchedule_thread(self):
+        #reset variable cours_participants_global
+        self.controller.participants_frame.LoadParticipants()
+
         startdate:str = self.entry_1.get()
         enddate:str = self.entry_2.get()
         if not self.ValidateDate(startdate):
@@ -530,6 +533,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.scrapper_progressbar.grid_remove()
             self.label.grid()
             self.LoadedStatus(error="")
+            loaded_data[3] = True
         except FileNotFoundError:
             logger.warning("Stoped schedule scraper.")
             self.scrapper_progressbar.stop()
@@ -810,49 +814,64 @@ class FillGroupsFrame(ctk.CTkFrame):
         #self.subframe.grid_columnconfigure(1, weight=0)
         self.subframe.grid_rowconfigure(0, weight=0)
 
+    def ResetDownloadButton_2(self):
+        self.button_2.configure(text="Preuzmi", text_color="white")
+    def ResetDownloadButton_3(self):
+        self.button_3.configure(text="Preuzmi", text_color="white")
+
     def CopyErrorWeightsToDownloads(self,weight_errors:list[Student],fill_errors:list[Student]):
-        workbook = xlsxwriter.Workbook("data/Error_detailes.xlsx")
-        worksheet = workbook.add_worksheet()
-        worksheet.write("A1", f"Broj studenta kojima ne odgovara niti jedna grupa: {len(weight_errors)}", workbook.add_format({"border":2, "bottom":1}))
-        worksheet.write("A2", f"Broj studenta koji nisu uspjesno svrstani u grupu: {len(fill_errors)}", workbook.add_format({"border":2, "top":1}))
-        worksheet.write("A4", "Studenti")
-        worksheet.write("B4", "Dostupne grupe")
-        worksheet.write("C4", "Nesvrstani studenti")
-        worksheet.write("D4", "Dostupne grupe")
-        worksheet.write("E4", "Studenti bez grupe")
+        try:
+            workbook = xlsxwriter.Workbook("data/Error_detailes.xlsx")
+            worksheet = workbook.add_worksheet()
+            worksheet.write("A1", f"Broj studenta kojima ne odgovara niti jedna grupa: {len(weight_errors)}", workbook.add_format({"border":2, "bottom":1}))
+            worksheet.write("A2", f"Broj studenta koji nisu uspjesno svrstani u grupu: {len(fill_errors)}", workbook.add_format({"border":2, "top":1}))
+            worksheet.write("A4", "Studenti")
+            worksheet.write("B4", "Dostupne grupe")
+            worksheet.write("C4", "Nesvrstani studenti")
+            worksheet.write("D4", "Dostupne grupe")
+            worksheet.write("E4", "Studenti bez grupe")
 
-        f1=workbook.add_format({"border":1, "left":5, "right":5})   #Thick left and right
-        f2=workbook.add_format({"border":1, "right":5})             #Thick right
-        f3=workbook.add_format({"border":1, "left":5})              #Thick left
+            f1=workbook.add_format({"border":1, "left":5, "right":5})   #Thick left and right
+            f2=workbook.add_format({"border":1, "right":5})             #Thick right
+            f3=workbook.add_format({"border":1, "left":5})              #Thick left
 
-        row: int = 5
-        for student in cours_participants_global.values():
-            worksheet.write(f"A{row}", f"{student}", f3)
-            if hasattr(student, "groups"):
-                worksheet.write(f"B{row}", f"{*student.groups,}", f2)
-            else:
-                worksheet.write(f"B{row}", "Bez grupe")
-            row += 1
-        
-        row: int = 5
-        for student in fill_errors:
-            worksheet.write(f"C{row}", f"{student}", f3)
-            if hasattr(student, "groups"):
-                worksheet.write(f"D{row}", f"{*student.groups,}", f2)
-            else:
-                worksheet.write(f"D{row}", "Bez grupe")
-            row += 1
-        
-        row: int = 5
-        for student in weight_errors:
-            worksheet.write(f"E{row}", f"{student}", f1)
-            row += 1
-        
-        workbook.close()
+            row: int = 5
+            for student in cours_participants_global.values():
+                worksheet.write(f"A{row}", f"{student}", f3)
+                if hasattr(student, "groups"):
+                    worksheet.write(f"B{row}", f"{*student.groups,}", f2)
+                else:
+                    worksheet.write(f"B{row}", "Bez grupe")
+                row += 1
+            
+            row: int = 5
+            for student in fill_errors:
+                worksheet.write(f"C{row}", f"{student}", f3)
+                if hasattr(student, "groups"):
+                    worksheet.write(f"D{row}", f"{*student.groups,}", f2)
+                else:
+                    worksheet.write(f"D{row}", "Bez grupe")
+                row += 1
+            
+            row: int = 5
+            for student in weight_errors:
+                worksheet.write(f"E{row}", f"{student}", f1)
+                row += 1
+            
+            workbook.close()
+        except Exception:
+            logger.critical("Error with creating Error_detailes.xlsx")
+            logger.exception()
 
-        dest_dir = Path.home() / "Downloads"
-        copy("data/Error_detailes.xlsx", dest_dir)
-        os.unlink("data/Error_detailes.xlsx")
+        try:
+            dest_dir = Path.home() / "Downloads"
+            copy("data/Error_detailes.xlsx", dest_dir)
+            os.unlink("data/Error_detailes.xlsx")
+        except Exception:
+            logger.exception("Error with downloading Error_detailes.xlsx")
+        
+        self.button_3.configure(text="Preuzeto", text_color="green")
+        self.button_3.after(1000, self.ResetDownloadButton_3)
 
     def CopyFilledGroupsToDownloads(self):
         try:
@@ -871,11 +890,11 @@ class FillGroupsFrame(ctk.CTkFrame):
             copy(srcfile, dest_dir)
             new_name = f"{dest_dir}/{cours_name}-{cours_number}-Popunjene_Grupe.xlsx"
             move(f"{dest_dir}/Filled_Groups.xlsx", new_name)
-            os.unlink("data/Filled_Groups.xlsx")
+            #os.unlink("data/Filled_Groups.xlsx")
         except Exception:
             logger.critical("Error when moving excel result file to downloads.")
-
-    
+        self.button_2.configure(text="Preuzeto", text_color="green")
+        self.button_2.after(1000, self.ResetDownloadButton_2)
     
     def CreateExcelWorkbook(self):
         global cours_participants_global

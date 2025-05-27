@@ -124,7 +124,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
             else:
                 csvError.append(user)
         except Exception:
-            logger.warningr("Error with parsing a csv file!")
+            logger.warning("Error with parsing a csv file!")
             Errors.append(user)
             logger.warning(f"Removing {user} from list. He will not be added to a group!")
             cours_participants.pop(user)

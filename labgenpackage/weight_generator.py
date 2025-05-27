@@ -27,7 +27,13 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                 total_places += group.group_size
                 for student in cours_participants.values():
                     canjoin: bool = True
-                    dayappointments: list[list[datetime]] = student.schedule[day]
+                    #dayappointments = []
+                    if student.schedule:
+                        dayappointments: list[list[datetime]] = student.schedule[day]
+                    else:
+                        logger.critical(f"student {student} has no scraped schedule.")
+                        canjoin = False
+
                     #check if dayappointments is empty
                     if dayappointments:
                         appointment: list[datetime]

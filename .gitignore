@@ -7,7 +7,7 @@
 *.so
 
 #local data
-data/
+/data/
 #Raspored_scraping/data
 
 # Distribution / packaging
