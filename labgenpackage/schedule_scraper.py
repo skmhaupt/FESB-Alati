@@ -3,7 +3,7 @@ from pathlib import Path
 from labgenpackage.classes import Student
 import logging
 
-def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool, startdate:str="", enddate:str=""):
+def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool, startdate:str="", enddate:str="") -> tuple[list[Student],list[Student]]:
 
     logger = logging.getLogger("my_app.schedule_scraper")
     logger.setLevel("INFO")
@@ -67,8 +67,11 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     
  
     
-    Errors: list = []
-    csvError:list = []
+    Errors: list[Student] = []
+    csvErrors:list[Student] = []
+    csvMissing:list[Student] = []
+    csvEmpty:list[Student] = []
+    csvUserNames:list[str]=[]
     days = {
         "ponedjeljak": "PON",
         "utorak": "UTO",
@@ -90,8 +93,12 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
                 "PET": []
             }
             user: str = fpath.split("\\",1)[1].split("_",1)[0]
+            csvUserNames.append(user)
             if(user in cours_participants):
                 #logger.debug(f"Found student: {cours_participants[user]}")
+                if os.path.getsize(fpath) == 0:
+                    cours_participants[user].schedule = schedule
+                    raise ValueError
                 with open(fpath, newline='', encoding="utf8") as csvfile:
                     reader = csv.reader(csvfile, delimiter=',')
                     #skip first line
@@ -122,14 +129,30 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
                     #print("----------------------------\n")
                     cours_participants[user].schedule = schedule
             else:
-                csvError.append(user)
+                csvErrors.append(cours_participants[user])
+        except ValueError:
+            logger.warning(f"csv file for student {user} is empty.")
+            csvEmpty.append(cours_participants[user])
         except Exception:
             logger.warning("Error with parsing a csv file!")
-            Errors.append(user)
-            logger.warning(f"Removing {user} from list. He will not be added to a group!")
-            cours_participants.pop(user)
+            Errors.append(cours_participants[user])
+            #logger.warning(f"Removing {user} from list. He will not be added to a group!")
+            #cours_participants.pop(user)
+    
+    for user in cours_participants:
+        if user not in csvUserNames:
+            logger.warning(f"csv file missing for student: {cours_participants[user]}")
+            csvMissing.append(cours_participants[user])
+
     if Errors:
-        logger.error(f"Errors with users: {Errors}")
-    if csvError:
-        logger.error(f"Users and .csv files in 'data/timetables/' are out of sync. Found following .csv files that dont have a user: {csvError}")
+        logger.error(f"Errors with users: {*Errors,}")
+        raise Exception(Errors)
+    if csvErrors:
+        logger.error(f"Users and .csv files in 'data/timetables/' are out of sync. Found following .csv files that dont have a user: {*csvErrors,}")
         raise ValueError
+    if csvMissing:
+        logger.warning(f"Students missing csv files: {*csvMissing,}")
+    if csvEmpty:
+        logger.warning(f"Students with empty csv files: {*csvEmpty,}")
+    
+    return (csvMissing, csvEmpty)

@@ -432,8 +432,9 @@ class ScraperFrame(ctk.CTkFrame):
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=2, column=1, columnspan=4, padx=(5,5), pady=10,sticky="wens")
+        self.subframe.grid_columnconfigure(0, weight=1)
         self.label = ctk.CTkLabel(self.subframe, text="Raspored studenta nije preuzet.")
-        self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="we")
+        self.label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky="")
 
         if not startdate=="":
             self.entry_1.insert(0,startdate)
@@ -450,13 +451,107 @@ class ScraperFrame(ctk.CTkFrame):
 
         try:
             if cours_participants_global:
-                schedule_scraper(cours_participants_global,False)
+                csvMissing, csvEmpty = schedule_scraper(cours_participants_global,False)
                 self.LoadedStatus(error="")
                 loaded_data[3] = True
         except FileNotFoundError:
             logger.warning("Pleas scrape for new student schedule data.")
         except ValueError:
             self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.")
+            return
+        except Exception as error:
+            Errors: list[Student] = error.args[0]
+            logger.error(f"Errors with users: {*Errors,}")
+
+        if csvMissing or csvEmpty:
+            self.label.configure(text="Potencijalne greske sa preuzetim rasporedima.")
+            self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
+            self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
+        else:
+            self.LoadedStatus(error="")
+    
+    def ErrorDetails(self, csvMissing:list[Student], csvEmpty:list[Student]):
+        try:
+            workbook = xlsxwriter.Workbook("data/Student_schedules_Error_detailes.xlsx")
+            worksheet = workbook.add_worksheet()
+
+            merge_format = workbook.add_format({"border":1, "bottom":5, "align": "center"})
+
+            worksheet.write("A2", "Ime i prezime")
+            worksheet.write("B2", "JMBAG")
+            worksheet.write("C2", "E-Mail")
+
+            worksheet.write("E2", "Ime i prezime")
+            worksheet.write("F2", "JMBAG")
+            worksheet.write("G2", "E-Mail")
+            
+            width1 = len("Ime i prezime")+1
+            width2 = len("JMBAG")+1
+            width3 = len("E-Mail")+1
+            row: int = 3
+            for student in csvMissing:
+                worksheet.write(f"A{row}", f"{student.fullname}")
+                if width1 < len(f"{student.fullname}"):
+                    width1 = len(f"{student.fullname}")+1
+
+                worksheet.write(f"B{row}", f"{student.jmbag}")
+                if width2 < len(f"{student.jmbag}"):
+                    width2 = len(f"{student.jmbag}")+1
+
+                worksheet.write(f"C{row}", f"{student.email}")
+                if width3 < len(f"{student.email}"):
+                    width3 = len(f"{student.email}")+1
+
+                row += 1
+
+            worksheet.set_column(0, 0, width1)
+            worksheet.set_column(1, 1, width2)
+            worksheet.set_column(2, 2, width3)
+            worksheet.merge_range("A1:C1", "Studenti kojima nije uspjesno preuzet raspored", merge_format)
+            
+            width1 = len("Ime i prezime")+1
+            width2 = len("JMBAG")+1
+            width3 = len("E-Mail")+1
+            row: int = 3
+            for student in csvEmpty:
+                #worksheet.write(f"C{row}", f"{student}")
+                worksheet.write(f"E{row}", f"{student.fullname}")
+                if width1 < len(f"{student.fullname}"):
+                    width1 = len(f"{student.fullname}")+1
+
+                worksheet.write(f"F{row}", f"{student.jmbag}")
+                if width2 < len(f"{student.jmbag}"):
+                    width2 = len(f"{student.jmbag}")+1
+
+                worksheet.write(f"G{row}", f"{student.email}")
+                if width3 < len(f"{student.email}"):
+                    width3 = len(f"{student.email}")+1
+
+                row += 1
+
+            worksheet.set_column(4, 4, width1)
+            worksheet.set_column(5, 5, width2)
+            worksheet.set_column(6, 6, width3)
+            worksheet.merge_range("E1:G1", "Studenti kojima je preuzet raspored prazan", merge_format)
+
+            workbook.close()
+
+        except Exception:
+            logger.critical("Error with creating Student_schedules_Error_detailes.xlsx")
+            logger.exception()
+        
+        try:
+            dest_dir = Path.home() / "Downloads"
+            copy("data/Student_schedules_Error_detailes.xlsx", dest_dir)
+            os.unlink("data/Student_schedules_Error_detailes.xlsx")
+        except Exception:
+            logger.exception("Error with downloading Student_schedules_Error_detailes.xlsx")
+        
+        self.details_button.configure(text="Preuzeto", text_color="green")
+        self.details_button.after(1000, self.ResetDetailsButton)
+    
+    def ResetDetailsButton(self):
+        self.details_button.configure(text="Preuzmi detalje", text_color="white")
         
     def LoadedStatus(self, error:str):
         if error=="":
