@@ -623,11 +623,10 @@ class ScraperFrame(ctk.CTkFrame):
         global cours_participants_global
         logger.info("Started thread for scraping schedule.")
         try:
-            schedule_scraper(cours_participants_global,True,startdate,enddate)
+            csvMissing, csvEmpty = schedule_scraper(cours_participants_global,True,startdate,enddate)
             self.scrapper_progressbar.stop()
             self.scrapper_progressbar.grid_remove()
             self.label.grid()
-            self.LoadedStatus(error="")
             loaded_data[3] = True
         except FileNotFoundError:
             logger.warning("Stoped schedule scraper.")
@@ -635,6 +634,15 @@ class ScraperFrame(ctk.CTkFrame):
             self.scrapper_progressbar.grid_remove()
             self.label.grid()
             self.LoadedStatus(error="FileNotFoundError")
+            logger.info("Ending thread for scraping schedule.")
+            return
+        
+        if csvMissing or csvEmpty:
+            self.label.configure(text="Potencijalne greske sa preuzetim rasporedima.")
+            self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
+            self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
+        else:
+            self.LoadedStatus(error="")
         
         logger.info("Ending thread for scraping schedule.")
 
