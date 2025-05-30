@@ -452,19 +452,20 @@ class ScraperFrame(ctk.CTkFrame):
         try:
             if cours_participants_global:
                 csvMissing, csvEmpty = schedule_scraper(cours_participants_global,False)
-                self.LoadedStatus(error="")
                 loaded_data[3] = True
+                #self.LoadedStatus(error="")
         except FileNotFoundError:
             logger.warning("Pleas scrape for new student schedule data.")
         except ValueError:
             self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.")
+            self.details_button.grid_remove()
             return
         except Exception as error:
             Errors: list[Student] = error.args[0]
             logger.error(f"Errors with users: {*Errors,}")
 
         if csvMissing or csvEmpty:
-            self.label.configure(text="Potencijalne greske sa preuzetim rasporedima.")
+            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")
             self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
             self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
         else:
@@ -556,8 +557,12 @@ class ScraperFrame(ctk.CTkFrame):
     def LoadedStatus(self, error:str):
         if error=="":
             self.label.configure(text="Raspored studenta preuzet.")
+            if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
         if error=="FileNotFoundError":
             self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.")
+            if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
     
     def ScrapSchedule_thread(self):
         #reset variable cours_participants_global
@@ -638,7 +643,7 @@ class ScraperFrame(ctk.CTkFrame):
             return
         
         if csvMissing or csvEmpty:
-            self.label.configure(text="Potencijalne greske sa preuzetim rasporedima.")
+            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")
             self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
             self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
         else:
@@ -648,6 +653,8 @@ class ScraperFrame(ctk.CTkFrame):
 
     def SetProgressBar(self):
         self.label.grid_remove()
+        if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
         self.scrapper_progressbar = ctk.CTkProgressBar(self.subframe, orientation="horizontal", mode="determinate", determinate_speed=2)
         self.scrapper_progressbar.grid(row=0, column=0, padx=5, pady=10, sticky="we")
 
