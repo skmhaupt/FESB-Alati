@@ -449,6 +449,9 @@ class ScraperFrame(ctk.CTkFrame):
         #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         loaded_data[3] = False
 
+        csvMissing = None
+        csvEmpty = None
+
         try:
             if cours_participants_global:
                 csvMissing, csvEmpty = schedule_scraper(cours_participants_global,False)
@@ -468,7 +471,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")
             self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
             self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
-        else:
+        elif cours_participants_global:
             self.LoadedStatus(error="")
     
     def ErrorDetails(self, csvMissing:list[Student], csvEmpty:list[Student]):
