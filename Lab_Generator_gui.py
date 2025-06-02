@@ -460,7 +460,7 @@ class ScraperFrame(ctk.CTkFrame):
         except FileNotFoundError:
             logger.warning("Pleas scrape for new student schedule data.")
         except ValueError:
-            self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.")
+            self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.", text_color="red")
             self.details_button.grid_remove()
             return
         except Exception as error:
@@ -468,7 +468,7 @@ class ScraperFrame(ctk.CTkFrame):
             logger.error(f"Errors with users: {*Errors,}")
 
         if csvMissing or csvEmpty:
-            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")
+            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}", text_color="white")
             self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
             self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
         elif cours_participants_global:
@@ -559,15 +559,15 @@ class ScraperFrame(ctk.CTkFrame):
         
     def LoadedStatus(self, error:str):
         if error=="":
-            self.label.configure(text="Raspored studenta preuzet.")
+            self.label.configure(text="Raspored studenta preuzet.", text_color="white")
             if hasattr(self, "details_button"):
                 self.details_button.grid_remove()
         if error=="FileNotFoundError":
-            self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.")
+            self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.", text_color="red")
             if hasattr(self, "details_button"):
                 self.details_button.grid_remove()
         if error=="Exception":
-            self.label.configure(text="Neocekivana pogreska!")
+            self.label.configure(text="Neocekivana pogreska!", text_color="red")
             if hasattr(self, "details_button"):
                 self.details_button.grid_remove()
     
@@ -659,7 +659,7 @@ class ScraperFrame(ctk.CTkFrame):
 
         
         if csvMissing or csvEmpty:
-            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")
+            self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}", text_color="white")
             self.details_button = ctk.CTkButton(self.subframe,width=60 , text="Preuzmi detalje", command=lambda:self.ErrorDetails(csvMissing, csvEmpty))
             self.details_button.grid(row=1, column=0, padx=10, pady=10, sticky="")
         else:
@@ -773,13 +773,13 @@ class FillGroupsFrame(ctk.CTkFrame):
         for widget in self.subframe.winfo_children():
             widget.destroy()
         
-        self.warning_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani potrebni podatci za pokretanje!")
+        self.warning_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani potrebni podatci za pokretanje!", text_color="red")
         self.warning_label.grid(row=0,column=0, padx=10, pady=5, sticky="w")
 
         #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         row: int = 1
         if not loaded_data[0]:
-            self.groups_not_loaded_label = ctk.CTkLabel(self.subframe, text="Grupe nisu ucitane!")
+            self.groups_not_loaded_label = ctk.CTkLabel(self.subframe, text="Grupe nisu ucitane!", text_color="red")
             self.groups_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
             row += 1
         # if not loaded_data[1]:
@@ -787,20 +787,22 @@ class FillGroupsFrame(ctk.CTkFrame):
         #     self.cours_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
         #     row += 1
         if not loaded_data[2]:
-            self.participants_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani studenti!")
+            self.participants_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani studenti!", text_color="red")
             self.participants_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
             row += 1
         if not loaded_data[3]:
-            self.student_schedule_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani rasporedi studenta!")
+            self.student_schedule_not_loaded_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani rasporedi studenta!", text_color="red")
             self.student_schedule_not_loaded_label.grid(row=row,column=0, padx=10, pady=0)
             row += 1
 
     def StartMainTask_thread(self):
+        self.button_1.grid_remove()
         global total_places, cours_participants_global, continue_answer, loaded_data
 
         #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         if not loaded_data[0] or not loaded_data[2] or not loaded_data[3]:
             self.MissingData()
+            self.button_1.grid()
             return
 
         cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
@@ -824,13 +826,14 @@ class FillGroupsFrame(ctk.CTkFrame):
         #Clear subframe and set progress bar
         if total_places < len(cours_participants_global) and not continue_answer:
             self.CheckIfUserWantsToContinue()
+            self.button_1.grid()
             return
         continue_answer = False
         for widget in self.subframe.winfo_children():
             widget.destroy()
-        self.button_1.grid_remove()
         self.main_task_progressbar.grid()
         self.main_task_progressbar.start()
+        #self.button_1.configure(state="disabled")
         
         scrapper_thread = Thread(target=self.FillGroups_thread)
         scrapper_thread.start()
@@ -903,8 +906,10 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.main_task_progressbar.stop()
             self.main_task_progressbar.grid_remove()
             self.button_1.grid()
+            #self.button_1.configure(state="normal")
         except Exception:
             logger.error("Error filling groups!")
+            self.button_1.grid()
             raise
     
     def LoadStatus(self,success:bool, weight_errors:list[Student], fill_errors:list[Student]):
@@ -913,15 +918,15 @@ class FillGroupsFrame(ctk.CTkFrame):
         if success:
             self.label_2 = ctk.CTkLabel(self.subframe, text="Grupe popunjene.",font=("Helvetica", 18))
         else:
-            self.label_2 = ctk.CTkLabel(self.subframe, text="Pogreska pri punjenju grupa.",font=("Helvetica", 18))
+            self.label_2 = ctk.CTkLabel(self.subframe, text="Pogreska pri punjenju grupa.",font=("Helvetica", 18), text_color="red")
         self.label_2.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
 
         if weight_errors or fill_errors:
             self.errorsubframe = ctk.CTkFrame(self.subframe)
             self.errorsubframe.grid(row=1, column=0, columnspan=2, padx=20, pady=10, sticky="w")
-            self.label_3 = ctk.CTkLabel(self.errorsubframe, text=f"Broj studenta kojima ne odgovara niti jedna grupa: {len(weight_errors)}")
+            self.label_3 = ctk.CTkLabel(self.errorsubframe, text=f"Broj studenta kojima ne odgovara niti jedna grupa: {len(weight_errors)}", text_color="red")
             self.label_3.grid(row=0, column=0, padx=5, pady=(0, 5), sticky="w")
-            self.label_4 = ctk.CTkLabel(self.errorsubframe, text=f"Broj studenta koji nisu uspjesno svrstani u grupu: {len(fill_errors)}")
+            self.label_4 = ctk.CTkLabel(self.errorsubframe, text=f"Broj studenta koji nisu uspjesno svrstani u grupu: {len(fill_errors)}", text_color="red")
             self.label_4.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="w")
             self.label_5 = ctk.CTkLabel(self.errorsubframe, text="Preuzmi datoteku sa detaljima:")
             self.label_5.grid(row=2, column=0, padx=5, pady=(0, 5), sticky="w")
