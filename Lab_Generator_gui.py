@@ -566,6 +566,10 @@ class ScraperFrame(ctk.CTkFrame):
             self.label.configure(text="Pogreska! Nije zadana .csv datoteka sa studentima.")
             if hasattr(self, "details_button"):
                 self.details_button.grid_remove()
+        if error=="Exception":
+            self.label.configure(text="Neocekivana pogreska!")
+            if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
     
     def ScrapSchedule_thread(self):
         #reset variable cours_participants_global
@@ -644,6 +648,15 @@ class ScraperFrame(ctk.CTkFrame):
             self.LoadedStatus(error="FileNotFoundError")
             logger.info("Ending thread for scraping schedule.")
             return
+        except Exception:
+            logger.exception("Stoped schedule scraper.")
+            self.scrapper_progressbar.stop()
+            self.scrapper_progressbar.grid_remove()
+            self.label.grid()
+            self.LoadedStatus(error="Exception")
+            logger.info("Ending thread for scraping schedule.")
+            return
+
         
         if csvMissing or csvEmpty:
             self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}")

@@ -9,46 +9,65 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     logger.setLevel("INFO")
 
     if scraper_state:
-        print("test")
-        #date = datetime.datetime.now()
-        #summer_semester_start_date = datetime.datetime(date.year, 2, 24)
-        #winter_semester_start_date = datetime.datetime(date.year, 10, 1)
-        os.chdir('Raspored_scraping')
-        logger.info(f"Now in {os.getcwd()} directory!")
-    
-        logger.info("Creating dates.txt file for Raspored_scraping.")
-        dates_file = open("data/dates.txt", "w")
+        try:
+            os.chdir('Raspored_scraping')
+            logger.info(f"Now in {os.getcwd()} directory!")
+        except Exception:
+            logger.critical("Failed to enter /Raspored_scraping directory.")
+            raise
 
-        dates_file.write(f"{startdate}\n")
-        dates_file.write(f"{enddate}\n")
-        dates_file.close()
+        logger.info("Creating/opening dates.txt file for Raspored_scraping.")
+        try:
+            dates_file = open("data/dates.txt", "w")
 
+            dates_file.write(f"{startdate}\n")
+            dates_file.write(f"{enddate}\n")
+            dates_file.close()
+        except Exception:
+            logger.critical("Failed with dates.txt.")
+            raise
+        
         logger.info("Creating usernames.txt file for Raspored_scraping.")
-        usernames_file = open("data/usernames.txt", "w")
-        student: Student
-        if cours_participants:
-            for student in cours_participants.values():
-                usernames_file.write(f"{student.username}\n")
-            usernames_file.close()
-        else:
-            logger.error("Coursparticipants not loaded.")
-            os.chdir('..')
-            logger.info(f"Now in {os.getcwd()} directory!\n")
-            raise FileNotFoundError
+        try:
+            usernames_file = open("data/usernames.txt", "w")
+            student: Student
+            if cours_participants:
+                for student in cours_participants.values():
+                    usernames_file.write(f"{student.username}\n")
+                usernames_file.close()
+        except Exception:
+            logger.critical("Failed with usernames.txt.")
+            raise
 
-        logger.info("Deleting old data from data/timetables!")
-        folder =  Path("data/timetables")
-        for item in folder.rglob("*"):
+        if not cours_participants:
+            logger.error("Coursparticipants not loaded.")
             try:
-                item.unlink()
-            except Exception:
-                logger.critical(f"Failed to delete {item}")
                 os.chdir('..')
                 logger.info(f"Now in {os.getcwd()} directory!\n")
+            except Exception:
+                logger.critical("Failed to exit /Raspored_scraping directory.")
                 raise
+            raise FileNotFoundError
+        
+        logger.info("Deleting old data from data/timetables!")
+        try:
+            folder =  Path("data/timetables")
+            for item in folder.rglob("*"):
+                item.unlink()
+        except Exception:
+            logger.critical(f"Failed to delete {item}")
+            os.chdir('..')
+            logger.info(f"Now in {os.getcwd()} directory!\n")
+            raise
 
         logger.info("Launching schedule scraper!")
-        subprocess.run(['.\\gradlew', 'run'], shell=True)
+        try:
+            subprocess.run(['.\\gradlew', 'run'], shell=True, check=True)
+        except subprocess.CalledProcessError:
+            logger.critical("Error with running subprocess \gradlew")
+            os.chdir('..')
+            logger.info(f"Now in {os.getcwd()} directory!\n")
+            raise
 
         os.chdir('..')
         logger.info(f"Now in {os.getcwd()} directory!\n")
