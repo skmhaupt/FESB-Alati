@@ -1,7 +1,11 @@
-import os, subprocess, datetime, glob, csv
+import os, subprocess, datetime, glob, csv, logging
+from subprocess import PIPE, STDOUT
 from pathlib import Path
 from labgenpackage.classes import Student
-import logging
+
+def log_subprocess_output(pipe, logger: logging):
+    for line in iter(pipe.readline, b''): # b'\n'-separated lines
+        logger.info('got line from subprocess: %r', line)
 
 def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool, startdate:str="", enddate:str="") -> tuple[list[Student],list[Student]]:
 
@@ -62,9 +66,14 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
 
         logger.info("Launching schedule scraper!")
         try:
-            subprocess.run(['.\\gradlew', 'run'], shell=True, check=True)
+            #subprocess.run(['.\\gradlew', 'run'], shell=True, check=True)
+            pro = subprocess.Popen('.\\gradlew run --no-daemon', shell=True, stdout=PIPE, stderr=STDOUT) #, preexec_fn=os.setsid
+            with pro.stdout:
+                log_subprocess_output(pro.stdout, logger)
+            pro.wait()
         except subprocess.CalledProcessError:
-            logger.critical("Error with running subprocess \gradlew")
+            #os.killpg(os.getpgid(pro.pid), signal.SIGTERM)
+            logger.critical("Error with running subprocess /gradlew")
             os.chdir('..')
             logger.info(f"Now in {os.getcwd()} directory!\n")
             raise
