@@ -143,7 +143,7 @@ class GroupsFrame(ctk.CTkFrame):
         for widget in self.subframe.winfo_children():
             widget.destroy()  # deleting widget
 
-        self.warning_label = ctk.CTkLabel(self.subframe, text=f"Ispravni format zapisa grupa u datoteci:")
+        self.warning_label = ctk.CTkLabel(self.subframe, text=f"Ispravni format zapisa grupa u datoteci:", text_color="red")
         self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
         self.warning_label2 = ctk.CTkLabel(self.subframe, text=f"grupa, dan, od - do, dvorana, broj studenta")
         self.warning_label2.grid(row=3, column=0, padx=5, pady=(5, 0), sticky="w")
@@ -182,6 +182,10 @@ class GroupsFrame(ctk.CTkFrame):
         input_txt_file = self.entry_1.get()
         if(input_txt_file==""):
             logger.warning("Select a .txt file befor uploading.")
+            for widget in self.subframe.winfo_children():
+                widget.destroy()  # deleting widget
+            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Nije zadana .txt datoteka.", text_color="red")
+            self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             return
         elif input_txt_file.endswith(".txt"):
             logger.info(f"{self.entry_1.get()}")
@@ -189,7 +193,7 @@ class GroupsFrame(ctk.CTkFrame):
             logger.warning("Input file hase to be a .txt file.")
             for widget in self.subframe.winfo_children():
                 widget.destroy()  # deleting widget
-            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Odabrana pogresna datoteka.")
+            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Odabrana pogresna datoteka.", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             return
         
@@ -197,32 +201,39 @@ class GroupsFrame(ctk.CTkFrame):
         fpath: Path
         fpaths: list = glob.glob("data/*.txt")
         if(len(fpaths) > 1):
-            logger.critical(f"Found {len(fpaths)} .txt files, there has to be only one!")
+            logger.critical(f"Found {len(fpaths)} old .txt files, there has to be only one!")
             logger.critical(f"Erasing all \'.txt\' files!")
             for pathstr in fpaths:
                 logger.critical(f"Erasing {pathstr}")
                 delpath = Path(pathstr)
                 delpath.unlink()
-            raise Exception
         elif(len(fpaths) == 0):
-            logger.warning("No .txt file found!")
+            logger.info("No old .txt file found!")
         else:
             fpath = Path(fpaths[0])
             try:
                 fpath.unlink()
-                logger.info(f"Deleted {fpath}!")
+                logger.info(f"Deleted old .txt file {fpath}!")
             except Exception:
-                logger.critical(f"Failed to delete {fpath}")
-                raise
+                logger.critical(f"Failed to delete old txt file {fpath}")
+                for widget in self.subframe.winfo_children():
+                    widget.destroy()  # deleting widget
+                    self.warning_label = ctk.CTkLabel(self.subframe, text=f"Neocekivana pogreska.\nPokusajte ponovo.", text_color="red")
+                    self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
+                return
         
         #get new selected .txt file
         fpath = Path(input_txt_file)
         try:
             copy(fpath, "data/")
-            logger.info(f"Uploaded file: {fpath}!")
+            logger.info(f"Uploaded new file: {fpath}!")
         except Exception:
-            logger.critical(f"Failed to copy file: {fpath}!")
-            raise
+            logger.critical(f"Failed to copy new file: {fpath}!")
+            for widget in self.subframe.winfo_children():
+                widget.destroy()  # deleting widget
+                self.warning_label = ctk.CTkLabel(self.subframe, text=f"Neocekivana pogreska.\nPokusajte ponovo.", text_color="red")
+                self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
+            return
 
         self.LoadGroups()
 
@@ -344,6 +355,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             fpath = error.args[0]
             if not self.first_load:
                 self.label_error.configure(text="Neispravna datoteka.", text_color="red")
+            return
         except Exception:
             logger.critical("Failed parcing participants!")
             self.label_error.configure(text="Nastupila pogreska!")
@@ -364,14 +376,17 @@ class ParticipantsFrame(ctk.CTkFrame):
 
 
     def UploadAction(self):
+        self.label_error.configure(text="")
         input_csv_file = self.entry_1.get()
         if(input_csv_file==""):
             logger.warning("Select a .csv file befor uploading.")
+            self.label_error.configure(text="Nije zadana .csv datoteka.", text_color="red")
             return
         elif input_csv_file.endswith(".csv"):
             logger.info(f"{self.entry_1.get()}")
         else:
             logger.warning("Input file hase to be a .csv file.")
+            self.label_error.configure(text="Zadana neispravna datoteka.", text_color="red")
             return
         
         #get path to old existing .csv file
@@ -379,9 +394,11 @@ class ParticipantsFrame(ctk.CTkFrame):
         fpaths: list = glob.glob("data/*.csv")
         if(len(fpaths) > 1):
             logger.critical(f"Found {len(fpaths)} .csv files, there has to be only one!")
+            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
             raise Exception
         elif(len(fpaths) == 0):
             logger.warning("No .csv file found!")
+            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
         else:
             fpath = Path(fpaths[0])
             try:
@@ -389,6 +406,7 @@ class ParticipantsFrame(ctk.CTkFrame):
                 logger.info(f"Deleted {fpath}!")
             except Exception:
                 logger.critical(f"Failed to delete {fpath}")
+                self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
                 raise
         
         #get new selected .csv file
@@ -398,6 +416,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             logger.info(f"Uploaded file: {fpath}!")
         except Exception:
             logger.critical(f"Failed to copy file: {fpath}!")
+            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
             raise
 
         self.LoadParticipants()
@@ -579,9 +598,11 @@ class ScraperFrame(ctk.CTkFrame):
         enddate:str = self.entry_2.get()
         if not self.ValidateDate(startdate):
             logger.warning(f"Entered invalid start date: {startdate}")
+            self.label.configure(text="Pogreska sa prvim datumom.", text_color="red")
             return
         if not self.ValidateDate(enddate):
             logger.warning(f"Entered invalid end date: {enddate}")
+            self.label.configure(text="Pogreska sa drugim datumom.", text_color="red")
             return
         logger.info(f"Entered valid dates: {startdate}, {enddate}")
 
@@ -607,6 +628,7 @@ class ScraperFrame(ctk.CTkFrame):
             pass
         else: 
             logger.warning("Start date is later than end date.")
+            self.label.configure(text="Drugi datum je prije prvog.", text_color="red")
             return
         try:
             with open("data/data.json", "r") as file:
@@ -615,7 +637,6 @@ class ScraperFrame(ctk.CTkFrame):
                 data["enddate"] = jsonenddate
         except FileNotFoundError:
             data = {"cours":"","cours_number":"","startdate":jsonstartdate, "enddate":jsonenddate}
-            pass
         
         json_object = json.dumps(data, indent=4)
         logger.info(f"Saving scraper dates: {jsonstartdate} - {jsonenddate}")
