@@ -95,7 +95,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
     
  
     
-    Errors: list[Student] = []
+    Errors:list[Student] = []
     csvErrors:list[Student] = []
     csvMissing:list[Student] = []
     csvEmpty:list[Student] = []
@@ -157,13 +157,15 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
                     #print("----------------------------\n")
                     cours_participants[user].schedule = schedule
             else:
-                csvErrors.append(cours_participants[user])
+                logger.error(f"Found .csv for user {user}, but the user is not in cours_participants!")
+                csvErrors.append(user)
         except ValueError:
             logger.warning(f"csv file for student {user} is empty.")
             csvEmpty.append(cours_participants[user])
         except Exception:
-            logger.warning("Error with parsing a csv file!")
+            logger.critical(f"Error with parsing a csv file for user: {user}")
             Errors.append(cours_participants[user])
+            #logger.critical(f"test {Errors}")
             #logger.warning(f"Removing {user} from list. He will not be added to a group!")
             #cours_participants.pop(user)
     
@@ -173,7 +175,7 @@ def schedule_scraper(cours_participants: dict[str, Student], scraper_state:bool,
             csvMissing.append(cours_participants[user])
 
     if Errors:
-        logger.error(f"Errors with users: {*Errors,}")
+        logger.error(f"Errors with users: {Errors}")
         raise Exception(Errors)
     if csvErrors:
         logger.error(f"Users and .csv files in 'data/timetables/' are out of sync. Found following .csv files that dont have a user: {*csvErrors,}")

@@ -420,7 +420,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             raise
 
         self.LoadParticipants()
-        self.controller.scraper_frame.Update_label()
+        self.controller.scraper_frame.Reset_label()
     
 class ScraperFrame(ctk.CTkFrame):
     def __init__(self, master, startdate:str, enddate:str):
@@ -462,6 +462,12 @@ class ScraperFrame(ctk.CTkFrame):
 
         self.Update_label()
 
+    def Reset_label(self):
+        loaded_data[3] = False
+        self.label.configure(text="Raspored studenta nije preuzet.", text_color="white")
+        if hasattr(self, "details_button"):
+            self.details_button.grid_remove()
+
     def Update_label(self):
         global cours_participants_global, loaded_data
 
@@ -478,13 +484,19 @@ class ScraperFrame(ctk.CTkFrame):
                 #self.LoadedStatus(error="")
         except FileNotFoundError:
             logger.warning("Pleas scrape for new student schedule data.")
+            return
         except ValueError:
             self.label.configure(text="Ucitani studenti nisu uskladeni sa preuzetim rasporedima za studente.", text_color="red")
-            self.details_button.grid_remove()
+            if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
             return
         except Exception as error:
             Errors: list[Student] = error.args[0]
             logger.error(f"Errors with users: {*Errors,}")
+            self.label.configure(text="Nastala neocekivana pogreska!", text_color="red")
+            if hasattr(self, "details_button"):
+                self.details_button.grid_remove()
+            return
 
         if csvMissing or csvEmpty:
             self.label.configure(text=f"Potencijalne greske sa preuzetim rasporedima.\nBroj rasporeda koji nisu preuzeti: {len(csvMissing)}\nBroj praznih rasporeda: {len(csvEmpty)}", text_color="white")
@@ -734,9 +746,9 @@ class FillGroupsFrame(ctk.CTkFrame):
         self.button_1 = ctk.CTkButton(self,width=60 , text="Pokreni", command=self.StartMainTask_thread)
         self.button_1.grid(row=3, column=0, padx=10, pady=10, sticky="")
 
-        self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
-        self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
-        self.main_task_progressbar.grid_remove()
+        # self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
+        # self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
+        # self.main_task_progressbar.grid_remove()
 
         self.subframe = ctk.CTkFrame(self)
         self.subframe.grid(row=0, column=1, rowspan=4, padx=10, pady=10,sticky="wens")
@@ -818,12 +830,15 @@ class FillGroupsFrame(ctk.CTkFrame):
 
     def StartMainTask_thread(self):
         self.button_1.grid_remove()
+        self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
+        
         global total_places, cours_participants_global, continue_answer, loaded_data
 
         #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         if not loaded_data[0] or not loaded_data[2] or not loaded_data[3]:
             self.MissingData()
             self.button_1.grid()
+            self.main_task_progressbar.destroy()
             return
 
         cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
@@ -848,11 +863,12 @@ class FillGroupsFrame(ctk.CTkFrame):
         if total_places < len(cours_participants_global) and not continue_answer:
             self.CheckIfUserWantsToContinue()
             self.button_1.grid()
+            self.main_task_progressbar.destroy()
             return
         continue_answer = False
         for widget in self.subframe.winfo_children():
             widget.destroy()
-        self.main_task_progressbar.grid()
+        self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
         self.main_task_progressbar.start()
         #self.button_1.configure(state="disabled")
         
@@ -925,12 +941,12 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.CreateExcelWorkbook()
             self.LoadStatus(success, weight_errors, fill_errors)
             self.main_task_progressbar.stop()
-            self.main_task_progressbar.grid_remove()
+            self.main_task_progressbar.destroy()
             self.button_1.grid()
-            #self.button_1.configure(state="normal")
         except Exception:
             logger.error("Error filling groups!")
             self.button_1.grid()
+            self.main_task_progressbar.destroy()
             raise
     
     def LoadStatus(self,success:bool, weight_errors:list[Student], fill_errors:list[Student]):
