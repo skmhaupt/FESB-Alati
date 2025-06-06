@@ -73,6 +73,27 @@ U csv datoteci se nalazi lista svih studenta kojima ce se ispuniti zadane grupe.
 
 ### Program
 
+![alt text](images/program.png "Program")
+
 #### Grupe
 
-![alt text](images/program.png "Program")
+Za ucitati grupe prvo je potrebno zadati .txt datoteku. Vise informacija o pripremi datoteke se moze naci u poglavlju ['Priprema ulaznih podataka'](#priprema-ulaznih-podataka).
+
+Datoteka se bira pomocu botuna 'Pretrazi'. Nakon sto se odabere zeljenu datoteku, potrebno ju je ucitati pomocu botuna 'ucitaj datoteku'. Ukoliko je zadana datoteka ispravna, ispod botuna ce biti prikazani zadani podatci te se moze provjeriti ako je sve pravilno ucitano. Ukoliko neka grupa nije pravilno zadana ona nece biti prikazana.
+
+Na slici ispod je prikazan primjer pravilno ucitane datoteke. Sa lijeve strane je .txt datoteka sa podatcima, a sa desne je prikaz sekcije iz programa sa pravilno ucitanim grupama.
+
+![alt text](images/groups.png "Groups")
+
+### Sudionici
+
+Za ucitati studente prvo je potrebno zadati .csv datoteku. Vise informacija o pripremi datoteke se moze naci u poglavlju ['Priprema ulaznih podataka'](#priprema-ulaznih-podataka).
+
+Datoteka se bira pomocu botuna 'Pretrazi'. Nakon sto se odabere zeljenu datoteku, potrebno ju je ucitati pomocu botuna 'ucitaj datoteku'. Ukoliko je zadana datoteka ispravna, ispod botuna ce biti prikazani zadani podatci te se moze provjeriti ako je sve pravilno ucitano.
+
+Na slici ispod je prikazan primjer pravilno ucitane datoteke. Prvo je prikazana .csv datoteka sa podatcima, te je ispod prikazana sekcije iz programa sa pravilno ucitanim studentima.
+
+![alt text](images/participants.png "Participants")
+
+### Raspored studenata
+
