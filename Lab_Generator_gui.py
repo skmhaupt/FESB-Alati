@@ -316,7 +316,7 @@ class ParticipantsFrame(ctk.CTkFrame):
 
         self.button_2 = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)
         self.button_2.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 0), sticky="")
-        self.label_error = ctk.CTkLabel(self, text="")
+        self.label_error = ctk.CTkLabel(self, text="", text_color="red")
         self.label_error.grid(row=2, column=1, columnspan=2, padx=10, pady=(10, 0), sticky="w")
 
         self.subframe = ctk.CTkFrame(self)
@@ -354,7 +354,7 @@ class ParticipantsFrame(ctk.CTkFrame):
         except ValueError as error:
             fpath = error.args[0]
             if not self.first_load:
-                self.label_error.configure(text="Neispravna datoteka.", text_color="red")
+                self.label_error.configure(text="Neispravna datoteka.")
             return
         except Exception:
             logger.critical("Failed parcing participants!")
@@ -380,13 +380,13 @@ class ParticipantsFrame(ctk.CTkFrame):
         input_csv_file = self.entry_1.get()
         if(input_csv_file==""):
             logger.warning("Select a .csv file befor uploading.")
-            self.label_error.configure(text="Nije zadana .csv datoteka.", text_color="red")
+            self.label_error.configure(text="Nije zadana .csv datoteka.")
             return
         elif input_csv_file.endswith(".csv"):
             logger.info(f"{self.entry_1.get()}")
         else:
             logger.warning("Input file hase to be a .csv file.")
-            self.label_error.configure(text="Zadana neispravna datoteka.", text_color="red")
+            self.label_error.configure(text="Zadana neispravna datoteka.")
             return
         
         #get path to old existing .csv file
@@ -394,11 +394,11 @@ class ParticipantsFrame(ctk.CTkFrame):
         fpaths: list = glob.glob("data/*.csv")
         if(len(fpaths) > 1):
             logger.critical(f"Found {len(fpaths)} .csv files, there has to be only one!")
-            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
+            self.label_error.configure(text="Neocekivana pogreska.")
             raise Exception
         elif(len(fpaths) == 0):
             logger.warning("No .csv file found!")
-            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
+            self.label_error.configure(text="Neocekivana pogreska.")
         else:
             fpath = Path(fpaths[0])
             try:
@@ -406,7 +406,7 @@ class ParticipantsFrame(ctk.CTkFrame):
                 logger.info(f"Deleted {fpath}!")
             except Exception:
                 logger.critical(f"Failed to delete {fpath}")
-                self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
+                self.label_error.configure(text="Neocekivana pogreska.")
                 raise
         
         #get new selected .csv file
@@ -416,7 +416,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             logger.info(f"Uploaded file: {fpath}!")
         except Exception:
             logger.critical(f"Failed to copy file: {fpath}!")
-            self.label_error.configure(text="Neocekivana pogreska.", text_color="red")
+            self.label_error.configure(text="Neocekivana pogreska.")
             raise
 
         self.LoadParticipants()
@@ -606,15 +606,19 @@ class ScraperFrame(ctk.CTkFrame):
         #reset variable cours_participants_global
         self.controller.participants_frame.LoadParticipants()
 
+        self.schedule_scrapper_button.grid_remove()
+    
         startdate:str = self.entry_1.get()
         enddate:str = self.entry_2.get()
         if not self.ValidateDate(startdate):
             logger.warning(f"Entered invalid start date: {startdate}")
             self.label.configure(text="Pogreska sa prvim datumom.", text_color="red")
+            self.schedule_scrapper_button.grid()
             return
         if not self.ValidateDate(enddate):
             logger.warning(f"Entered invalid end date: {enddate}")
             self.label.configure(text="Pogreska sa drugim datumom.", text_color="red")
+            self.schedule_scrapper_button.grid()
             return
         logger.info(f"Entered valid dates: {startdate}, {enddate}")
 
@@ -641,6 +645,7 @@ class ScraperFrame(ctk.CTkFrame):
         else: 
             logger.warning("Start date is later than end date.")
             self.label.configure(text="Drugi datum je prije prvog.", text_color="red")
+            self.schedule_scrapper_button.grid()
             return
         try:
             with open("data/data.json", "r") as file:
@@ -680,6 +685,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.label.grid()
             self.LoadedStatus(error="FileNotFoundError")
             logger.info("Ending thread for scraping schedule.")
+            self.schedule_scrapper_button.grid()
             return
         except Exception:
             logger.exception("Stoped schedule scraper.")
@@ -688,6 +694,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.label.grid()
             self.LoadedStatus(error="Exception")
             logger.info("Ending thread for scraping schedule.")
+            self.schedule_scrapper_button.grid()
             return
 
         
@@ -698,6 +705,7 @@ class ScraperFrame(ctk.CTkFrame):
         else:
             self.LoadedStatus(error="")
         
+        self.schedule_scrapper_button.grid()
         logger.info("Ending thread for scraping schedule.")
 
     def SetProgressBar(self):
