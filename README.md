@@ -11,7 +11,14 @@
       <a href="#koristenje">Koristenje</a>
       <ul>
         <li><a href="#priprema-ulaznih-podataka">Priprema ulaznih podataka</a></li>
-        <li><a href="#program">Program</a></li>
+        <li><a href="#program">Program</a>
+          <ul>
+            <li><a href="#grupe">Grupe</a></li>
+            <li><a href="#sudionici">Sudionici</a></li>
+            <li><a href="#raspored-studenata">Raspored studenata</a></li>
+            <li><a href="#ispuna-grupa">Ispuna grupa</a></li>
+          </ul>
+        </li>
       </ul>
     </li>
     <li><a href="#roadmap">Roadmap</a></li>
@@ -67,7 +74,7 @@ U csv datoteci se nalazi lista svih studenta kojima ce se ispuniti zadane grupe.
 
 ![alt text](images/cours_participants.png "Preuzimanje liste studenta")
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
 
 ---
 
@@ -85,6 +92,8 @@ Na slici ispod je prikazan primjer pravilno ucitane datoteke. Sa lijeve strane j
 
 ![alt text](images/groups.png "Groups")
 
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
+
 ### Sudionici
 
 Za ucitati studente prvo je potrebno zadati .csv datoteku. Vise informacija o pripremi datoteke se moze naci u poglavlju ['Priprema ulaznih podataka'](#priprema-ulaznih-podataka).
@@ -95,5 +104,22 @@ Na slici ispod je prikazan primjer pravilno ucitane datoteke. Prvo je prikazana 
 
 ![alt text](images/participants.png "Participants")
 
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
+
 ### Raspored studenata
 
+Za preuzeti raspored studenata potrebno je zadati raspon datuma unutar kojeg se preuzima raspored i listu studenta. Zadavanje liste studenata je vec opisano u prethodnom poglavlju ['Sudionici'](#sudionici). Pocetni i krajnji datum se zadaju u za to predvidena polja. 
+
+Nakon sto su potrebni podatci zadani, preuzimanje rasporeda se pokrece sa botunom 'Preuzmi raspored'. Preuzimanje rasporeda moze potrajati duze vremena (nekoliko minuta) ovisno o kolicini studenta i o rasponu datuma.
+
+Na slici ispod je vidljiv prikaz preuzimanja rasporeda, prikaz preuzetog rasporeda sa mogucim pogreskama i prikaz sa ispravno preuzetim rasporedom. Slucaj preuzetog rasporeda sa mogucim pogreskama nastupa kad program ne uspije preuzeti raspored za nekog studenta ili/i ako je neki preuzeti raspored prazan. Botunom 'Preuzmi detalje' se moze preuzeti excel datoteka koja sadrzi listu studenata kod kojih je nastupila pogreska.
+
+![alt text](images/scraper.png "Schedule scraper")
+
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
+
+### Ispuna grupa
+
+
+
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
