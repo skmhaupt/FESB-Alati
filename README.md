@@ -43,6 +43,11 @@ U planu je nadogradnja programa s funkcijom za pronalazak termina nadoknada i po
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 -->
 
+## Upozorenja
+
+[!WARNING]
+Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ucitavanje grupa dok se vec radi preuzimanje studentskih rasporeda nastane nepovratna greska. - Trenutno se radi na ispravljanju greske. - 
+
 ## Korištenje
 
 ### Priprema ulaznih podataka
@@ -108,7 +113,7 @@ Na slici ispod je prikazan primjer pravilno učitane datoteke. Prvo je prikazana
 
 ### Raspored studenata
 
-Za preuzeti raspored studenata potrebno je zadati raspon datuma unutar kojeg se preuzima raspored i listu studenta. Zadavanje liste studenata je već opisano u prethodnom poglavlju ['Sudionici'](#sudionici). Početni i krajnji datum se zadaju u za to predviđena polja.
+Za preuzeti raspored studenata potrebno je zadati raspon datuma unutar kojeg se preuzima raspored i listu studenata. Zadavanje liste studenata je već opisano u prethodnom poglavlju ['Sudionici'](#sudionici). Početni i krajnji datum se zadaju u za to predviđena polja.
 
 Nakon što su potrebni podatci zadani, preuzimanje rasporeda se pokreće s botunom 'Preuzmi raspored'. Preuzimanje rasporeda može potrajati duže vremena (nekoliko minuta) ovisno o količini studenta i o rasponu datuma.
 
@@ -120,6 +125,11 @@ Na slici ispod je vidljiv prikaz preuzimanja rasporeda, prikaz preuzetog raspore
 
 ### Ispuna grupa
 
+Ispuniti grupe nije moguce sve dok nisu spremni svi potrebni podatci (grupe, studenti, rasporedi studenata). Ispunjavanje grupa se pokreće botunom 'pokreni'. Ako je zadani ukupni broj dostupnih mjesta po grupama manji od broja zadanih studenata pri pokretanju ce program izbaciti upozorenje i pitati ako korisnik zeli nastaviti.
 
+__abecedni prioritet:__
+Prije pokretanja ispune moze se zadati razina abecednom prioritetu. Abecedni prioritet definira koji studenti imaju prioritet pri popunjavanju grupa. Ako se zada vrijednost od '100' onda se studenti biraju po striktno abecednom redosljedu prezimena. Ako se zada vrijednost od '0' onda se studenti biraju striktno po kriteriju kolicine odgovarajucih grupa (dostupnih mjesta). Npr. ako student A moze samo u grupu 4 koja ima 12 slobodnih mjesta, a student B moze u grupe 1,2,3 sa ukupno 10 slobodnih mjesta, student B ima prioritet i biti ce razvrstan prije studenta A.
+
+Ako su svi studenti uspjesno razvrstani po grupama korisnik moze preuzeti excel datoteku sa popunjenim grupama. Ako nisu svi studenti uspjesno razvrstani po grupama korisnik moze, pored standarndne datoteke sa rezultatom, preuzeti i excel datoteku sa dodatnim informacijama o pogreskama.
 
 <p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
