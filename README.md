@@ -45,8 +45,8 @@ U planu je nadogradnja programa s funkcijom za pronalazak termina nadoknada i po
 
 ## Upozorenja
 
-[!WARNING]
-Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ucitavanje grupa dok se vec radi preuzimanje studentskih rasporeda nastane nepovratna greska. - Trenutno se radi na ispravljanju greske. - 
+> [!WARNING]
+> Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ucitavanje grupa dok se vec radi preuzimanje studentskih rasporeda nastane nepovratna greska. - Trenutno se radi na ispravljanju greske. - 
 
 ## Korištenje
 
