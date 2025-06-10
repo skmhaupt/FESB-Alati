@@ -245,7 +245,7 @@ class RightFrame(ctk.CTkFrame):
         #self.grid_rowconfigure(0, weight=1)
         #self.grid_rowconfigure(1, weight=1)
         #self.grid_rowconfigure(2, weight=1)
-        #self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(3, weight=1)
 
         #Expected data is dict {"cours", "cours_number", "startdate", "enddate"}
         try:
@@ -267,13 +267,13 @@ class RightFrame(ctk.CTkFrame):
         self.cours_frame.grid(row=0, column=0, padx=10, pady=10, sticky="ew")
 
         self.participants_frame = ParticipantsFrame(self)
-        self.participants_frame.grid(row=1, column=0, padx=10, pady=10, sticky="ew")
+        self.participants_frame.grid(row=1, column=0, padx=10, pady=(0,10), sticky="ew")
 
         self.scraper_frame = ScraperFrame(self,data["startdate"], data["enddate"])
-        self.scraper_frame.grid(row=2, column=0, padx=10, pady=10, sticky="ew")
+        self.scraper_frame.grid(row=2, column=0, padx=10, pady=(0,10), sticky="ew")
 
         self.fill_groups_frame = FillGroupsFrame(self)
-        self.fill_groups_frame.grid(row=3, column=0, padx=10, pady=10, sticky="ew")
+        self.fill_groups_frame.grid(row=3, column=0, padx=10, pady=(0,10), sticky="nsew")
 
 
 #First segment of the right side of the UI. Hold the section for cours data
@@ -739,20 +739,24 @@ class FillGroupsFrame(ctk.CTkFrame):
         continue_answer = False
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=1)
+        self.grid_rowconfigure(0, weight=2)
+        self.grid_rowconfigure(1, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_rowconfigure(3, weight=1)
         self.controller = master
         self.label_1 = ctk.CTkLabel(self, text="Ispuna grupa", font=("Helvetica", 23))
-        self.label_1.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="w")
+        self.label_1.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="nw")
 
         global alfa_prio_label, alfa_prio_lvl
         self.alfa_prio_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.slider_event)
         self.alfa_prio_slider.configure(number_of_steps=100)
-        self.alfa_prio_slider.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="")
+        self.alfa_prio_slider.grid(row=1, column=0, padx=10, pady=(10, 0), sticky="s")
         alfa_prio_lvl = int(self.alfa_prio_slider.get())
         self.alfa_prio_label = ctk.CTkLabel(self, text=f"Abecedni prioritet: {alfa_prio_lvl}")
-        self.alfa_prio_label.grid(row=2, column=0, padx=10, pady=(0, 5), sticky="")
+        self.alfa_prio_label.grid(row=2, column=0, padx=10, pady=(0, 5), sticky="n")
 
         self.button_1 = ctk.CTkButton(self,width=60 , text="Pokreni", command=self.StartMainTask_thread)
-        self.button_1.grid(row=3, column=0, padx=10, pady=10, sticky="")
+        self.button_1.grid(row=3, column=0, padx=10, pady=10, sticky="n")
 
         # self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
         # self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
@@ -778,18 +782,20 @@ class FillGroupsFrame(ctk.CTkFrame):
         for widget in self.subframe.winfo_children():
             widget.destroy()
         self.label_question = ctk.CTkLabel(self.subframe, text="Broj dostupnih mjesta je manji od broja studenta! Zelite li nastaviti?")
-        self.label_question.grid(row=0,column=0, columnspan=2, padx=10, pady=(10,0))
+        self.label_question.grid(row=0,column=0, columnspan=2, padx=10, pady=(10,0),sticky="s")
         self.label_data = ctk.CTkLabel(self.subframe, text=f"Broj dostupnih mjesta: {total_places}; Broj studenta: {len(cours_participants_global)}")
         self.label_data.grid(row=1,column=0, columnspan=2, padx=10, pady=(10,0))
 
         self.button_yes = ctk.CTkButton(self.subframe, width=60 , text="DA", command=self.Yes)
-        self.button_yes.grid(row=2,column=0, padx=10, pady=10)
+        self.button_yes.grid(row=2,column=0, padx=10, pady=10,sticky="n")
         self.button_no = ctk.CTkButton(self.subframe, width=60 , text="NE", command=self.No)
-        self.button_no.grid(row=2,column=1, padx=10, pady=10)
+        self.button_no.grid(row=2,column=1, padx=10, pady=10,sticky="n")
 
         self.subframe.grid_columnconfigure(0, weight=1)
         self.subframe.grid_columnconfigure(1, weight=1)
-        self.subframe.grid_rowconfigure(0, weight=0)
+        self.subframe.grid_rowconfigure(0, weight=1)
+        self.subframe.grid_rowconfigure(1, weight=1)
+        self.subframe.grid_rowconfigure(2, weight=1)
     
     def Yes(self):
         global continue_answer
@@ -885,6 +891,7 @@ class FillGroupsFrame(ctk.CTkFrame):
     
     def FillGroups_thread(self):
         global alfa_prio_lvl, cours_participants_global
+        success = False
         weight_errors:list[Student] = []
         fill_errors:list[Student] = []
         running: bool = True
@@ -953,6 +960,7 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.button_1.grid()
         except Exception:
             logger.error("Error filling groups!")
+            self.LoadStatus(success, weight_errors, fill_errors)
             self.button_1.grid()
             self.main_task_progressbar.destroy()
             raise
@@ -1105,7 +1113,7 @@ class App(ctk.CTk):
         Path("data").mkdir(exist_ok=True)
 
         self.title("Lab generator")
-        #self.geometry("1070x700")
+        self.geometry("1100x765")
         self.resizable(False, False)
         ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
         self.grid_columnconfigure(0, weight=1)
