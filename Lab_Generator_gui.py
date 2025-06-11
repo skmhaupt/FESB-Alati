@@ -1113,7 +1113,7 @@ class App(ctk.CTk):
         Path("data").mkdir(exist_ok=True)
 
         self.title("Lab generator")
-        self.geometry("1100x765")
+        self.geometry("1100x700")
         self.resizable(False, False)
         ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
         self.grid_columnconfigure(0, weight=1)
