@@ -127,6 +127,12 @@ Za preuzeti raspored studenata potrebno je zadati raspon datuma unutar kojeg se 
 
 Nakon što su potrebni podatci zadani, preuzimanje rasporeda se pokreće s botunom 'Preuzmi raspored'. Preuzimanje rasporeda može potrajati duže vremena (nekoliko minuta) ovisno o količini studenta i o rasponu datuma.
 
+> [!TIP]
+> Ako se kao raspon zada cijeli semestar, pri popunjavanju grupa će se uzeti u obzir i sva predavanja koja se ne ponavljaju redovito (Npr. već unaprijed pripremljene nadoknade).
+
+> [!TIP]
+>Program se može koristiti i za provjeru dostupnosti studenata u nekom terminu nadoknade. U takve svrhe se ne predlaže zadati raspon duži od jednog tjedna, dapače predlaže se zadati raspon ograničen na dan nadoknade. Pri tome je potrebno imati na umu da nekim studentima preuzeti raspored vrlo vjerojatno može biti prazan, što nije greška.
+
 Na slici ispod je vidljiv prikaz preuzimanja rasporeda, prikaz preuzetog rasporeda s mogućim pogreškama i prikaz s ispravno preuzetim rasporedom. Slučaj preuzetog rasporeda s mogućim pogreškama nastupa kad program ne uspije preuzeti raspored za nekog studenta ili/i ako je neki preuzeti raspored prazan. Botunom 'Preuzmi detalje' se može preuzeti excel datoteka koja sadrži listu studenata kod kojih je nastupila pogreška.
 
 ![alt text](images/scraper.png "Schedule scraper")
