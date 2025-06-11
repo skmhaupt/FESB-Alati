@@ -47,8 +47,8 @@ Sustav za preuzimanje rasporeda studenata je napravio Stipe Jurković (Stipe.Jur
 
 ## Poznate greške
 
-> [!WARNING]
-> Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ucitavanje grupa dok se vec radi preuzimanje studentskih rasporeda nastane nepovratna greska. - Trenutno se radi na ispravljanju greske. - 
+> [!CAUTION]
+> Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ućitavanje grupa dok se već radi preuzimanje studentskih rasporeda nastane nepovratna greška. - Trenutno nema mjera za ispravljanje pogreške te ako se slučajno izazove se predlaže ponovno preuzimanje programa. - U što kračem roku će biti dostupna verzija sa privremenim rješenjem.
 
 ## U planu
 
