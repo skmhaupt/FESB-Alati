@@ -7,6 +7,8 @@
   <ol>
     <li><a href="#opis-programa">Opis programa</a></li>
     <li><a href="#instaliranje-programa">Instaliranje programa</a></li>
+    <li><a href="#poznate-greške">Poznate greške</a></li>
+    <li><a href="#u-planu">U planu</a></li>
     <li>
       <a href="#koristenje">Koristenje</a>
       <ul>
@@ -21,7 +23,7 @@
         </li>
       </ul>
     </li>
-    <li><a href="#roadmap">Roadmap</a></li>
+    <!-- <li><a href="#roadmap">Roadmap</a></li> -->
   </ol>
 </details>
 
@@ -29,9 +31,9 @@
 
 Cilj programa je olakšati stvaranje rasporeda za nastavu na FESB-u.
 
-Za rad programa korisnik mora unijeti željeni raspored grupa i listu studenta koju preuzme sa sustava merlin. Zatim program preuzima već postojeće rasporede za svakog studenta kako bi onda popunio sve grupe izbjegavajući preklapanja.
+Korisnik unosi željeni raspored grupa i listu studenta. Zatim program preuzima postojeće rasporede za svakog studenta kako bi onda popunio sve grupe izbjegavajući preklapanja. U slučaj neuspješnog razvrstavanja dostupne su informacije o pogreškama koje olakšavaju ispravljanje rasporeda.
 
-U planu je nadogradnja programa s funkcijom za pronalazak termina nadoknada i potencijalno pronalazak termina za cijeli predmet.
+Sustav za preuzimanje rasporeda studenata je napravio Stipe Jurković (Stipe.Jurkovic.00@fesb.hr)
 
 ## Instaliranje programa
 
@@ -43,10 +45,18 @@ U planu je nadogradnja programa s funkcijom za pronalazak termina nadoknada i po
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 -->
 
-## Upozorenja
+## Poznate greške
 
 > [!WARNING]
 > Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ucitavanje grupa dok se vec radi preuzimanje studentskih rasporeda nastane nepovratna greska. - Trenutno se radi na ispravljanju greske. - 
+
+## U planu
+
+- [ ] Funkcija za pronalaženje termina nadoknada
+- [ ] Funkcija za generiranje tablica za lab vježbe
+- [ ] Bolje pračenje koraka preuzimanja studentskih rasporeda
+
+<p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
 
 ## Korištenje
 
@@ -125,11 +135,16 @@ Na slici ispod je vidljiv prikaz preuzimanja rasporeda, prikaz preuzetog raspore
 
 ### Ispuna grupa
 
-Ispuniti grupe nije moguce sve dok nisu spremni svi potrebni podatci (grupe, studenti, rasporedi studenata). Ispunjavanje grupa se pokreće botunom 'pokreni'. Ako je zadani ukupni broj dostupnih mjesta po grupama manji od broja zadanih studenata pri pokretanju ce program izbaciti upozorenje i pitati ako korisnik zeli nastaviti.
+Ispuniti grupe nije moguće sve dok nisu spremni svi potrebni podatci (grupe, studenti, rasporedi studenata). Ispunjavanje grupa se pokreće botunom 'pokreni'. Ako je zadani ukupni broj dostupnih mjesta po grupama manji od broja zadanih studenata, pri pokretanju će program izbaciti upozorenje i pitati ako korisnik želi nastaviti.
 
 __abecedni prioritet:__
-Prije pokretanja ispune moze se zadati razina abecednom prioritetu. Abecedni prioritet definira koji studenti imaju prioritet pri popunjavanju grupa. Ako se zada vrijednost od '100' onda se studenti biraju po striktno abecednom redosljedu prezimena. Ako se zada vrijednost od '0' onda se studenti biraju striktno po kriteriju kolicine odgovarajucih grupa (dostupnih mjesta). Npr. ako student A moze samo u grupu 4 koja ima 12 slobodnih mjesta, a student B moze u grupe 1,2,3 sa ukupno 10 slobodnih mjesta, student B ima prioritet i biti ce razvrstan prije studenta A.
+Prije pokretanja ispune može se zadati razina abecednom prioritetu. Abecedni prioritet definira koji studenti imaju prioritet pri popunjavanju grupa. Ako se zada vrijednost od '100' onda se studenti biraju po striktno abecednom redoslijedu prezimena. Ako se zada vrijednost od '0' onda se studenti biraju striktno po kriteriju količine odgovarajućih grupa (dostupnih mjesta). Npr. ako student A može samo u grupu 4 koja ima 12 slobodnih mjesta, a student B može u grupe 1,2,3 s ukupno 10 slobodnih mjesta, student B ima prioritet i biti će razvrstan prije studenta A.
 
-Ako su svi studenti uspjesno razvrstani po grupama korisnik moze preuzeti excel datoteku sa popunjenim grupama. Ako nisu svi studenti uspjesno razvrstani po grupama korisnik moze, pored standarndne datoteke sa rezultatom, preuzeti i excel datoteku sa dodatnim informacijama o pogreskama.
+> [!TIP]
+> Ako abecedno sortiranje nije uspješno preporučuje se jednom pokrenuti s abecednim prioritetom od '0' jer postoji mogućnost da s odabranim grupama uopće nije moguće razvrstati studente. Nakon uspješnog razvrstavanja može se postepeno povećavati abecedni prioritet.
+
+Ako su svi studenti uspješno razvrstani po grupama korisnik može preuzeti excel datoteku s popunjenim grupama. Ako nisu svi studenti uspješno razvrstani po grupama korisnik može, pored standardne datoteke s rezultatom, preuzeti i excel datoteku s dodatnim informacijama o pogreškama.
+
+![alt text](images/fill_groups.png "Fill groups")
 
 <p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
