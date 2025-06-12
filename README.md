@@ -37,9 +37,21 @@ Sustav za preuzimanje rasporeda studenata je napravio Stipe Jurković (Stipe.Jur
 
 ## Instaliranje programa
 
-1. Preuzeti program za poveznie [Releas](https://github.com/skmhaupt/Lab-Generator)
-2. unzip
-3. .exe kratica
+Windows:
+1. Preuzeti 'Lab_Generator-v1.0.0-alpha.zip' sa poveznice [Release](https://github.com/skmhaupt/Lab-Generator/releases/tag/v1.0.0-alpha).
+2. Rraspakirati preuzeti direktorij.
+3. Program se pogreće otvaranjem 'Lab_Generator-v1.0.0-alpha.exe' datoteke
+4. Po želji napraviti poveznicu za 'Lab_Generator-v1.0.0-alpha.exe' datoteku na radnu površinu.
+
+<!-- ### Priprema iz izvornih podataka
+
+1. Preuzeti 'Source code' sa poveznice [Release](https://github.com/skmhaupt/Lab-Generator/releases/tag/v1.0.0-alpha).
+2. Rraspakirati preuzeti direktorij.
+3. 
+```
+pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\Roaming\Python\Python313\site-packages;customtkinter/" "Lab_Generator_gui.py"
+```
+4. Po želji napraviti povežnicu za radnu površinu. -->
 
 <!--
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
