@@ -59,8 +59,8 @@ pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\R
 
 ## Poznate greške
 
-> [!CAUTION]
-> Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ućitavanje grupa dok se već radi preuzimanje studentskih rasporeda nastane nepovratna greška. - Trenutno nema mjera za ispravljanje pogreške te ako se slučajno izazove se predlaže ponovno preuzimanje programa. - U što kračem roku će biti dostupna verzija sa privremenim rješenjem.
+> [!info]
+> ~~Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ućitavanje grupa dok se već radi preuzimanje studentskih rasporeda nastane nepovratna greška. - Trenutno nema mjera za ispravljanje pogreške te ako se slučajno izazove se predlaže ponovno preuzimanje programa. - U što kračem roku će biti dostupna verzija sa privremenim rješenjem.~~ - Pokretanje različitih sekcija istovremeno je blokirano. - U budućnosti se možda napravi rješenje za grešku.
 
 ## U planu
 
