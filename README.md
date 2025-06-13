@@ -38,7 +38,7 @@ Sustav za preuzimanje rasporeda studenata je napravio Stipe Jurković (Stipe.Jur
 ## Instaliranje programa
 
 Windows:
-1. Preuzeti 'Lab_Generator-v1.0.0-alpha.zip' sa poveznice [Release](https://github.com/skmhaupt/Lab-Generator/releases/tag/v1.0.0-alpha).
+1. Preuzeti 'Lab_Generator-v1.0.1-alpha.zip' sa poveznice [Release](https://github.com/skmhaupt/Lab-Generator/releases/tag/v1.0.1-alpha).
 2. Rraspakirati preuzeti direktorij.
 3. Program se pogreće otvaranjem 'Lab_Generator-v1.0.0-alpha.exe' datoteke
 4. Po želji napraviti poveznicu za 'Lab_Generator-v1.0.0-alpha.exe' datoteku na radnu površinu.
