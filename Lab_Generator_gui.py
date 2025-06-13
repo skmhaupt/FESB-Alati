@@ -179,6 +179,20 @@ class GroupsFrame(ctk.CTkFrame):
         logger.info(f"Selected file: {filename}")
 
     def UploadAction(self):
+        loaded_data[0] = False
+        global working
+        if working:
+            logger.warning("Already runing another section! Cant upload new groups.")
+            for widget in self.subframe.winfo_children():
+                widget.destroy()  # deleting widget
+            
+            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Vec je pokrenuta druga sekcija.\nSacekajte dok ne zavrsi sa izvodenjem", text_color="red")
+            self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
+            
+            self.label_loaded_schedule.configure(text=f"Nije ucitan raspored grupa.")
+            self.label_num_of_groups.configure(text=f"Broj grupa: N/A")
+            self.label_num_of_places.configure(text=f"Broj dostupnih mjesta: N/A")
+            return
         input_txt_file = self.entry_1.get()
         if(input_txt_file==""):
             logger.warning("Select a .txt file befor uploading.")
@@ -246,6 +260,8 @@ class RightFrame(ctk.CTkFrame):
         #self.grid_rowconfigure(1, weight=1)
         #self.grid_rowconfigure(2, weight=1)
         self.grid_rowconfigure(3, weight=1)
+
+        self.controller = master
 
         #Expected data is dict {"cours", "cours_number", "startdate", "enddate"}
         try:
@@ -376,6 +392,11 @@ class ParticipantsFrame(ctk.CTkFrame):
 
 
     def UploadAction(self):
+        global working
+        if working:
+            logger.warning("Already runing another section! Cant upload new groups.")
+            self.label_error.configure(text="Vec je pokrenuta druga sekcija!")
+            return
         self.label_error.configure(text="")
         input_csv_file = self.entry_1.get()
         if(input_csv_file==""):
@@ -604,6 +625,10 @@ class ScraperFrame(ctk.CTkFrame):
     
     def ScrapSchedule_thread(self):
         #reset variable cours_participants_global
+        global working
+        working = True
+        loaded_data[3] = False
+
         self.controller.participants_frame.LoadParticipants()
 
         self.schedule_scrapper_button.grid_remove()
@@ -614,11 +639,13 @@ class ScraperFrame(ctk.CTkFrame):
             logger.warning(f"Entered invalid start date: {startdate}")
             self.label.configure(text="Pogreska sa prvim datumom.", text_color="red")
             self.schedule_scrapper_button.grid()
+            working = False
             return
         if not self.ValidateDate(enddate):
             logger.warning(f"Entered invalid end date: {enddate}")
             self.label.configure(text="Pogreska sa drugim datumom.", text_color="red")
             self.schedule_scrapper_button.grid()
+            working = False
             return
         logger.info(f"Entered valid dates: {startdate}, {enddate}")
 
@@ -646,6 +673,7 @@ class ScraperFrame(ctk.CTkFrame):
             logger.warning("Start date is later than end date.")
             self.label.configure(text="Drugi datum je prije prvog.", text_color="red")
             self.schedule_scrapper_button.grid()
+            working = False
             return
         try:
             with open("data/data.json", "r") as file:
@@ -670,7 +698,7 @@ class ScraperFrame(ctk.CTkFrame):
         scrapper_thread.start()
 
     def ScrapeSchedule(self, startdate:str, enddate:str):
-        global cours_participants_global
+        global cours_participants_global, working
         logger.info("Started thread for scraping schedule.")
         try:
             csvMissing, csvEmpty = schedule_scraper(cours_participants_global,True,startdate,enddate)
@@ -686,6 +714,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.LoadedStatus(error="FileNotFoundError")
             logger.info("Ending thread for scraping schedule.")
             self.schedule_scrapper_button.grid()
+            working = False
             return
         except Exception:
             logger.exception("Stoped schedule scraper.")
@@ -695,6 +724,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.LoadedStatus(error="Exception")
             logger.info("Ending thread for scraping schedule.")
             self.schedule_scrapper_button.grid()
+            working = False
             return
 
         
@@ -706,6 +736,7 @@ class ScraperFrame(ctk.CTkFrame):
             self.LoadedStatus(error="")
         
         self.schedule_scrapper_button.grid()
+        working = False
         logger.info("Ending thread for scraping schedule.")
 
     def SetProgressBar(self):
