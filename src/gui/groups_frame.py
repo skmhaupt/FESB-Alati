@@ -72,6 +72,7 @@ class GroupsFrame(ctk.CTkFrame):
         self.logger.info(f"Selected file: {filename}")
 
     # 'UploadAction' runs from 'upload_button'. Sets 'loaded_data[0]' to False in order to block the main section from starting.
+    # (loaded_data[0]: bool = flag for groups_loaded)
     # Makes preparations for 'LoadGroups'
     def UploadAction(self):
         # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
@@ -174,7 +175,7 @@ class GroupsFrame(ctk.CTkFrame):
     # this section sets loaded_data[0] to True. (loaded_data[0]: bool = flag for groups_loaded)
     def LoadGroups(self)->str:
         # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
-        settings.loaded_data[0] = False
+        settings.loaded_data[0] = False     # this will probably always already be false at this point
 
         try:
             groups, filename = pars_schedule_file()
