@@ -13,3 +13,5 @@ def init():
     #this variable defines the total amount of places that are available with the provided groups in the .txt file
     total_places = 0
 
+    # this variable is only used for initial data loading for validation, it is not used in the main section 'fill_groups'
+    cours_participants_global = None
