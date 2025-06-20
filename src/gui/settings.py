@@ -7,6 +7,9 @@ def init():
     #loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
     loaded_data = [False, False, False, False]
 
+    #prevents multiple sections of running simultaneously to prevent unpredictable behaviour
+    working = False
+
     #this variable defines the total amount of places that are available with the provided groups in the .txt file
     total_places = 0
 
