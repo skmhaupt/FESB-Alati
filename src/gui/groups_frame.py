@@ -178,7 +178,7 @@ class GroupsFrame(ctk.CTkFrame):
         settings.loaded_data[0] = False     # this will probably always already be false at this point
 
         try:
-            groups, filename = pars_schedule_file()
+            groups, filename, group_errors = pars_schedule_file()
         except ValueError:
             self.NoGroupsInUploadedFile()
             return
@@ -195,6 +195,17 @@ class GroupsFrame(ctk.CTkFrame):
 
         row:int = 2
         group:Group
+        settings.total_places = 0
+        if group_errors:
+            self.group_error_label = ctk.CTkLabel(self.subframe, text=f"Moguca greska u datoteci!", text_color="red")
+            self.group_error_label.grid(row=row, column=0, columnspan=5, padx=5, pady=(5, 0), sticky="we")
+            row+=1
+            
+        for line in group_errors:
+            self.group_error_label = ctk.CTkLabel(self.subframe, text=f"{line}", text_color="red")
+            self.group_error_label.grid(row=row, column=0, columnspan=5, padx=5, pady=(5, 0), sticky="we")
+            row+=1
+
         for groups_in_day in groups.values():   # display all loaded groups in subframe and set 'settings.total_places' global var
             for group in groups_in_day:
                 self.AddGrouplabel(row,group)
