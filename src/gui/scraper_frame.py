@@ -1,3 +1,4 @@
+from excel_functions.fill_groups_results import GenScraperDetailesWorkbook
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.classes import Student
 from threading import Thread
@@ -111,73 +112,11 @@ class ScraperFrame(ctk.CTkFrame):
     # create excel file with error details
     def ErrorDetails(self, csvMissing:list[Student], csvEmpty:list[Student]):
         try:
-            workbook = xlsxwriter.Workbook("data/Student_schedules_Error_detailes.xlsx")
-            worksheet = workbook.add_worksheet()
-
-            merge_format = workbook.add_format({"border":1, "bottom":5, "align": "center"})
-
-            worksheet.write("A2", "Ime i prezime")
-            worksheet.write("B2", "JMBAG")
-            worksheet.write("C2", "E-Mail")
-
-            worksheet.write("E2", "Ime i prezime")
-            worksheet.write("F2", "JMBAG")
-            worksheet.write("G2", "E-Mail")
-            
-            width1 = len("Ime i prezime")+1
-            width2 = len("JMBAG")+1
-            width3 = len("E-Mail")+1
-            row: int = 3
-            for student in csvMissing:
-                worksheet.write(f"A{row}", f"{student.fullname}")
-                if width1 < len(f"{student.fullname}"):
-                    width1 = len(f"{student.fullname}")+1
-
-                worksheet.write(f"B{row}", f"{student.jmbag}")
-                if width2 < len(f"{student.jmbag}"):
-                    width2 = len(f"{student.jmbag}")+1
-
-                worksheet.write(f"C{row}", f"{student.email}")
-                if width3 < len(f"{student.email}"):
-                    width3 = len(f"{student.email}")+1
-
-                row += 1
-
-            worksheet.set_column(0, 0, width1)
-            worksheet.set_column(1, 1, width2)
-            worksheet.set_column(2, 2, width3)
-            worksheet.merge_range("A1:C1", "Studenti kojima nije uspjesno preuzet raspored", merge_format)
-            
-            width1 = len("Ime i prezime")+1
-            width2 = len("JMBAG")+1
-            width3 = len("E-Mail")+1
-            row: int = 3
-            for student in csvEmpty:
-                #worksheet.write(f"C{row}", f"{student}")
-                worksheet.write(f"E{row}", f"{student.fullname}")
-                if width1 < len(f"{student.fullname}"):
-                    width1 = len(f"{student.fullname}")+1
-
-                worksheet.write(f"F{row}", f"{student.jmbag}")
-                if width2 < len(f"{student.jmbag}"):
-                    width2 = len(f"{student.jmbag}")+1
-
-                worksheet.write(f"G{row}", f"{student.email}")
-                if width3 < len(f"{student.email}"):
-                    width3 = len(f"{student.email}")+1
-
-                row += 1
-
-            worksheet.set_column(4, 4, width1)
-            worksheet.set_column(5, 5, width2)
-            worksheet.set_column(6, 6, width3)
-            worksheet.merge_range("E1:G1", "Studenti kojima je preuzet raspored prazan", merge_format)
-
-            workbook.close()
+            GenScraperDetailesWorkbook(csvMissing, csvEmpty)
 
         except Exception:
             self.logger.critical("Error with creating Student_schedules_Error_detailes.xlsx")
-            self.logger.exception()
+            raise
         
         try:
             dest_dir = Path.home() / "Downloads"
