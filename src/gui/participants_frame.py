@@ -138,7 +138,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             return
 
         self.LoadParticipants()
-        #self.controller.scraper_frame.Reset_label()
+        self.controller.scraper_frame.Reset_label()
         settings.working = False
 
     # 'LoadParticipants' runs on sturtup and when loading new .csv file after the 'UploadAction' function. It runs the 'pars_cours_participants'

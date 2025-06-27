@@ -7,8 +7,8 @@ from shutil import copy
 
 import copy as listcopy
 import customtkinter as ctk
-import gui.settings as settings
-import logging, xlsxwriter, os, json
+import gui.settings as settings, gui.util as util
+import logging, os, json
 
 # ScraperFrame crates the section used for getting the schedule of all students.
 # This section is made around the 'schedule_scraper' funciton from 'labgenpackage'.
@@ -119,21 +119,16 @@ class ScraperFrame(ctk.CTkFrame):
             raise
         
         try:
-            dest_dir = Path.home() / "Downloads"
-            copy("data/Student_schedules_Error_detailes.xlsx", dest_dir)
+            util.CopyAndRename(srcname="Student_schedules_Error_detailes.xlsx", dstname="Greske_sa_preuzetim_rasporedima")
             os.unlink("data/Student_schedules_Error_detailes.xlsx")
         except Exception:
             self.logger.exception("Error with downloading Student_schedules_Error_detailes.xlsx")
         
         self.details_button.configure(text="Preuzeto", text_color="green")
-        self.details_button.after(2000, self.ResetDetailsButton)
-
-    def ResetDetailsButton(self):
-        self.details_button.configure(text="Preuzmi detalje", text_color="white")
+        self.details_button.after(2000, lambda: util.ResetButton(self.details_button, "Preuzmi detalje", "white"))
     
-    # Validate needed data before running scraper
+    # Validate input data before running scraper
     def ScrapSchedule_setup(self):
-        #reset variable cours_participants_global
         settings.loaded_data[3] = False
 
         if not settings.cours_participants_global:

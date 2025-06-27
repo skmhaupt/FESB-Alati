@@ -6,6 +6,7 @@ from shutil import copy
 
 import customtkinter as ctk
 import gui.settings as settings
+import gui.util as util
 import logging, glob
 
 # GroupFrame crates the section used for uploading a group.txt file.
@@ -77,13 +78,11 @@ class GroupsFrame(ctk.CTkFrame):
     def UploadAction(self):
         # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         settings.loaded_data[0] = False
+        util.ClearSubframe(self.subframe)
         
         if settings.working:    # only one section can run at a time. This prevents unpredictable errors. - temporary fix
             self.logger.warning("Already runing another section! Cant upload new groups.")
 
-            for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-                widget.destroy()
-            
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Vec je pokrenuta druga sekcija.\nSacekajte dok ne zavrsi sa izvodenjem", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             
@@ -98,10 +97,6 @@ class GroupsFrame(ctk.CTkFrame):
         input_txt_file = self.txt_file_entry.get()
         if(input_txt_file==""):
             self.logger.warning("Select a .txt file befor uploading.")
-
-            for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-                widget.destroy()
-            
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Nije zadana .txt datoteka.", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             settings.working = False
@@ -112,10 +107,6 @@ class GroupsFrame(ctk.CTkFrame):
         
         else:
             self.logger.warning("Input file hase to be a .txt file.")
-
-            for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-                widget.destroy()
-            
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Odabrana pogresna datoteka.", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             settings.working = False
@@ -179,19 +170,17 @@ class GroupsFrame(ctk.CTkFrame):
 
         try:
             groups, filename, group_errors = pars_schedule_file()
+            util.ClearSubframe(self.subframe)   # this is called in case there is data on startup
         except ValueError:
             self.NoGroupsInUploadedFile()
             return
-        except FileNotFoundError:   # this should never occur as it has already been verified in 'UploadAction'
-            self.UnexpectedErrorMsg("Critical - this should never occur as it has already been verified in 'UploadAction'")
-            return
+        except FileNotFoundError:   # this should only ever occur on startup as it has already been verified in 'UploadAction'
+            self.logger.warning("Found no .txt schedule file on startup.")
+            raise
         except Exception:
             #self.logger.critical("Failed parcing participants!")
             self.UnexpectedErrorMsg("Failed parcing participants!")
             return
-
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
 
         row:int = 2
         group:Group
@@ -226,9 +215,6 @@ class GroupsFrame(ctk.CTkFrame):
         self.num_of_groups_label.configure(text=f"Broj grupa: N/A")
         self.num_of_places_label.configure(text=f"Broj dostupnih mjesta: N/A")
 
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
-
         # Displays example for .txt file
         self.warning_label = ctk.CTkLabel(self.subframe, text=f"Ispravni format zapisa grupa u datoteci:", text_color="red")
         self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
@@ -261,7 +247,5 @@ class GroupsFrame(ctk.CTkFrame):
     # display unexpected error msg in subframe
     def UnexpectedErrorMsg(self, errormsg:str):
         self.logger.critical(errormsg)
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
         self.warning_label = ctk.CTkLabel(self.subframe, text=f"Neocekivana pogreska.\nPokusajte ponovo.", text_color="red")
         self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")

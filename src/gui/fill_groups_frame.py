@@ -5,13 +5,11 @@ from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
 from labgenpackage.fill_groups import fill_groups
 from labgenpackage.classes import Student, Group
-from shutil import copy, move
 from threading import Thread
-from pathlib import Path
 
 import customtkinter as ctk
 import gui.settings as settings
-import logging, xlsxwriter, os, json
+import logging, os, json, gui.util as util
 
 class FillGroupsFrame(ctk.CTkFrame):
     def __init__(self, master, logger: logging.Logger):
@@ -31,7 +29,6 @@ class FillGroupsFrame(ctk.CTkFrame):
         self.section_title_label = ctk.CTkLabel(self, text="Ispuna grupa", font=("Helvetica", 23))
         self.section_title_label.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="nw")
 
-        #global alfa_prio_label, alfa_prio_lvl
         self.alfa_prio_slider = ctk.CTkSlider(self, from_=0, to=100, command=self.slider_event)
         self.alfa_prio_slider.configure(number_of_steps=20)
         self.alfa_prio_slider.set(0)
@@ -54,15 +51,11 @@ class FillGroupsFrame(ctk.CTkFrame):
 
     # sync slider label and slider value
     def slider_event(self,value):
-        #global alfa_prio_label, alfa_prio_lvl
         settings.alfa_prio_lvl = int(value)
         self.alfa_prio_label.configure(text=f"Abecedni prioritet: {settings.alfa_prio_lvl}")
     
     # ask user if he wants to run the main section even if the number of places is smaller than the number of students
     def CheckIfUserWantsToContinue(self)->bool:
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
-
         self.label_question = ctk.CTkLabel(self.subframe, text="Broj dostupnih mjesta je manji od broja studenta! Zelite li nastaviti?")
         self.label_question.grid(row=0,column=0, columnspan=2, padx=10, pady=(10,0),sticky="s")
         self.label_data = ctk.CTkLabel(self.subframe, text=f"Broj dostupnih mjesta: {settings.total_places}; Broj studenta: {len(settings.cours_participants_global)}")
@@ -87,21 +80,13 @@ class FillGroupsFrame(ctk.CTkFrame):
     # user doesnt wants to run the main section
     def No(self):
         settings.continue_answer = False
-
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
-
+        util.ClearSubframe(self.subframe)
         self.label_question = ctk.CTkLabel(self.subframe, text="Zadatak prekinut")
         self.label_question.grid(row=0,column=0, columnspan=2, padx=10, pady=10)
-        #self.subframe.grid_columnconfigure(0, weight=1)
-        #self.subframe.grid_columnconfigure(1, weight=1)
         self.subframe.grid_rowconfigure(0, weight=1)
 
     # display error msg in subframe if missing input data
     def MissingData(self):
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
-        
         self.warning_label = ctk.CTkLabel(self.subframe, text="Nisu ucitani potrebni podatci za pokretanje!", text_color="red")
         self.warning_label.grid(row=0,column=0, padx=10, pady=5, sticky="w")
 
@@ -127,18 +112,14 @@ class FillGroupsFrame(ctk.CTkFrame):
     # Is called on 'fill_groups_button' press. Makes all needed preparations before running main task thread
     def FillGroups_setup(self):
         self.fill_groups_button.grid_remove()
+        util.ClearSubframe(self.subframe)
 
         if settings.working:    # only one section can run at a time. This prevents unpredictable errors. - temporary fix
             self.logger.warning("Already runing another section! Cant upload new groups.")
-
-            for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-                widget.destroy()
-            
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Vec je pokrenuta druga sekcija.\nSacekajte dok ne zavrsi sa izvodenjem", text_color="red")
             self.warning_label.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
             self.fill_groups_button.grid()
             return
-        
         else: settings.working = True   # block other sections from starting
         
 
@@ -159,21 +140,17 @@ class FillGroupsFrame(ctk.CTkFrame):
 
         # get cours data and save it to data.json
         cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
-        cours_name = cours_name_entry.get()
+        settings.cours_name = cours_name_entry.get()
         cours_number_entry: ctk.CTkEntry = self.controller.cours_frame.cours_number_entry
-        cours_number = cours_number_entry.get()
+        settings.cours_number = cours_number_entry.get()
         with open("data/data.json", "r") as file:
             data:dict[str:str] = json.load(file)
-        data["cours"] = cours_name
-        data["cours_number"] = cours_number
+        data["cours"] = settings.cours_name
+        data["cours_number"] = settings.cours_number
         json_object = json.dumps(data, indent=4)
-        self.logger.info(f"Saving cours data: {cours_name} - {cours_number}")
+        self.logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}")
         with open("data/data.json", "w") as file:
             file.write(json_object)
-
-        #Clear subframe and set progress bar
-        for widget in self.subframe.winfo_children():   # deleting all old widgets in subframe
-            widget.destroy()
 
         self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
         self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
@@ -248,8 +225,6 @@ class FillGroupsFrame(ctk.CTkFrame):
             
             # display results of fill_groups
             settings.cours_participants_result = cours_participants_copy
-            GenResultsWorkbook()
-            #self.CreateExcelWorkbook()
             self.LoadStatus(success, weight_errors, fill_errors)
             self.main_task_progressbar.stop()
             self.main_task_progressbar.destroy()
@@ -264,9 +239,6 @@ class FillGroupsFrame(ctk.CTkFrame):
             return
     
     def LoadStatus(self,success:bool, weight_errors:list[Student], fill_errors:list[Student]):
-        for widget in self.subframe.winfo_children():
-            widget.destroy()
-
         if success:
             self.status_header_label = ctk.CTkLabel(self.subframe, text="Grupe popunjene.",font=("Helvetica", 18))
         else:
@@ -284,9 +256,6 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.label_5.grid(row=2, column=0, padx=5, pady=(0, 5), sticky="w")
             self.button_3 = ctk.CTkButton(self.errorsubframe, width=60, text="Preuzmi", command=lambda:self.CopyErrorWeightsToDownloads(weight_errors,fill_errors))
             self.button_3.grid(row=2, column=0, columnspan=2, padx=(150,20), pady=(0, 5), sticky="e")
-        # else:
-        #     self.label_3 = ctk.CTkLabel(self.subframe, text=f"Broj studenti kojima ne odgovara niti jedna grupa: N/A")
-        #     self.label_3.grid(row=1, column=0, padx=20, pady=10, sticky="w")
 
         self.label_6 = ctk.CTkLabel(self.subframe, text="Excel datoteka sa popunjenim grupama:")
         self.label_6.grid(row=2, column=0, padx=(20,0), pady=10, sticky="w")
@@ -294,59 +263,37 @@ class FillGroupsFrame(ctk.CTkFrame):
         self.button_2.grid(row=2, column=0, columnspan=2, padx=(120,0), pady=10, sticky="")
 
         self.subframe.grid_columnconfigure(0, weight=1)
-        #self.subframe.grid_columnconfigure(1, weight=0)
         self.subframe.grid_rowconfigure(0, weight=0)
-
-    def ResetDownloadButton_2(self):
-        self.button_2.configure(text="Preuzmi", text_color="white")
-    def ResetDownloadButton_3(self):
-        self.button_3.configure(text="Preuzmi", text_color="white")
 
     def CopyErrorWeightsToDownloads(self,weight_errors:list[Student],fill_errors:list[Student]):
         try:
-            cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
-            cours_name = cours_name_entry.get()
-            if cours_name=="":
-                cours_name = "predmet"
-
-            cours_number_entry: ctk.CTkEntry = self.controller.cours_frame.cours_number_entry
-            cours_number = cours_number_entry.get()
-            if cours_number=="":
-                cours_number = "smjer"
-
             GenErrorDetailsWorkbook(self.logger, weight_errors, fill_errors)
 
-            dest_dir = Path.home() / "Downloads"
-            copy("data/Error_detailes.xlsx", dest_dir)
+            util.CopyAndRename(srcname="Error_detailes.xlsx", dstname="Greske_pri_punjenju_grupa")
+
             os.unlink("data/Error_detailes.xlsx")
-            new_name = f"{dest_dir}/{cours_name}-{cours_number}-Error_detailes.xlsx"
-            move(f"{dest_dir}/Error_detailes.xlsx", new_name)
+            
+            self.button_3.configure(text="Preuzeto", text_color="green")
+            self.button_3.after(2000, lambda: util.ResetButton(self.button_3, "Preuzmi", "white"))
 
         except Exception:
+            self.button_3.configure(text="Pogreska", text_color="red")
+            self.button_3.after(2000, lambda: util.ResetButton(self.button_3, "Preuzmi", "white"))
             self.logger.exception("Error with downloading Error_detailes.xlsx")
         
-        self.button_3.configure(text="Preuzeto", text_color="green")
-        self.button_3.after(1000, self.ResetDownloadButton_3)
-
     def CopyFilledGroupsToDownloads(self):
         try:
-            cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
-            cours_name = cours_name_entry.get()
-            if cours_name=="":
-                cours_name = "predmet"
+            GenResultsWorkbook()
 
-            cours_number_entry: ctk.CTkEntry = self.controller.cours_frame.cours_number_entry
-            cours_number = cours_number_entry.get()
-            if cours_number=="":
-                cours_number = "smjer"
+            util.CopyAndRename(srcname="Filled_Groups.xlsx", dstname="Popunjene_Grupe")
 
-            srcfile = "data/Filled_Groups.xlsx"
-            dest_dir = Path.home() / "Downloads"
-            copy(srcfile, dest_dir)
-            new_name = f"{dest_dir}/{cours_name}-{cours_number}-Popunjene_Grupe.xlsx"
-            move(f"{dest_dir}/Filled_Groups.xlsx", new_name)
-            #os.unlink("data/Filled_Groups.xlsx")
-        except Exception:
+            os.unlink("data/Filled_Groups.xlsx")
+            
+            self.button_2.configure(text="Preuzeto", text_color="green")
+            self.button_2.after(2000, lambda: util.ResetButton(self.button_2, "Preuzmi", "white"))
+
+        except Exception as e:
+            self.button_2.configure(text="Pogreska", text_color="red")
+            self.button_2.after(2000, lambda: util.ResetButton(self.button_2, "Preuzmi", "white"))
             self.logger.critical("Error when moving excel result file to downloads.")
-        self.button_2.configure(text="Preuzeto", text_color="green")
-        self.button_2.after(1000, self.ResetDownloadButton_2)
+            self.logger.critical(e)

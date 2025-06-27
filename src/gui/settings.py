@@ -1,8 +1,6 @@
-from labgenpackage.classes import Student
-
 # global variables used in GUI
 def init():
-    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result
+    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number
     
     # loaded_data is a collection of flags used to signal if main section 'fill_groups' can be launched
     # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
@@ -25,3 +23,6 @@ def init():
 
     # this will hold the final resultgit 
     cours_participants_result = None
+
+    cours_name = ""
+    cours_number = ""
