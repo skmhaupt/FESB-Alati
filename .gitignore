@@ -7,7 +7,7 @@
 *.so
 
 #local data
-/data/
+/src/data/
 #Raspored_scraping/data
 
 # Distribution / packaging
@@ -189,7 +189,7 @@ Raspored_scraping/.gradle
 **/data/timetables
 **/data/freeTimes
 **/data/usernames.txt
-Raspored_scraping/data/dates.txt
+**/data/dates.txt
 !Raspored_scraping/gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/

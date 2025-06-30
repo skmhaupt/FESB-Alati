@@ -1,11 +1,10 @@
 from labgenpackage.classes import Group
-import logging
-import glob
-import re
 from pathlib import Path
 from os import path
 
-def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
+import logging, glob, re
+
+def pars_schedule_file()->list[dict[str, list[Group]], str, list[str]]:
 
     logger = logging.getLogger("my_app.schedule_parsere")
     logger.setLevel("INFO")
@@ -28,6 +27,7 @@ def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
         fpath = fpaths[0]
         file_name = path.basename(fpath)
 
+        group_errors: list[str] = []
         days = ["PON", "UTO", "SRI", "ČET", "PET"]
         with open(fpath,"r", encoding="utf8") as file:
             for line in file:
@@ -41,10 +41,13 @@ def pars_schedule_file()->tuple[dict[str, list[Group]],str]:
                         if not group.day in groups:
                                 groups[group.day] = []
                         groups[group.day].append(group)
+                    else:
+                        group_errors.append(f"{line}")
+                        logger.warning(f"Potential error with provided group in line {line}!")
         if(len(groups)==0):
             logger.error(f"Failed to finde groups in {fpath}")
             raise ValueError
-        return (groups,file_name)
+        return [groups,file_name,group_errors]
 
     except FileNotFoundError:
         logger.warning("The file 'data/schedule.txt' was not found.")
