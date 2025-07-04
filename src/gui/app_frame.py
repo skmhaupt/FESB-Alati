@@ -1,4 +1,6 @@
+from gui.table_gen_options_frame import TableGenOptionsFrame
 from gui.groups_frame import GroupsFrame
+from gui.cours_frame import CoursFrame
 from gui.right_frame import RightFrame
 from pathlib import Path
 
@@ -22,7 +24,7 @@ class App(ctk.CTk):
         self.grid_rowconfigure(0, weight=1)
 
         self.tab_view = TabView(master=self,logger=logger)
-        self.tab_view.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
+        self.tab_view.grid(row=0, column=0, padx=0, pady=0, sticky="snwe")
 
 class TabView(ctk.CTkTabview):
     def __init__(self, master, logger: logging.Logger):
@@ -33,17 +35,18 @@ class TabView(ctk.CTkTabview):
         self.add("table_gen")
 
         # add widgets on tabs
-        self.group_gen = GrouGen(master=self.tab("groups_gen"),logger=logger)
+        self.group_gen = GroupsGen(master=self.tab("groups_gen"),logger=logger)
         self.group_gen.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
+        self.table_gen = TableGen(master=self.tab("table_gen"),logger=logger)
+        self.table_gen.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(0, weight=1)
 
-class GrouGen(ctk.CTkLabel):
+class GroupsGen(ctk.CTkLabel):
     def __init__(self, master, logger: logging.Logger):
         super().__init__(master)
 
         self.logger = logger
-
         self.controller = master    # in case ctk widgets from other sections have to be accessed
 
         #init groups frame
@@ -54,3 +57,18 @@ class GrouGen(ctk.CTkLabel):
         self.right_frame = RightFrame(self,logger)
         self.right_frame.grid(row=0, column=1, padx=(0,5), pady=0, sticky="nsew")
         self.right_frame.grid_columnconfigure(0, weight=1)
+
+class TableGen(ctk.CTkFrame):
+    def __init__(self, master, logger:logging.Logger):
+        super().__init__(master)
+
+        self.grid_columnconfigure(0, weight=1)
+
+        self.logger = logger
+        self.controller = master
+
+        self.cours_frame = CoursFrame(self, settings.cours_name, settings.cours_number)
+        self.cours_frame.grid(row=0,column=0, padx=5, pady=0, sticky="we")
+
+        self.table_gen_options_frame = TableGenOptionsFrame(self,logger)
+        self.table_gen_options_frame.grid(row=1,column=0, padx=5, pady=(5,0), sticky="we")
