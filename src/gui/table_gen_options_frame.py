@@ -7,7 +7,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     def __init__(self, master, logger: logging.Logger):
         super().__init__(master)
         
-        self.grid_columnconfigure(0, weight=2)
+        self.grid_columnconfigure(0, weight=1)
 
         self.controller = master    # in case ctk widgets from other sections have to be accessed
         self.logger = logger
@@ -16,12 +16,13 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.section_title_label.grid(row=0, column=0, columnspan=2, padx=13, pady=(10, 0), sticky="nw")
 
         self.ex_lable_subframe = ctk.CTkFrame(self)
-        self.ex_lable_subframe.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nwe")
+        self.ex_lable_subframe.grid(row=1, column=0, padx=5, pady=5, sticky="nwe")
         
+        self.ex_lable_subframe.grid_columnconfigure(0, weight=1)
         
         # --------------------------
         # number of lab exercises and required attendance
-        self.num_lab_attend_subframe = ctk.CTkFrame(self.ex_lable_subframe, width=400)
+        self.num_lab_attend_subframe = ctk.CTkFrame(self.ex_lable_subframe)
         self.num_lab_attend_subframe.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nwe")
         self.num_lab_attend_subframe.grid_columnconfigure(4, weight=1)
         self.num_labexc_lable = ctk.CTkLabel(self.num_lab_attend_subframe, text="Broj vjezbi:")
@@ -31,19 +32,19 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.num_labexc_entry = ctk.CTkEntry(self.num_lab_attend_subframe, width=45, justify="center", validate='all', validatecommand=(self.vcmd, '%P'))
         self.num_labexc_entry.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
 
-        self.attendance_lable = ctk.CTkLabel(self.num_lab_attend_subframe, text="-  Obavezna prisutnost:")
-        self.attendance_lable.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
+        self.attendance_lable = ctk.CTkLabel(self.num_lab_attend_subframe, text="Obavezna prisutnost:")
+        self.attendance_lable.grid(row=0, column=2, padx=(40, 5), pady=5, sticky="nw")
 
         self.vcmd1 = (self.register(self.callback1))
         self.attendance_entry = ctk.CTkEntry(self.num_lab_attend_subframe, width=45, justify="center", validate='all', validatecommand=(self.vcmd1, '%P'))
         self.attendance_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
 
-        self.attendance_lable2 = ctk.CTkLabel(self.num_lab_attend_subframe, text="/ NaN")
+        self.attendance_lable2 = ctk.CTkLabel(self.num_lab_attend_subframe, anchor=ctk.W, width=70, text="/ NaN")
         self.attendance_lable2.grid(row=0, column=4, padx=5, pady=5, sticky="nw")
 
         # --------------------------
         # custom exercise lables
-        self.custom_exlables_subframe = ctk.CTkFrame(self.ex_lable_subframe, width=400)
+        self.custom_exlables_subframe = ctk.CTkFrame(self.ex_lable_subframe)
         self.custom_exlables_subframe.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nwe")
 
         self.custom_exlables_lable = ctk.CTkLabel(self.custom_exlables_subframe, text="Rucno postavljanje labela za zadatke:")
@@ -53,27 +54,48 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.custom_exlables_checkbox = ctk.CTkCheckBox(self.custom_exlables_subframe, text="", width=24, command=self.eval_custom_exlables_checkbox_event,variable=self.custom_exlables_check_var, onvalue="on", offvalue="off")
         self.custom_exlables_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
 
+        self.custom_exlables_subframe.grid_columnconfigure(1, weight=1)
+
         # self.custom_exlables_entry = ctk.CTkEntry(self.custom_exlables_subframe, placeholder_text="Unesite zarezom odvojene vrijednosti. Npr: zad1, vj2, test3, itd.", width=400, validate='all', validatecommand=(vcmd2, '%P'))
         # self.custom_exlables_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nwe")
 
         # --------------------------
         # evaluation of exercise 0 or 1
-        self.evalex0_subframe = ctk.CTkFrame(self.ex_lable_subframe, width=400)
+        self.evalex0_subframe = ctk.CTkFrame(self.ex_lable_subframe)
         self.evalex0_subframe.grid(row=2, column=0, padx=5, pady=5, sticky="nwe")
 
         self.eval_ex0_lable = ctk.CTkLabel(self.evalex0_subframe, text="Prva vjezba se ne ocjenjuje:")
         self.eval_ex0_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
 
         self.ex0_check_var = ctk.StringVar(value="off")
+        self.lab0_check_var = ctk.StringVar(value="off")
         self.ex0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.eval_ex0_checkbox_event,variable=self.ex0_check_var, onvalue="on", offvalue="off")
         self.ex0_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
 
+        # --------------------------
+        # errors subframe
+        self.errors_subframe = ctk.CTkFrame(self.ex_lable_subframe)
+        self.errors_subframe.grid(row=0, column=1, padx=5, pady=(5, 0), sticky="nwe")
+
+        self.error_lable = ctk.CTkLabel(self.errors_subframe, text=" ", text_color="red")
+        self.error_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+
+        # --------------------------
+        # preview subframe
+        self.preview_subframe = ctk.CTkFrame(self.ex_lable_subframe)
+        self.preview_subframe.grid(row=1, column=1,rowspan=2, padx=5, pady=5, sticky="nwe")
+
+        self.preview_title_lable = ctk.CTkLabel(self.preview_subframe, text="Pretpregled:", font=("Helvetica", 15))
+        self.preview_title_lable.grid(row=0, column=0, padx=10, pady=(5,0), sticky="nw")
+        self.preview_lable = ctk.CTkLabel(self.preview_subframe, text="Prezime i ime | ... | grupe | ...")
+        self.preview_lable.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="nw")
 
     def callback(self, P):
         if str.isdigit(P):
             self.attendance_lable2.configure(text=f"/ {P}")
             self.attendance_entry.delete(0)
             self.attendance_entry.insert(0,P)
+            self.update_preview_label(int(P))
             return True
         elif P == "":
             self.attendance_lable2.configure(text=f"/ NaN")
@@ -88,26 +110,76 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         else: return False
     
     def callback2(self, P):
+        entry = self.num_labexc_entry.get()
+        if str.isdigit(entry): ex_num = int(entry)
+
+        ex_lables = str.split(P,",")
+        if len(ex_lables) > ex_num: self.error_lable.configure(text="Previse labela!")
+        elif len(ex_lables) != ex_num: self.error_lable.configure(text="Nedovoljan broj labela!")
+        else: self.error_lable.configure(text="")
+
+        new_text = "Prezime i ime"
+        for ex in range(len(ex_lables)):
+            new_text = new_text + f" | {ex_lables[ex].strip()}"
+            if ex>9 and ex%10==0:
+                new_text = new_text + "\n"
+        new_text = new_text + " | Grupa"
+        self.preview_lable.configure(text=new_text)
+
         return True
     
     def eval_custom_exlables_checkbox_event(self):
         if self.custom_exlables_check_var.get() == "on":
             self.vcmd2 = (self.register(self.callback2))
             self.custom_exlables_entry = ctk.CTkEntry(self.custom_exlables_subframe, placeholder_text="Unesite zarezom odvojene vrijednosti. Npr: zad1, vj2, test3, itd.", width=400, validate='all', validatecommand=(self.vcmd2, '%P'))
-            self.custom_exlables_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nwe")
+            self.custom_exlables_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nw")
+            self.clear_preview_label()
+            self.lab0_check_var.set("off")
+            if hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
+                if self.lab0_label.winfo_exists(): self.lab0_label.destroy()
+                if self.lab0_checkbox.winfo_exists(): self.lab0_checkbox.destroy()
         elif self.custom_exlables_check_var.get() == "off":
             self.custom_exlables_entry.destroy()
+            self.error_lable.configure(text="")
+            self.update_preview_label()
+            if self.ex0_check_var.get() == "on":
+                self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text="Koristiti nultu vjezbu (lab0):")
+                self.lab0_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
+                self.lab0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.eval_lab0_checkbox_event,variable=self.lab0_check_var, onvalue="on", offvalue="off")
+                self.lab0_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
     
     def eval_ex0_checkbox_event(self):
-        if self.ex0_check_var.get() == "on":
+        if self.ex0_check_var.get() == "on" and self.custom_exlables_check_var.get() == "off":
             self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text="Koristiti nultu vjezbu (lab0):")
             self.lab0_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
-            self.lab0_check_var = ctk.StringVar(value="off")
             self.lab0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.eval_lab0_checkbox_event,variable=self.lab0_check_var, onvalue="on", offvalue="off")
             self.lab0_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
-        elif self.ex0_check_var.get() == "off":
-            self.lab0_label.destroy()
-            self.lab0_checkbox.destroy()
+        elif self.ex0_check_var.get() == "off" and hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
+            if self.lab0_label.winfo_exists(): self.lab0_label.destroy()
+            if self.lab0_checkbox.winfo_exists(): self.lab0_checkbox.destroy()
     
     def eval_lab0_checkbox_event(self):
-        pass
+        if self.lab0_check_var.get() == "on": self.update_preview_label(lab0=True)
+        elif self.lab0_check_var.get() == "off": self.update_preview_label(lab0=False)
+
+    def clear_preview_label(self):
+        new_text = "Prezime i ime | ... | Grupa"
+        self.preview_lable.configure(text=new_text)
+
+    def update_preview_label(self, ex_num: int = 0, lab0: bool = None):
+        if not ex_num:
+            entry = self.num_labexc_entry.get()
+            if str.isdigit(entry): ex_num = int(entry)
+        
+        if not lab0:
+            if self.lab0_check_var.get() == "on": lab0 = True
+            else: lab0 = False
+
+        new_text = "Prezime i ime"
+        if lab0: new_text = new_text + " | Lab 0"
+        for ex in range(ex_num):
+            new_text = new_text + f" | Lab {ex+1}"
+            if ex>9 and ex%10==0:
+                new_text = new_text + "\n"
+        new_text = new_text + " | Grupa"
+        self.preview_lable.configure(text=new_text)
