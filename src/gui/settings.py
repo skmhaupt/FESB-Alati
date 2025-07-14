@@ -2,8 +2,8 @@
 from customtkinter import BooleanVar
 
 def init():
-    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, ex_num, custom_ex_lables, max_test_points, min_average_required
-    global using_custom_exlables, no_eval_ex0, using_lab0, not_using_failed_points, get_repeat_students  # BooleanVar
+    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, ex_num, custom_ex_labels, max_test_points, min_average_required
+    global using_custom_exlabels, no_eval_ex0, using_lab0, not_using_failed_points, get_repeat_students  # BooleanVar
 
     # loaded_data is a collection of flags used to signal if main section 'fill_groups' can be launched
     # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
@@ -32,9 +32,9 @@ def init():
 
     ex_num = 0
 
-    custom_ex_lables = None
+    custom_ex_labels = None
 
-    using_custom_exlables = BooleanVar(value=False)
+    using_custom_exlabels = BooleanVar(value=False)
     no_eval_ex0 = BooleanVar(value=False)
     using_lab0 = BooleanVar(value=False)
     not_using_failed_points = BooleanVar(value=False)

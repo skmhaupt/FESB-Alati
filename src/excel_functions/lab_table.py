@@ -25,7 +25,7 @@ def CheckForValidWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.workshee
            not sh.max_column == 6 or \
            not sh.cell(row = 1, column = 1).value == "Prezime" or \
            not sh.cell(row = 1, column = 2).value == "Ime" or \
-           not sh.cell(row = 1, column = 4).value == "ID broj":
+           not (sh.cell(row = 1, column = 4).value == "ID broj" or "JMBAG"):
             raise BadWorkbook("Loaded workbook is not apropriet.")
         
         if sh.cell(row = 1, column = 3).value == "Email" and \
@@ -127,10 +127,10 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stude
     width3 = len("JMBAG")+1
     width4 = len("Korisničko ime")+1
     width5 = len("Email")+1
-    width6 = len("Grupa")+2
-    width7 = len("Priznat lab")+1
-    width8 = len("Priznat jednom")+1
-    width9 = len("Priznat dvaput")+1
+    width6 = 11 # grupa
+    width7 = 15 # Priznat lab
+    width8 = 19 # Priznat jednom
+    width9 = 19 # Priznat dvaput
 
     row: int = 2
     for student in cours_participants:
@@ -158,13 +158,13 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stude
     
     worksheet.set_column(0, 0, width1, format_left)
     worksheet.set_column(1, 1, width2, format_left)
-    worksheet.set_column(2, 2, width3, format_left)
-    worksheet.set_column(3, 3, width4, format_left)
-    worksheet.set_column(4, 4, width5, format_left)
+    worksheet.set_column(2, 2, width3, format_center)
+    worksheet.set_column(3, 3, width4, format_center)
+    worksheet.set_column(4, 4, width5, format_center)
     worksheet.set_column(5, 5, width6, format_center)
-    worksheet.set_column(6, 6, width7, format_left)
-    worksheet.set_column(7, 7, width8, format_left)
-    worksheet.set_column(8, 8, width9, format_left)
+    worksheet.set_column(6, 6, width7, format_center)
+    worksheet.set_column(7, 7, width8, format_center)
+    worksheet.set_column(8, 8, width9, format_center)
 
     worksheet.write("L1", "Grupa",format_header)
     worksheet.write("M1", "Dan",format_header)
@@ -196,6 +196,8 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stude
     worksheet.set_column(14, 14, width4, format_center)
 
     worksheet.set_row(0, 30)    # set row 1 height
+
+    worksheet.autofilter(0,5, len(cours_participants),8)    # filter by groups and exemptions
 
 # -----------------------------------------------------------
 # Writes sheet that containes all points, average and attendance
@@ -253,15 +255,15 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
     format_header = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
     
     format_fullname_label = workbook.add_format({'border':1, 'left':1, 'right':1, 'bottom':5 , 'top':5})
-    format_ex_lable = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':1, 'right':1, 'bottom':5 , 'top':5})
-    format_last_ex_lable = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':1, 'right':5, 'bottom':5 , 'top':5})
-    format_group_lable = workbook.add_format({'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
+    format_ex_label = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':1, 'right':1, 'bottom':5 , 'top':5})
+    format_last_ex_label = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':1, 'right':5, 'bottom':5 , 'top':5})
+    format_group_label = workbook.add_format({'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
     
     format_empty_cell = workbook.add_format({'border':1, 'left':5, 'right':1, 'bottom':1 })
     
-    format_first_index_lable = workbook.add_format({'border':1, 'left':5, 'right':1, 'bottom':1 , 'top':5})
-    format_index_lable = workbook.add_format({'border':1, 'left':5, 'right':1, 'bottom':1 , 'top':1})
-    format_last_index_lable = workbook.add_format({'border':1, 'left':5, 'right':1, 'bottom':5 , 'top':1})
+    format_first_index_label = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':1, 'bottom':1 , 'top':5})
+    format_index_label = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':1, 'bottom':1 , 'top':1})
+    format_last_index_label = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':1, 'bottom':5 , 'top':1})
 
     format_center_cell = workbook.add_format({'border':1, 'right':1, 'bottom':1})
     format_right_moste_center_cell = workbook.add_format({'border':1, 'right':5, 'bottom':1})
@@ -281,31 +283,31 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
 
     row: int = 5
     col: int = 0
-    group_lable_width = 4
+    group_label_width = 4
     student_width = len("Prezime i Ime")
     for group in groups:
         starting_row = row
-        if len(group.group_label) > group_lable_width: group_lable_width = len(group.group_label)
-        worksheet.write(row, col, f"{group.group_label}", format_group_lable)
-        worksheet.write(row, col+1, f"{group.day} {group.time}", format_group_lable)
-        worksheet.write(row, col+2, f"{group.lab}", format_group_lable)
+        if len(group.group_label) > group_label_width: group_label_width = len(group.group_label)
+        worksheet.write(row, col, f"{group.group_label}", format_group_label)
+        worksheet.write(row, col+1, f"{group.day} {group.time}", format_group_label)
+        worksheet.write(row, col+2, f"{group.lab}", format_group_label)
         worksheet.set_row(row, 16)  # label rows -> height px
         row+=1  # move to next row
         worksheet.write(row, col, "", format_empty_cell)
         worksheet.write(row, col+1, "Prezime i Ime", format_fullname_label)
         for ex in range(settings.ex_num):   # write ex labels
-            if ex == settings.ex_num-1: format = format_last_ex_lable
-            else: format = format_ex_lable
+            if ex == settings.ex_num-1: format = format_last_ex_label
+            else: format = format_ex_label
             worksheet.write(row, col+2+ex, f"Lab{ex+1}", format)
         worksheet.set_row(row, 16)  # label rows -> height px
 
         row+=1  # move to next row
         index = 1
         for student in group.students:  # add students to table and format row
-            if index == 1: format = format_first_index_lable
-            else: format = format_index_lable
+            if index == 1: format = format_first_index_label
+            else: format = format_index_label
             format2 = format_center_cell
-            worksheet.write(row, col, f"{index}", format)
+            worksheet.write(row, col, index, format)
             worksheet.write(row, col+1, f"{student.fullname}", format2)
             if student_width < len(student.fullname): student_width = len(student.fullname)
             for index2 in range(settings.ex_num):
@@ -317,15 +319,15 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
 
         while index < max_group_size+2: # padd with empty group slots
             if index == 1: 
-                format = format_first_index_lable
+                format = format_first_index_label
                 format2 = format_center_cell
             elif index == max_group_size+1: 
-                format = format_last_index_lable
+                format = format_last_index_label
                 format2 = format_last_row_center_cell
             else: 
-                format = format_index_lable
+                format = format_index_label
                 format2 = format_center_cell
-            worksheet.write(row, col, f"{index}", format)
+            worksheet.write(row, col, index, format)
             worksheet.write(row, col+1, "",format2)
             for index2 in range(settings.ex_num):
                 if index == max_group_size+1 and index2 == settings.ex_num-1: format2 = format_right_moste_last_row_center_cell
@@ -342,8 +344,8 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
             row = row + 4
             col = 0
 
-    worksheet.set_column(0, 0, group_lable_width)
-    worksheet.set_column(3+settings.ex_num, 3+settings.ex_num, group_lable_width)
+    worksheet.set_column(0, 0, group_label_width)
+    worksheet.set_column(3+settings.ex_num, 3+settings.ex_num, group_label_width)
     worksheet.set_column(1, 1, student_width)
     worksheet.set_column(4+settings.ex_num, 4+settings.ex_num, student_width)
     

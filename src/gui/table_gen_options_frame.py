@@ -1,5 +1,6 @@
 from customtkinter import filedialog
 from excel_functions.lab_table import gen_tables
+from gui.util import ResetButton
 
 import gui.settings as settings
 import customtkinter as ctk
@@ -27,7 +28,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         # validations commands for entrys 
         self.v_num_labex = (self.register(self.num_labex_callback))
         self.v_attendance = (self.register(self.attendance_callback))
-        self.v_custom_exlables = (self.register(self.custom_exlables_callback))
+        self.v_custom_exlabels = (self.register(self.custom_exlabels_callback))
         self.v_max_points = (self.register(self.max_points_callback))
         self.v_min_average_required = (self.register(self.min_average_required_callback))
 
@@ -36,43 +37,43 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.num_lab_attend_subframe = ctk.CTkFrame(self.settings_subframe)
         self.num_lab_attend_subframe.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="nwe")
         
-        self.num_labexc_lable = ctk.CTkLabel(self.num_lab_attend_subframe, text="Broj vjezbi:")
-        self.num_labexc_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+        self.num_labexc_label = ctk.CTkLabel(self.num_lab_attend_subframe, text="Broj vjezbi:")
+        self.num_labexc_label.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
 
         self.num_labexc_entry = ctk.CTkEntry(self.num_lab_attend_subframe, width=45, justify="center", validate='all', validatecommand=(self.v_num_labex, '%P'))
         self.num_labexc_entry.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
 
-        self.attendance_lable = ctk.CTkLabel(self.num_lab_attend_subframe, text="Obavezna prisutnost:")
-        self.attendance_lable.grid(row=0, column=2, padx=(40, 5), pady=5, sticky="nw")
+        self.attendance_label = ctk.CTkLabel(self.num_lab_attend_subframe, text="Obavezna prisutnost:")
+        self.attendance_label.grid(row=0, column=2, padx=(40, 5), pady=5, sticky="nw")
 
         self.attendance_entry = ctk.CTkEntry(self.num_lab_attend_subframe, width=45, justify="center", validate='all', validatecommand=(self.v_attendance, '%P'))
         self.attendance_entry.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
 
-        self.attendance_lable2 = ctk.CTkLabel(self.num_lab_attend_subframe, anchor=ctk.W, width=70, text="/ NaN")
-        self.attendance_lable2.grid(row=0, column=4, padx=5, pady=5, sticky="nw")
+        self.attendance_label2 = ctk.CTkLabel(self.num_lab_attend_subframe, anchor=ctk.W, width=70, text="/ NaN")
+        self.attendance_label2.grid(row=0, column=4, padx=5, pady=5, sticky="nw")
         
         self.num_lab_attend_subframe.grid_columnconfigure(4, weight=1)
 
         # ----------------------------------------------------------------------------------------------------
-        # custom exercise lables
-        self.custom_exlables_subframe = ctk.CTkFrame(self.settings_subframe)
-        self.custom_exlables_subframe.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nwe")
+        # custom exercise labels
+        self.custom_exlabels_subframe = ctk.CTkFrame(self.settings_subframe)
+        self.custom_exlabels_subframe.grid(row=1, column=0, padx=5, pady=(5, 0), sticky="nwe")
 
-        self.custom_exlables_lable = ctk.CTkLabel(self.custom_exlables_subframe, text="Rucno postavljanje labela za vjezbe:")
-        self.custom_exlables_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+        self.custom_exlabels_label = ctk.CTkLabel(self.custom_exlabels_subframe, text="Rucno postavljanje labela za vjezbe:")
+        self.custom_exlabels_label.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
 
-        self.custom_exlables_checkbox = ctk.CTkCheckBox(self.custom_exlables_subframe, text="", width=24, command=self.eval_custom_exlables_checkbox_event,variable=settings.using_custom_exlables, onvalue=True, offvalue=False)
-        self.custom_exlables_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
+        self.custom_exlabels_checkbox = ctk.CTkCheckBox(self.custom_exlabels_subframe, text="", width=24, command=self.eval_custom_exlabels_checkbox_event,variable=settings.using_custom_exlabels, onvalue=True, offvalue=False)
+        self.custom_exlabels_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
 
-        self.custom_exlables_subframe.grid_columnconfigure(1, weight=1)
+        self.custom_exlabels_subframe.grid_columnconfigure(1, weight=1)
 
         # ----------------------------------------------------------------------------------------------------
         # evaluation of exercise 0 or 1
         self.evalex0_subframe = ctk.CTkFrame(self.settings_subframe)
         self.evalex0_subframe.grid(row=2, column=0, padx=5, pady=(5,0), sticky="nwe")
 
-        self.no_eval_ex0_lable = ctk.CTkLabel(self.evalex0_subframe, text="Prva vjezba se ne ocjenjuje:")
-        self.no_eval_ex0_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+        self.no_eval_ex0_label = ctk.CTkLabel(self.evalex0_subframe, text="Prva vjezba se ne ocjenjuje:")
+        self.no_eval_ex0_label.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
         
         self.no_eval_ex0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.eval_ex0_checkbox_event,variable=settings.no_eval_ex0, onvalue=True, offvalue=False)
         self.no_eval_ex0_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky="nw")
@@ -82,19 +83,19 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.errors_subframe = ctk.CTkFrame(self.settings_subframe)
         self.errors_subframe.grid(row=0, column=1, padx=5, pady=(5, 0), sticky="nwe")
 
-        self.error_lable = ctk.CTkLabel(self.errors_subframe, text=" ", text_color="red")
-        self.error_lable.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
+        self.error_label = ctk.CTkLabel(self.errors_subframe, text=" ", text_color="red")
+        self.error_label.grid(row=0, column=0, padx=5, pady=5, sticky="nw")
 
         # ----------------------------------------------------------------------------------------------------
         # preview subframe
         self.preview_subframe = ctk.CTkFrame(self.settings_subframe)
         self.preview_subframe.grid(row=1, column=1,rowspan=2, padx=5, pady=5, sticky="nwe")
 
-        self.preview_title_lable = ctk.CTkLabel(self.preview_subframe, text="Pretpregled:", font=("Helvetica", 15))
-        self.preview_title_lable.grid(row=0, column=0, padx=10, pady=(5,0), sticky="nw")
+        self.preview_title_label = ctk.CTkLabel(self.preview_subframe, text="Pretpregled:", font=("Helvetica", 15))
+        self.preview_title_label.grid(row=0, column=0, padx=10, pady=(5,0), sticky="nw")
         
-        self.preview_lable = ctk.CTkLabel(self.preview_subframe, text="Prezime i ime | ... | grupe")
-        self.preview_lable.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="nw")
+        self.preview_label = ctk.CTkLabel(self.preview_subframe, text="Prezime i ime | ... | grupe")
+        self.preview_label.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="nw")
 
         # ----------------------------------------------------------------------------------------------------
         # grade subframe subframe
@@ -151,8 +152,13 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.input_file_subframe.grid_columnconfigure(1, weight=1)
 
         # ----------------------------------------------------------------------------------------------------
+        # generate tables and errors
         self.gen_tables_button = ctk.CTkButton(self.settings_subframe, width=60, text="Generiraj Tablice", command=self.gen_tables)
         self.gen_tables_button.grid(row=6, column=0, columnspan=2, padx=5, pady=10)
+
+        self.error_label2 = ctk.CTkLabel(self.settings_subframe, width=140, text="test", text_color="red")
+        self.error_label2.grid(row=6, column=0, columnspan=2, padx=50, pady=10, sticky="ne")
+
         # ----------------------------------------------------------------------------------------------------
         # set default entry values
         self.max_points_entry.insert(0,"10")
@@ -164,12 +170,12 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         if str.isdigit(P):
             settings.ex_num = int(P)
             self.update_min_average_required_preview_label()
-            self.update_attendance_lable2()
+            self.update_attendance_label2()
             self.update_ex_preview_label()
             return True
         elif P == "":
             settings.ex_num = 0     # default value
-            self.clear_attendance_lable2()
+            self.clear_attendance_label2()
             return True
         else: return False
 
@@ -180,20 +186,20 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         if int(P) > settings.ex_num: return False
         else: return True
     
-    def custom_exlables_callback(self, P):
-        ex_lables = str.split(P,",")
-        settings.custom_ex_lables = ex_lables
-        if len(ex_lables) > settings.ex_num: self.error_lable.configure(text="Previse labela!")
-        elif len(ex_lables) != settings.ex_num: self.error_lable.configure(text="Nedovoljan broj labela!")
-        else: self.error_lable.configure(text="")
+    def custom_exlabels_callback(self, P):
+        ex_labels = str.split(P,",")
+        settings.custom_ex_labels = ex_labels
+        if len(ex_labels) > settings.ex_num: self.error_label.configure(text="Previse labela!")
+        elif len(ex_labels) != settings.ex_num: self.error_label.configure(text="Nedovoljan broj labela!")
+        else: self.error_label.configure(text="")
 
         new_text = "Prezime i ime"
-        for ex in range(len(ex_lables)):
-            new_text = new_text + f" | {ex_lables[ex].strip()}"
+        for ex in range(len(ex_labels)):
+            new_text = new_text + f" | {ex_labels[ex].strip()}"
             if ex>9 and ex%10==0:
                 new_text = new_text + "\n"
         new_text = new_text + " | Grupa"
-        self.preview_lable.configure(text=new_text)
+        self.preview_label.configure(text=new_text)
         return True
     
     def max_points_callback(self, P):
@@ -215,23 +221,23 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     
     # --------------------------------------------------------------------------------------------------------
     # checkbox events
-    def eval_custom_exlables_checkbox_event(self):
-        if settings.using_custom_exlables.get():
-            self.custom_exlables_entry = ctk.CTkEntry(self.custom_exlables_subframe, placeholder_text="Unesite zarezom odvojene vrijednosti. Npr: zad1, vj2, test3, itd.", width=400, validate='all', validatecommand=(self.v_custom_exlables, '%P'))
-            self.custom_exlables_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nw")
+    def eval_custom_exlabels_checkbox_event(self):
+        if settings.using_custom_exlabels.get():
+            self.custom_exlabels_entry = ctk.CTkEntry(self.custom_exlabels_subframe, placeholder_text="Unesite zarezom odvojene vrijednosti. Npr: zad1, vj2, test3, itd.", width=400, validate='all', validatecommand=(self.v_custom_exlabels, '%P'))
+            self.custom_exlabels_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nw")
             self.clear_preview_label()
             settings.using_lab0.set(False)
             if hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
                 self.destroy_lab0_widgets()
-        elif not settings.using_custom_exlables.get():
-            self.custom_exlables_entry.destroy()
-            self.error_lable.configure(text="")
+        elif not settings.using_custom_exlabels.get():
+            self.custom_exlabels_entry.destroy()
+            self.error_label.configure(text="")
             self.update_ex_preview_label()
             if settings.no_eval_ex0.get():
                 self.create_lab0_widgets()
     
     def eval_ex0_checkbox_event(self):
-        if settings.no_eval_ex0.get() and not settings.using_custom_exlables.get():
+        if settings.no_eval_ex0.get() and not settings.using_custom_exlabels.get():
             self.create_lab0_widgets()
         elif not settings.no_eval_ex0.get() and hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
             self.destroy_lab0_widgets()
@@ -268,20 +274,20 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     # --------------------------------------------------------------------------------------------------------
     # update label functions
-    def clear_attendance_lable2(self):
-        self.attendance_lable2.configure(text=f"/ NaN")
+    def clear_attendance_label2(self):
+        self.attendance_label2.configure(text=f"/ NaN")
     
-    def update_attendance_lable2(self):
-        self.attendance_lable2.configure(text=f"/ {settings.ex_num}")
+    def update_attendance_label2(self):
+        self.attendance_label2.configure(text=f"/ {settings.ex_num}")
         self.attendance_entry.delete(0)
         self.attendance_entry.insert(0,settings.ex_num)
 
     def clear_preview_label(self):
         new_text = "Prezime i ime | ... | Grupa"
-        self.preview_lable.configure(text=new_text)
+        self.preview_label.configure(text=new_text)
 
     def update_ex_preview_label(self):
-        if settings.using_custom_exlables.get(): return
+        if settings.using_custom_exlabels.get(): return
         if not settings.ex_num: return
 
         new_text = "Prezime i ime"
@@ -291,7 +297,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             if ex>9 and ex%10==0:
                 new_text = new_text + "\n"
         new_text = new_text + " | Grupa"
-        self.preview_lable.configure(text=new_text)
+        self.preview_label.configure(text=new_text)
 
     def update_min_average_required_preview_label(self):
         if not settings.ex_num or not settings.max_test_points or not settings.min_average_required:
@@ -312,4 +318,11 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     def gen_tables(self):
         input_file = self.input_file_entry.get()
-        gen_tables(input_file)
+        success = gen_tables(input_file)
+
+        if success:
+            self.gen_tables_button.configure(text="Preuzeto", text_color="green")
+            self.gen_tables_button.after(2000, lambda: ResetButton(self.gen_tables_button, "Preuzmi", "white"))
+        else:
+            self.gen_tables_button.configure(text="Pogreska", text_color="red")
+            self.gen_tables_button.after(2000, lambda: ResetButton(self.gen_tables_button, "Preuzmi", "white"))

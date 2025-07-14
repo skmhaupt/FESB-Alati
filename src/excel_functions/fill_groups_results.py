@@ -1,7 +1,7 @@
 from labgenpackage.classes import Student
 
 import gui.settings as settings
-import xlsxwriter, logging
+import xlsxwriter, logging, locale
 
 def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student]):
     try:
@@ -148,33 +148,62 @@ def GenErrorDetailsWorkbook(logger: logging.Logger, weight_errors:list[Student],
 def GenResultsWorkbook():
     workbook = xlsxwriter.Workbook("data/Filled_Groups.xlsx")
     worksheet = workbook.add_worksheet()
-    worksheet.write("A1", "Prezime")
-    worksheet.write("B1", "Ime")
-    worksheet.write("C1", "Email")
-    worksheet.write("D1", "ID broj")
-    worksheet.write("E1", "Korisničko ime")
-    worksheet.write("F1", "Grupa")
+
+    format_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 
+                                         'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
+    format_header_first = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 
+                                         'bg_color': '#BFBFBF', 'border':1, 'left':5, 'right':0, 'bottom':5 , 'top':5})
+    format_header_last = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 
+                                         'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
+
+    format_surname = workbook.add_format({'align': 'center', 'border':1, 'left':5, 'right':0, 'bottom':0 , 'top':0})
+    format_bottom_surname = workbook.add_format({'align': 'center', 'border':1, 'left':5, 'right':0, 'bottom':5 , 'top':0})
+    format_center = workbook.add_format({'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0 , 'top':0})
+    format_bottom_center = workbook.add_format({'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':0})
+    
+    worksheet.write("A1", "Prezime", format_header_first)
+    worksheet.write("B1", "Ime", format_header)
+    worksheet.write("C1", "Email", format_header)
+    worksheet.write("D1", "JMBAG", format_header)
+    worksheet.write("E1", "Korisničko ime", format_header)
+    worksheet.write("F1", "Grupa", format_header_last)
+
+    worksheet.set_row(0, 30)    # row 1 -> height 50px
 
     width1 = len("Prezime")+1
     width2 = len("Ime")+1
     width3 = len("Email")+1
-    width4 = len("ID broj")+1
+    width4 = 12 # JMBAG
     width5 = len("Korisničko ime")+1
     width6 = len("Grupa")+1
 
     row: int = 2
     student: Student = None
+    cours_participants_list: list[Student] = []
+
     for student in settings.cours_participants_result.values():
-        worksheet.write(f"A{row}", f"{student.surname}")
-        worksheet.write(f"B{row}", f"{student.name}")
-        worksheet.write(f"C{row}", f"{student.email}")
-        worksheet.write(f"D{row}", f"{student.jmbag}")
-        worksheet.write(f"E{row}", f"{student.username}")
+        cours_participants_list.append(student)
+
+    locale.setlocale(locale.LC_COLLATE, "croatian")
+    cours_participants_list.sort(key=lambda x: locale.strxfrm(x.surname))
+
+    for student in cours_participants_list:
+        if student is cours_participants_list[-1]: 
+            format = format_bottom_surname
+            format1 = format_bottom_center
+        else: 
+            format = format_surname
+            format1 = format_center
+        worksheet.write(f"A{row}", f"{student.surname}", format)
+        worksheet.write(f"B{row}", f"{student.name}", format1)
+        worksheet.write(f"C{row}", f"{student.email}", format1)
+        worksheet.write(f"D{row}", student.jmbag, format1)
+        worksheet.write(f"E{row}", f"{student.username}", format1)
         if hasattr(student, "group"):
-            worksheet.write(f"F{row}", f"{student.group}")
+            worksheet.write(f"F{row}", f"{student.group}", format1)
             groupstr = f"{student.group}"
         else:
-            worksheet.write(f"F{row}", "Jos nisu svrstani")
+            worksheet.write(f"F{row}", "Jos nisu svrstani", format1)
             groupstr = "Jos nisu svrstani"
 
         if width1 < len(f"{student.surname}"):
@@ -184,7 +213,7 @@ def GenResultsWorkbook():
             width2 = len(f"{student.name}")+1
         
         if width3 < len(f"{student.email}"):
-            width3 = len(f"{student.email}")+1
+            width3 = len(f"{student.email}")+3
         
         if width4 < len(f"{student.jmbag}"):
             width4 = len(f"{student.jmbag}")+1
@@ -194,14 +223,18 @@ def GenResultsWorkbook():
 
         if width6 < len(groupstr):
             width6 = len(groupstr)+1
-        
-        worksheet.set_column(0, 0, width1)
-        worksheet.set_column(1, 1, width2)
-        worksheet.set_column(2, 2, width3)
-        worksheet.set_column(3, 3, width4)
-        worksheet.set_column(4, 4, width5)
-        worksheet.set_column(5, 5, width6)
 
+        worksheet.set_row(row-1, 18)  # student rows -> height 30px
+        
         row += 1
     
+    worksheet.set_column(0, 0, width1)
+    worksheet.set_column(1, 1, width2)
+    worksheet.set_column(2, 2, width3)
+    worksheet.set_column(3, 3, width4)
+    worksheet.set_column(4, 4, width5)
+    worksheet.set_column(5, 5, width6)
+
+    worksheet.autofilter(0,5, len(cours_participants_list),5)
+
     workbook.close()
