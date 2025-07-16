@@ -1,4 +1,5 @@
 from labgenpackage.classes import Student, Group
+from xlsxwriter.utility import xl_rowcol_to_cell
 from gui.util import CopyAndRename
 from pathlib import Path
 
@@ -207,46 +208,169 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stu
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 'bg_color': '#BFBFBF', 'left':0, 'right':0, 'border':1, 'bottom':5 , 'top':5})
     format_name_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
     format_average_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
+    format_group_header = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF'})
     
     format_students = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':5, 'bottom':0 , 'top':0})
-    format_last_student = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':0 })
     format_bottom = workbook.add_format({'border':1, 'left':0, 'right':0, 'bottom':0, 'top':5 })
 
+    format_attendance_cell = workbook.add_format({'align': 'center', 'border':1, 'left':5, 'right':1, 'bottom':0, 'top':0})
+    format_grade_cell = workbook.add_format({'num_format': '0.00%', 'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0, 'top':0})
+    format_point_cell = workbook.add_format({'align': 'center'})
+
+    format_green1_bg = workbook.add_format({'bg_color': '#9BBB59'})
+    format_red1_bg = workbook.add_format({'bg_color': '#FF0000'})
+    format_green2_bg = workbook.add_format({'bg_color': '#92D050'})
+    format_red2_bg = workbook.add_format({'bg_color': '#C00000'})
 
     worksheet.name = "Bodovi"
     worksheet.write("A1", "Prezime i Ime",format_name_header)
     
     # --------------------------------------
     # write header
-    row=0
-    col=0
-    for ex in range(settings.ex_num):
+    row: int = 0
+    col: int = 0
+    if settings.using_lab0.get():
+        col+=1
+        worksheet.write(row, col, "LAB0[+/-]",format_header)
+        worksheet.set_column(col, col, 10)
+        first_eval_col = 2  #zero indexed
+        ex=0
+    elif settings.no_eval_ex0.get():
+        col+=1
+        worksheet.write(row, col, "LAB1[+/-]",format_header)
+        worksheet.set_column(col, col, 10)
+        first_eval_col = 2  #zero indexed
+        ex=1
+    else:
+        first_eval_col = 1  #zero indexed
+        ex=0
+
+    while ex < settings.ex_num:
         col+=1
         worksheet.write(row, col, f"LAB{ex+1}",format_header)
+        worksheet.set_column(col, col, 10)
+        ex+=1
+
+    first_ex_col = 1    #zero indexed
+    last_ex_col = col   #zero indexed
+
     col+=2   # skip one column
     worksheet.write(row, col, f"ZADOVOLJENA PRISUTNOST",format_header)
     worksheet.set_column(col, col, 14)  # col 'ZADOVOLJENA PRISUTNOST' -> width 133px
+    attendance_col = col    #zero indexed
+
     col+=1
     worksheet.write(row, col, f"PROSJEK",format_average_header)
     worksheet.set_column(col, col, 9)   # col 'PROSJEK' -> width 88px
-    worksheet.set_row(0, 33)    # row 1 -> height 55px
+    grade_col = col   #zero indexed
+
+    col+=1
+    worksheet.write(row, col, f"GRUPA", format_group_header)
+    worksheet.set_column(col, col, 11)   # col 'GRUPA'
+    group_col = col #zero indexed
+    
+    worksheet.set_row(row, 33)    # row 1 -> height 55px
 
     # -------------------
     # write students
     width1 = len("Prezime i Ime")+1
-    row: int = 2
-    for student in cours_participants:
-        if row == len(cours_participants)+1: format = format_last_student
-        else: format = format_students
-        worksheet.write(f"A{row}", student.fullname, format)
+    for index, student in enumerate(cours_participants):
+        row = 1 + index
+        worksheet.write(row, 0, student.fullname, format_students)
+        for ex in range(last_ex_col+1):
+            worksheet.write_blank(row, first_ex_col + ex, "blank", format_point_cell)
+        
+        first_ex_cell = xl_rowcol_to_cell(row, first_ex_col)
+        first_eval_cell = xl_rowcol_to_cell(row, first_eval_col)
+        last_ex_cell = xl_rowcol_to_cell(row, last_ex_col)
+        hidden_cell = xl_rowcol_to_cell(row, last_ex_col+1)
+        attendance_cell = xl_rowcol_to_cell(row, attendance_col)
+        grade_cell = xl_rowcol_to_cell(row, grade_col)
+        group_cell = xl_rowcol_to_cell(row, group_col)
+        
+        if settings.using_lab0.get():
+            worksheet.write_formula(hidden_cell, f"=AND(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance}, {first_ex_cell}=\"+\")")
+        elif settings.no_eval_ex0.get():
+            worksheet.write_formula(hidden_cell, f"=AND(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance-1}, {first_ex_cell}=\"+\")")
+        else:
+            worksheet.write_formula(hidden_cell, f"=COUNTIF({first_ex_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance}")
+        worksheet.write_formula(attendance_cell, f"=IF({hidden_cell}=TRUE,\"DA\",\"NE\")", format_attendance_cell)
+        if settings.no_eval_ex0.get() and not settings.using_lab0.get():
+            worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num-1}*{settings.max_test_points})", format_grade_cell)
+        else:
+            worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num}*{settings.max_test_points})", format_grade_cell)
+        worksheet.write(group_cell, f"{student.group.group_label}", format_point_cell)
+        
         if len(student.fullname) > width1: width1 = len(student.fullname)+1
-        worksheet.set_row(row-1, 18)  # student rows -> height 30px
-        row+=1
-    col=1
-    for index in range(settings.ex_num+3):
-        worksheet.write(row-1,  col+index, "", format_bottom)
-    worksheet.set_column(0, 0, width1)
+        worksheet.set_row(row, 18)  # student rows -> height 30px
+
+    col=0
+    row+=1
+    for index in range(group_col):  # does not include group_col
+        worksheet.write_blank(row,  col+index, "blank", format_bottom)
     
+    # conditional formating for attendance
+    worksheet.conditional_format(1,attendance_col, row-1,attendance_col, {
+        'type':     'text',
+        'criteria': 'containing',
+        'value':    'DA',
+        'format':   format_green2_bg
+    })
+    worksheet.conditional_format(1,attendance_col, row-1,attendance_col, {
+        'type':     'text',
+        'criteria': 'containing',
+        'value':    'NE',
+        'format':   format_red2_bg
+    })
+
+    # conditional formating for grade
+    worksheet.conditional_format(1,grade_col, row-1,grade_col, {
+        'type':     'cell',
+        'criteria': '>=',
+        'value':    settings.min_average_required/100,
+        'format':   format_green2_bg
+    })
+    worksheet.conditional_format(1,grade_col, row-1,grade_col, {
+        'type':     'cell',
+        'criteria': '<',
+        'value':    settings.min_average_required/100,
+        'format':   format_red2_bg
+    })
+
+    # conditional formating for points
+    worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+        'type':     'cell',
+        'criteria': 'between',
+        'minimum':  settings.max_test_points/2,
+        'maximum':  settings.max_test_points,
+        'format':   format_green1_bg
+    })
+    worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+        'type':     'cell',
+        'criteria': 'between',
+        'minimum':  1,
+        'maximum':  settings.max_test_points/2 - 0.001,
+        'format':   format_red1_bg
+    })
+
+    # conditional formating for no_eval
+    if settings.no_eval_ex0.get():
+        worksheet.conditional_format(1,first_ex_col, row-1,first_ex_col, {
+            'type':     'text',
+            'criteria': 'containing',
+            'value':    '+',
+            'format':   format_green1_bg
+        })
+        worksheet.conditional_format(1,first_ex_col, row-1,first_ex_col, {
+            'type':     'text',
+            'criteria': 'containing',
+            'value':    '-',
+            'format':   format_red1_bg
+        })
+    
+    worksheet.set_column(0, 0, width1)
+    worksheet.autofilter(0,group_col, row-1,group_col)    # filter by groups and exemptions
+
 # -----------------------------------------------------------
 # Writes sheet with all filled group tables
 def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):

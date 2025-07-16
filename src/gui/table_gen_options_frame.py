@@ -180,11 +180,15 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         else: return False
 
     def attendance_callback(self, P):
-        if P == "": return True
+        if P == "": 
+            settings.attendance = 0
+            return True
         if not settings.ex_num: return False
         if not str.isdigit(P): return False
         if int(P) > settings.ex_num: return False
-        else: return True
+        else: 
+            settings.attendance = int(P)
+            return True
     
     def custom_exlabels_callback(self, P):
         ex_labels = str.split(P,",")
@@ -241,6 +245,11 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             self.create_lab0_widgets()
         elif not settings.no_eval_ex0.get() and hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
             self.destroy_lab0_widgets()
+        self.update_min_average_required_preview_label()
+    
+    def eval_lab0_checkbox_event(self):
+        self.update_ex_preview_label()
+        self.update_min_average_required_preview_label()
 
     def eval_get_repeat_students_checkbox_event(self):
         if settings.get_repeat_students.get():
@@ -265,7 +274,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     def create_lab0_widgets(self):
         self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text="Koristiti nultu vjezbu (lab0):")
         self.lab0_label.grid(row=0, column=2, padx=5, pady=5, sticky="nw")
-        self.lab0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.update_ex_preview_label,variable=settings.using_lab0, onvalue=True, offvalue=False)
+        self.lab0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text="", width=24, command=self.eval_lab0_checkbox_event,variable=settings.using_lab0, onvalue=True, offvalue=False)
         self.lab0_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky="nw")
     
     def destroy_lab0_widgets(self):
@@ -303,7 +312,8 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         if not settings.ex_num or not settings.max_test_points or not settings.min_average_required:
             self.min_average_required_preview_label.configure(text="NaN/NaN")
         else:
-            max_cours_points = settings.max_test_points * settings.ex_num
+            if settings.no_eval_ex0.get() and not settings.using_lab0.get(): max_cours_points = settings.max_test_points * (settings.ex_num - 1)
+            else: max_cours_points = settings.max_test_points * settings.ex_num
             min_required_cours_points = settings.min_average_required / 100 * max_cours_points
             self.min_average_required_preview_label.configure(text=f"{min_required_cours_points}/{max_cours_points}")
 
