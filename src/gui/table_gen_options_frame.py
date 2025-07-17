@@ -168,14 +168,16 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     # callbacks for entry validations
     def num_labex_callback(self, P):
         if str.isdigit(P):
+            if settings.using_lab0.get(): old_total = settings.ex_num+1
+            else: old_total = settings.ex_num
             settings.ex_num = int(P)
             self.update_min_average_required_preview_label()
-            self.update_attendance_label2()
+            self.update_attendance(old_total_ex_num=old_total)
             self.update_ex_preview_label()
             return True
         elif P == "":
             settings.ex_num = 0     # default value
-            self.clear_attendance_label2()
+            self.clear_attendance()
             return True
         else: return False
 
@@ -185,7 +187,9 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             return True
         if not settings.ex_num: return False
         if not str.isdigit(P): return False
-        if int(P) > settings.ex_num: return False
+        if settings.using_lab0.get(): total_ex_num = settings.ex_num + 1
+        else: total_ex_num = settings.ex_num
+        if int(P) > total_ex_num: return False
         else: 
             settings.attendance = int(P)
             return True
@@ -231,6 +235,8 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             self.custom_exlabels_entry.grid(row=1, column=0, columnspan=2, padx=5, pady=(0,5), sticky="nw")
             self.clear_preview_label()
             settings.using_lab0.set(False)
+            if settings.ex_num:
+                self.update_attendance(old_total_ex_num=settings.ex_num+1)
             if hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
                 self.destroy_lab0_widgets()
         elif not settings.using_custom_exlabels.get():
@@ -244,12 +250,20 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         if settings.no_eval_ex0.get() and not settings.using_custom_exlabels.get():
             self.create_lab0_widgets()
         elif not settings.no_eval_ex0.get() and hasattr(self, "lab0_label") and hasattr(self, "lab0_checkbox"):
+            if settings.using_lab0.get():
+                settings.using_lab0.set(False)
+                self.update_attendance(old_total_ex_num=settings.ex_num+1)
+            self.update_ex_preview_label()
             self.destroy_lab0_widgets()
         self.update_min_average_required_preview_label()
     
     def eval_lab0_checkbox_event(self):
         self.update_ex_preview_label()
         self.update_min_average_required_preview_label()
+        if settings.ex_num:
+            if settings.using_lab0.get(): old_total = settings.ex_num
+            else: old_total = settings.ex_num + 1
+            self.after(5,lambda: self.update_attendance(old_total_ex_num=old_total))
 
     def eval_get_repeat_students_checkbox_event(self):
         if settings.get_repeat_students.get():
@@ -283,13 +297,26 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     # --------------------------------------------------------------------------------------------------------
     # update label functions
-    def clear_attendance_label2(self):
+    def clear_attendance(self):
         self.attendance_label2.configure(text=f"/ NaN")
-    
-    def update_attendance_label2(self):
-        self.attendance_label2.configure(text=f"/ {settings.ex_num}")
         self.attendance_entry.delete(0)
-        self.attendance_entry.insert(0,settings.ex_num)
+        self.attendance_entry.insert(0,"")
+    
+    def update_attendance(self, old_total_ex_num:int):
+        old_attendace = self.attendance_entry.get()
+        
+        total_ex_num = settings.ex_num
+        if settings.using_lab0.get(): total_ex_num += 1
+        if total_ex_num == 0: self.clear_attendance
+        
+        if str.isdigit(old_attendace):
+            dif = old_total_ex_num - int(old_attendace)
+        else:
+            dif = 0
+        new_attendace = total_ex_num - dif
+        self.attendance_label2.configure(text=f"/ {total_ex_num}")
+        self.attendance_entry.delete(0,'end')
+        self.attendance_entry.insert(0,new_attendace)
 
     def clear_preview_label(self):
         new_text = "Prezime i ime | ... | Grupa"

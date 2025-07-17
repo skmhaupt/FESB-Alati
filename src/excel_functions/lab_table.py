@@ -288,10 +288,8 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stu
         grade_cell = xl_rowcol_to_cell(row, grade_col)
         group_cell = xl_rowcol_to_cell(row, group_col)
         
-        if settings.using_lab0.get():
-            worksheet.write_formula(hidden_cell, f"=AND(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance}, {first_ex_cell}=\"+\")")
-        elif settings.no_eval_ex0.get():
-            worksheet.write_formula(hidden_cell, f"=AND(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance-1}, {first_ex_cell}=\"+\")")
+        if settings.no_eval_ex0.get():
+            worksheet.write_formula(hidden_cell, f"=SUM(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\"), COUNTIF({first_ex_cell},\"=+\"))>={settings.attendance}")
         else:
             worksheet.write_formula(hidden_cell, f"=COUNTIF({first_ex_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance}")
         worksheet.write_formula(attendance_cell, f"=IF({hidden_cell}=TRUE,\"DA\",\"NE\")", format_attendance_cell)
@@ -405,40 +403,74 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
     for group in groups:
         if max_group_size < group.group_size: max_group_size = group.group_size
 
-    row: int = 5
-    col: int = 0
+    # create ex labels
+    ex_label_width = 9
+    ex_labels:list[str] = []
+    if settings.using_custom_exlabels.get():
+        ex_labels = settings.custom_ex_labels
+        if settings.no_eval_ex0.get():
+            ex_labels[0] = f"{ex_labels[0]}[+/-]"
+        for label in ex_labels:
+            if len(label)> ex_label_width: ex_label_width = len(label)+2
+    else:
+        ex = 1
+        if settings.using_lab0.get(): 
+            ex_labels.append("Lab0[+/0]")
+        elif settings.no_eval_ex0.get(): 
+            ex_labels.append("Lab1[+/-]")
+            ex+=1
+        while ex <= settings.ex_num:
+            ex_labels.append(f"Lab{ex}")
+            ex+=1
+
     group_label_width = 4
     student_width = len("Prezime i Ime")
-    for group in groups:
-        starting_row = row
-        if len(group.group_label) > group_label_width: group_label_width = len(group.group_label)
-        worksheet.write(row, col, f"{group.group_label}", format_group_label)
-        worksheet.write(row, col+1, f"{group.day} {group.time}", format_group_label)
-        worksheet.write(row, col+2, f"{group.lab}", format_group_label)
-        worksheet.set_row(row, 16)  # label rows -> height px
-        row+=1  # move to next row
-        worksheet.write(row, col, "", format_empty_cell)
-        worksheet.write(row, col+1, "Prezime i Ime", format_fullname_label)
-        for ex in range(settings.ex_num):   # write ex labels
-            if ex == settings.ex_num-1: format = format_last_ex_label
-            else: format = format_ex_label
-            worksheet.write(row, col+2+ex, f"Lab{ex+1}", format)
-        worksheet.set_row(row, 16)  # label rows -> height px
+    
+    gap_between_tables_col = 3  # = wanted col gap + 1
+    gap_between_tables_row = 3  # = wanted row gap
 
-        row+=1  # move to next row
+    index_col1:int = 0
+    first_ex_col1 = index_col1 + 2
+    last_ex_col1 = first_ex_col1 + len(ex_labels) - 1
+
+    index_col2 = last_ex_col1 + gap_between_tables_col
+    first_ex_col2 = index_col2 + 2
+    last_ex_col2 = first_ex_col2 + len(ex_labels) - 1
+
+    index_col = index_col1
+    table_header_row1: int = 5
+    first_ex_col = first_ex_col1
+    for group in groups:
+        table_header_row2 = table_header_row1 + 1
+        student_row = table_header_row2 + 1
+
+        if len(group.group_label) > group_label_width: group_label_width = len(group.group_label)
+        worksheet.write(table_header_row1, index_col, f"{group.group_label}", format_group_label)
+        worksheet.write(table_header_row1, index_col+1, f"{group.day} {group.time}", format_group_label)
+        worksheet.write(table_header_row1, index_col+2, f"{group.lab}", format_group_label)
+        worksheet.set_row(table_header_row1, 16.8)  # label rows -> height 28px
+        
+        worksheet.write_blank(table_header_row2, index_col, "blank", format_empty_cell)
+        worksheet.write(table_header_row2, index_col+1, "Prezime i Ime", format_fullname_label)
+        for ex, ex_label in enumerate(ex_labels):   # write ex labels
+            if ex == len(ex_labels)-1: format = format_last_ex_label
+            else: format = format_ex_label
+            worksheet.write(table_header_row2, first_ex_col+ex, f"{ex_label}", format)
+        worksheet.set_row(table_header_row2, 16.8)  # label rows -> height 28px
+
         index = 1
         for student in group.students:  # add students to table and format row
             if index == 1: format = format_first_index_label
             else: format = format_index_label
             format2 = format_center_cell
-            worksheet.write(row, col, index, format)
-            worksheet.write(row, col+1, f"{student.fullname}", format2)
+            worksheet.write(student_row, index_col, index, format)
+            worksheet.write(student_row, index_col+1, f"{student.fullname}", format2)
             if student_width < len(student.fullname): student_width = len(student.fullname)
-            for index2 in range(settings.ex_num):
-                if index2 == settings.ex_num-1: format2 = format_right_moste_center_cell
-                worksheet.write(row, col+2+index2, "", format2)
-            worksheet.set_row(row, 18)  # student rows -> height 30px
-            row+=1  # move to next row
+            for ex,_ in enumerate(ex_labels):
+                if ex == len(ex_labels)-1: format2 = format_right_moste_center_cell
+                worksheet.write_blank(student_row, first_ex_col+ex, "blank", format2)
+            worksheet.set_row(student_row, 18)  # student rows -> height 30px
+            student_row+=1  # move to next row
             index+=1
 
         while index < max_group_size+2: # padd with empty group slots
@@ -451,27 +483,31 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
             else: 
                 format = format_index_label
                 format2 = format_center_cell
-            worksheet.write(row, col, index, format)
-            worksheet.write(row, col+1, "",format2)
-            for index2 in range(settings.ex_num):
-                if index == max_group_size+1 and index2 == settings.ex_num-1: format2 = format_right_moste_last_row_center_cell
-                elif index2 == settings.ex_num-1: format2 = format_right_moste_center_cell
-                worksheet.write(row, col+2+index2, "", format2)
-            worksheet.set_row(row, 18)  # student rows -> height 30px
-            row+=1
+            worksheet.write(student_row, index_col, index, format)
+            worksheet.write_blank(student_row, index_col+1, "blank",format2)
+            for ex,_ in enumerate(ex_labels):
+                if index == max_group_size+1 and ex == len(ex_labels)-1: format2 = format_right_moste_last_row_center_cell
+                elif ex == len(ex_labels)-1: format2 = format_right_moste_center_cell
+                worksheet.write_blank(student_row, first_ex_col+ex, "blank", format2)
+            worksheet.set_row(student_row, 18)  # student rows -> height 30px
+            student_row+=1
             index+=1
-        # move to next table location
-        if col == 0: 
-            row = starting_row
-            col = col + 3 + settings.ex_num
-        else:
-            row = row + 4
-            col = 0
 
-    worksheet.set_column(0, 0, group_label_width)
-    worksheet.set_column(3+settings.ex_num, 3+settings.ex_num, group_label_width)
-    worksheet.set_column(1, 1, student_width)
-    worksheet.set_column(4+settings.ex_num, 4+settings.ex_num, student_width)
+        # move to next table location
+        if index_col == 0: 
+            index_col = index_col2
+            first_ex_col = first_ex_col2
+        else:
+            table_header_row1 += gap_between_tables_row + max_group_size+1 + 2  # gap + indexed rows + header rows
+            index_col = index_col1
+            first_ex_col = first_ex_col1
+
+    worksheet.set_column(index_col1, index_col1, group_label_width)
+    worksheet.set_column(index_col2, index_col2, group_label_width)
+    worksheet.set_column(index_col1+1, index_col1+1, student_width)
+    worksheet.set_column(index_col2+1, index_col2+1, student_width)
+    worksheet.set_column(first_ex_col1, last_ex_col1, ex_label_width)
+    worksheet.set_column(first_ex_col2, last_ex_col2, ex_label_width)
     
 # -----------------------------------------------------------
 def LinkTableAndPointsSheet():
