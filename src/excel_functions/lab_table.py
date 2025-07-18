@@ -1,3 +1,4 @@
+import xlsxwriter.worksheet
 from labgenpackage.classes import Student, Group
 from xlsxwriter.utility import xl_rowcol_to_cell
 from gui.util import CopyAndRename
@@ -105,14 +106,11 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
 
 # -----------------------------------------------------------
 # Writes sheet with all student data (name, JMABG, username, Email, Group, ...)
-def WriteDataSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Student], groups: list[Group]):
-    worksheet = workbook.add_worksheet()
-
+def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student], groups: list[Group]):
     format_left = workbook.add_format({'align': 'left'})
     format_center = workbook.add_format({'align': 'center'})
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF'})
 
-    worksheet.name = "Studenti"
     worksheet.write("A1", "Prezime",format_header)
     worksheet.write("B1", "Ime",format_header)
     worksheet.write("C1", "JMBAG",format_header)
@@ -202,9 +200,7 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stude
 
 # -----------------------------------------------------------
 # Writes sheet that containes all points, average and attendance
-def WritePointsSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Student], groups: list[Group]):
-    worksheet = workbook.add_worksheet()
-
+def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student]):
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 'bg_color': '#BFBFBF', 'left':0, 'right':0, 'border':1, 'bottom':5 , 'top':5})
     format_name_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
     format_average_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
@@ -222,7 +218,6 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stu
     format_green2_bg = workbook.add_format({'bg_color': '#92D050'})
     format_red2_bg = workbook.add_format({'bg_color': '#C00000'})
 
-    worksheet.name = "Bodovi"
     worksheet.write("A1", "Prezime i Ime",format_name_header)
     
     # --------------------------------------
@@ -366,14 +361,12 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, cours_participants: list[Stu
             'format':   format_red1_bg
         })
     
-    worksheet.set_column(0, 0, width1)
+    worksheet.set_column(0,0 ,width1)
     worksheet.autofilter(0,group_col, row-1,group_col)    # filter by groups and exemptions
 
 # -----------------------------------------------------------
 # Writes sheet with all filled group tables
-def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
-    worksheet = workbook.add_worksheet()
-
+def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, groups: list[Group]):
     format_header = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
     
     format_fullname_label = workbook.add_format({'border':1, 'left':1, 'right':1, 'bottom':5 , 'top':5})
@@ -387,12 +380,13 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
     format_index_label = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':1, 'bottom':1 , 'top':1})
     format_last_index_label = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':1, 'bottom':5 , 'top':1})
 
-    format_center_cell = workbook.add_format({'border':1, 'right':1, 'bottom':1})
-    format_right_moste_center_cell = workbook.add_format({'border':1, 'right':5, 'bottom':1})
-    format_last_row_center_cell = workbook.add_format({'border':1, 'right':1, 'bottom':5})
-    format_right_moste_last_row_center_cell = workbook.add_format({'border':1, 'right':5, 'bottom':5})
+    format_name_cell = workbook.add_format({'border':1, 'right':1, 'bottom':1})
+    format_last_name_cell = workbook.add_format({'border':1, 'right':1, 'bottom':5})
+    format_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':1, 'bottom':1})
+    format_right_moste_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':5, 'bottom':1})
+    format_last_row_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':1, 'bottom':5})
+    format_right_moste_last_row_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':5, 'bottom':5})
 
-    worksheet.name = "Tablice"
     if settings.cours_name == "":
         worksheet.write("E1", "Predmet Smjer",format_header)
     else:
@@ -444,6 +438,9 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
         table_header_row2 = table_header_row1 + 1
         student_row = table_header_row2 + 1
 
+        first_student_coordinat = {"row":student_row, "col":index_col+1}
+        settings.student_coordinats[group.group_label] = first_student_coordinat
+        
         if len(group.group_label) > group_label_width: group_label_width = len(group.group_label)
         worksheet.write(table_header_row1, index_col, f"{group.group_label}", format_group_label)
         worksheet.write(table_header_row1, index_col+1, f"{group.day} {group.time}", format_group_label)
@@ -462,10 +459,10 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
         for student in group.students:  # add students to table and format row
             if index == 1: format = format_first_index_label
             else: format = format_index_label
-            format2 = format_center_cell
             worksheet.write(student_row, index_col, index, format)
-            worksheet.write(student_row, index_col+1, f"{student.fullname}", format2)
+            worksheet.write(student_row, index_col+1, f"{student.fullname}", format_name_cell)
             if student_width < len(student.fullname): student_width = len(student.fullname)
+            format2 = format_center_cell
             for ex,_ in enumerate(ex_labels):
                 if ex == len(ex_labels)-1: format2 = format_right_moste_center_cell
                 worksheet.write_blank(student_row, first_ex_col+ex, "blank", format2)
@@ -477,14 +474,17 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
             if index == 1: 
                 format = format_first_index_label
                 format2 = format_center_cell
+                format_name = format_name_cell
             elif index == max_group_size+1: 
                 format = format_last_index_label
                 format2 = format_last_row_center_cell
+                format_name = format_last_name_cell
             else: 
                 format = format_index_label
                 format2 = format_center_cell
+                format_name = format_name_cell
             worksheet.write(student_row, index_col, index, format)
-            worksheet.write_blank(student_row, index_col+1, "blank",format2)
+            worksheet.write_blank(student_row, index_col+1, "blank",format_name)
             for ex,_ in enumerate(ex_labels):
                 if index == max_group_size+1 and ex == len(ex_labels)-1: format2 = format_right_moste_last_row_center_cell
                 elif ex == len(ex_labels)-1: format2 = format_right_moste_center_cell
@@ -508,10 +508,138 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, groups: list[Group]):
     worksheet.set_column(index_col2+1, index_col2+1, student_width)
     worksheet.set_column(first_ex_col1, last_ex_col1, ex_label_width)
     worksheet.set_column(first_ex_col2, last_ex_col2, ex_label_width)
+
+def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, groups: list[Group]):
+    format_title = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
+
+    format_table_header_left = workbook.add_format({'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center = workbook.add_format({'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right = workbook.add_format({'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    pon_bg_color = '#FF5F1F'
+    uto_bg_color = '#1FFF0F'
+    sri_bg_color = '#B720F4'
+    cet_bg_color = '#CFFF04'
+    pet_bg_color = '#B4B4B4'
+    err_bg_color = '#000000'
+
+    format_index = workbook.add_format({'align': 'center', 'border':1, 'bottom':0, 'top':0, 'left':5, 'right':0})
+    format_name = workbook.add_format({'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':5})
+    format_empty_right = workbook.add_format({'border':1, 'bottom':0, 'top':0, 'left':0, 'right':5})
+    
+    format_bottom_left = workbook.add_format({'border':1, 'bottom':5, 'top':0, 'left':5, 'right':0})
+    format_bottom_center = workbook.add_format({'border':1, 'bottom':5, 'top':0, 'left':0, 'right':0})
+    format_bottom_right = workbook.add_format({'border':1, 'bottom':5, 'top':0, 'left':0, 'right':5})
+
+    worksheet.write(4,2,f"{settings.cours_name}-{settings.cours_number}", format_title)
+    group_coordinates = {'row': 4,'col':0}
+    row_gap_between_tables = 3
+    col_gap_between_tables = 0
+
+    max_group_size: int = 0
+    for group in groups:
+        if max_group_size < group.group_size: max_group_size = group.group_size
+
+    for group in groups:
+        starting_row = group_coordinates['row']
+        match group.day:
+            case 'PON':
+                format_table_header_left.set_bg_color(pon_bg_color)
+                format_table_header_center.set_bg_color(pon_bg_color)
+                format_table_header_right.set_bg_color(pon_bg_color)
+            case 'UTO':
+                format_table_header_left.set_bg_color(uto_bg_color)
+                format_table_header_center.set_bg_color(uto_bg_color)
+                format_table_header_right.set_bg_color(uto_bg_color)
+            case 'SRI':
+                format_table_header_left.set_bg_color(sri_bg_color)
+                format_table_header_center.set_bg_color(sri_bg_color)
+                format_table_header_right.set_bg_color(sri_bg_color)
+            case 'ČET':
+                format_table_header_left.set_bg_color(cet_bg_color)
+                format_table_header_center.set_bg_color(cet_bg_color)
+                format_table_header_right.set_bg_color(cet_bg_color)
+            case 'PET':
+                format_table_header_left.set_bg_color(pet_bg_color)
+                format_table_header_center.set_bg_color(pet_bg_color)
+                format_table_header_right.set_bg_color(pet_bg_color)
+            case _:
+                format_table_header_left.set_bg_color(err_bg_color)
+                format_table_header_center.set_bg_color(err_bg_color)
+                format_table_header_right.set_bg_color(err_bg_color)
+        
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col'], 'blank', format_table_header_left)
+        worksheet.write(group_coordinates['row'], group_coordinates['col']+1, f'{group.group_label}', format_table_header_center)
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col']+2, 'blank', format_table_header_right)
+        
+        group_coordinates['row']+=1
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col'], 'blank', format_table_header_left)
+        worksheet.write(group_coordinates['row'], group_coordinates['col']+1, f'Lab {group.lab}', format_table_header_center)
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col']+2, 'blank', format_table_header_right)
+        
+        group_coordinates['row']+=1
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col'], 'blank', format_table_header_left)
+        worksheet.write(group_coordinates['row'], group_coordinates['col']+1, f'{group.day} {group.time}', format_table_header_center)
+        worksheet.write_blank(group_coordinates['row'], group_coordinates['col']+2, 'blank', format_table_header_right)
+        
+        group_coordinates['row']+=1 # empty row
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col'], 'blank', format_index)
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
+        group_coordinates['row']+=1 # empty row
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col'], 'blank', format_index)
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
+
+        for index, student in enumerate(group.students):
+            group_coordinates['row']+=1
+            worksheet.write(group_coordinates['row'],group_coordinates['col'], index+1, format_index)
+            worksheet.write(group_coordinates['row'],group_coordinates['col']+1, f'{student.fullname}', format_name)
+            worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
+
+        while index < max_group_size-1:
+            index+=1
+            group_coordinates['row']+=1
+            worksheet.write(group_coordinates['row'],group_coordinates['col'], index+1, format_index)
+            worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+1, 'blank', format_name)
+            worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
+
+        group_coordinates['row']+=1 # empty row
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col'], 'blank', format_index)
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
+
+        group_coordinates['row']+=1 # empty row
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col'], 'blank', format_bottom_left)
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+1, 'blank', format_bottom_center)
+        worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_bottom_right)
+
+        dif = group_coordinates['row'] - starting_row
+        group_coordinates['row'] = starting_row
+        
+        if group_coordinates['col'] == 0 or group_coordinates['col'] == 3:
+            group_coordinates['col'] += 3 + col_gap_between_tables
+        else:
+            group_coordinates['col'] = 0
+            group_coordinates['row'] += dif + row_gap_between_tables
+
     
 # -----------------------------------------------------------
-def LinkTableAndPointsSheet():
-    pass
+def LinkTableAndPointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student]):
+    format_point_cell = workbook.add_format({'align': 'center'})
+    
+    if settings.using_lab0.get(): total_ex_num = settings.ex_num+1
+    else: total_ex_num = settings.ex_num
+    for index, student in enumerate(cours_participants):
+        student_table_coordinates = settings.student_coordinats[student.group.group_label]
+        student_name = xl_rowcol_to_cell(student_table_coordinates["row"], student_table_coordinates["col"], True,True)
+        last_ex = xl_rowcol_to_cell(student_table_coordinates["row"], student_table_coordinates["col"]+total_ex_num, True,True)
+        row = index+1
+        index_array_possition = 1
+        for ex in range(total_ex_num):
+            col = ex+1
+            index_array_possition+=1
+            worksheet.write_formula(row,col, f"=@INDEX(Tablice!{student_name}:{last_ex},,{index_array_possition})", format_point_cell)
+
+        settings.student_coordinats[student.group.group_label]["row"] += 1
+
+    worksheet.set_column(col+1,col+1, None, None,{'hidden': True})
     
 # -----------------------------------------------------------
 # util functions
@@ -539,9 +667,17 @@ def gen_tables(input_file: str)-> bool:
     cours_participants, groups = LoadInputData(type, input_sh)
     
     out_wb = xlsxwriter.Workbook(new_file)
-    WriteDataSheet(out_wb, cours_participants, groups)
-    WritePointsSheet(out_wb, cours_participants, groups)
-    WriteTablesSheet(out_wb, groups)
+    data_sheet = out_wb.add_worksheet("Studenti")
+    point_worksheet = out_wb.add_worksheet("Bodovi")
+    table_worksheet = out_wb.add_worksheet("Tablice")
+    schedule_worksheet = out_wb.add_worksheet("Raspored")
+    
+    WritePointsSheet(out_wb, point_worksheet, cours_participants)
+    WriteTablesSheet(out_wb, table_worksheet, groups)
+    LinkTableAndPointsSheet(out_wb, point_worksheet, cours_participants)
+    WriteDataSheet(out_wb, data_sheet, cours_participants, groups)
+    WriteScheduleSheet(out_wb, schedule_worksheet, groups)
+
     out_wb.close()
 
     CopyAndRename(srcname="cours_workbook.xlsx", dstname="lab_tablice")

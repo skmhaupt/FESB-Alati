@@ -4,6 +4,7 @@ from customtkinter import BooleanVar
 def init():
     global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, ex_num, attendance, custom_ex_labels, max_test_points, min_average_required
     global using_custom_exlabels, no_eval_ex0, using_lab0, not_using_failed_points, get_repeat_students  # BooleanVar
+    global student_coordinats
 
     # loaded_data is a collection of flags used to signal if main section 'fill_groups' can be launched
     # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
@@ -44,3 +45,5 @@ def init():
     max_test_points = 0
 
     min_average_required = 0
+
+    student_coordinats = {}
