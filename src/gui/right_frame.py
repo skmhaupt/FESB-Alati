@@ -3,6 +3,7 @@ from gui.cours_frame import CoursFrame
 from gui.scraper_frame import ScraperFrame
 from gui.fill_groups_frame import FillGroupsFrame
 
+import gui.settings as settings
 import customtkinter as ctk
 import logging, json
 
@@ -21,6 +22,8 @@ class RightFrame(ctk.CTkFrame):
         try:
             with open("data/data.json", "r") as file:
                 data:dict[str:str] = json.load(file)
+                settings.cours_name = data["cours"]
+                settings.cours_number = data["cours_number"]
         except FileNotFoundError:   # if no data.json file is found set default values
             logger.warning("The file 'data/data.json' was not found.")
             data = {"cours":"", "cours_number":"", "startdate":"","enddate":""}
