@@ -57,7 +57,7 @@ class ParticipantsFrame(ctk.CTkFrame):
 
     # get path to .csv file from user
     def BrowseAction(self):
-        filename = filedialog.askopenfilename()
+        filename = filedialog.askopenfilename(filetypes=[("CSV Files", "*.csv")])
         self.csv_file_entry.configure(state="normal")
         self.csv_file_entry.delete(0, "end")
         self.csv_file_entry.insert(0,filename)

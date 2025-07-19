@@ -65,7 +65,7 @@ class GroupsFrame(ctk.CTkFrame):
     
     # get path to .txt file from user
     def BrowseAction(self):
-        filename = filedialog.askopenfilename()
+        filename = filedialog.askopenfilename(filetypes=[("Text Files", "*.txt")])
         self.txt_file_entry.configure(state="normal")
         self.txt_file_entry.delete(0, "end")
         self.txt_file_entry.insert(0,filename)
