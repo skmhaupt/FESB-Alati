@@ -548,15 +548,37 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
 def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, groups: list[Group]):
     format_title = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
 
-    format_table_header_left = workbook.add_format({'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
-    format_table_header_center = workbook.add_format({'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
-    format_table_header_right = workbook.add_format({'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
     pon_bg_color = '#FF5F1F'
     uto_bg_color = '#1FFF0F'
     sri_bg_color = '#B720F4'
     cet_bg_color = '#CFFF04'
     pet_bg_color = '#B4B4B4'
     err_bg_color = '#000000'
+
+    format_table_header_left_pon = workbook.add_format({'bg_color': pon_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_pon = workbook.add_format({'bg_color': pon_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_pon = workbook.add_format({'bg_color': pon_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    
+    format_table_header_left_uto = workbook.add_format({'bg_color': uto_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_uto = workbook.add_format({'bg_color': uto_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_uto = workbook.add_format({'bg_color': uto_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    
+    format_table_header_left_sri = workbook.add_format({'bg_color': sri_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_sri = workbook.add_format({'bg_color': sri_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_sri = workbook.add_format({'bg_color': sri_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    
+    format_table_header_left_cet = workbook.add_format({'bg_color': cet_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_cet = workbook.add_format({'bg_color': cet_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_cet = workbook.add_format({'bg_color': cet_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    
+    format_table_header_left_pet = workbook.add_format({'bg_color': pet_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_pet = workbook.add_format({'bg_color': pet_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_pet = workbook.add_format({'bg_color': pet_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+
+    format_table_header_left_err = workbook.add_format({'bg_color': err_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':0})
+    format_table_header_center_err = workbook.add_format({'bg_color': err_bg_color, 'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':0})
+    format_table_header_right_err = workbook.add_format({'bg_color': err_bg_color, 'border':1, 'bottom':5, 'top':5, 'left':0, 'right':5})
+    
 
     format_index = workbook.add_format({'align': 'center', 'border':1, 'bottom':0, 'top':0, 'left':5, 'right':0})
     format_name = workbook.add_format({'align': 'center', 'border':1, 'bottom':5, 'top':5, 'left':5, 'right':5})
@@ -566,7 +588,7 @@ def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.work
     format_bottom_center = workbook.add_format({'border':1, 'bottom':5, 'top':0, 'left':0, 'right':0})
     format_bottom_right = workbook.add_format({'border':1, 'bottom':5, 'top':0, 'left':0, 'right':5})
 
-    worksheet.write(4,2,f"{settings.cours_name}-{settings.cours_number}", format_title)
+    worksheet.write(2,4,f"{settings.cours_name} {settings.cours_number}", format_title)
     group_coordinates = {'row': 4,'col':0}
     row_gap_between_tables = 3
     col_gap_between_tables = 0
@@ -577,35 +599,37 @@ def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.work
             continue
         if max_group_size < group.group_size: max_group_size = group.group_size
 
+    width = 15  # 110px
+
     for group in groups:
         if group.group_label == 'G0':
             continue
         starting_row = group_coordinates['row']
         match group.day:
             case 'PON':
-                format_table_header_left.set_bg_color(pon_bg_color)
-                format_table_header_center.set_bg_color(pon_bg_color)
-                format_table_header_right.set_bg_color(pon_bg_color)
+                format_table_header_left = format_table_header_left_pon
+                format_table_header_center = format_table_header_center_pon
+                format_table_header_right = format_table_header_right_pon
             case 'UTO':
-                format_table_header_left.set_bg_color(uto_bg_color)
-                format_table_header_center.set_bg_color(uto_bg_color)
-                format_table_header_right.set_bg_color(uto_bg_color)
+                format_table_header_left = format_table_header_left_uto
+                format_table_header_center = format_table_header_center_uto
+                format_table_header_right = format_table_header_right_uto
             case 'SRI':
-                format_table_header_left.set_bg_color(sri_bg_color)
-                format_table_header_center.set_bg_color(sri_bg_color)
-                format_table_header_right.set_bg_color(sri_bg_color)
+                format_table_header_left = format_table_header_left_sri
+                format_table_header_center = format_table_header_center_sri
+                format_table_header_right = format_table_header_right_sri
             case 'ČET':
-                format_table_header_left.set_bg_color(cet_bg_color)
-                format_table_header_center.set_bg_color(cet_bg_color)
-                format_table_header_right.set_bg_color(cet_bg_color)
+                format_table_header_left = format_table_header_left_cet
+                format_table_header_center = format_table_header_center_cet
+                format_table_header_right = format_table_header_right_cet
             case 'PET':
-                format_table_header_left.set_bg_color(pet_bg_color)
-                format_table_header_center.set_bg_color(pet_bg_color)
-                format_table_header_right.set_bg_color(pet_bg_color)
+                format_table_header_left = format_table_header_left_pet
+                format_table_header_center = format_table_header_center_pet
+                format_table_header_right = format_table_header_right_pet
             case _:
-                format_table_header_left.set_bg_color(err_bg_color)
-                format_table_header_center.set_bg_color(err_bg_color)
-                format_table_header_right.set_bg_color(err_bg_color)
+                format_table_header_left = format_table_header_left_err
+                format_table_header_center = format_table_header_center_err
+                format_table_header_right = format_table_header_right_err
         
         worksheet.write_blank(group_coordinates['row'], group_coordinates['col'], 'blank', format_table_header_left)
         worksheet.write(group_coordinates['row'], group_coordinates['col']+1, f'{group.group_label}', format_table_header_center)
@@ -630,6 +654,8 @@ def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.work
 
         for index, student in enumerate(group.students):
             group_coordinates['row']+=1
+            if len(student.fullname) > width:
+                width = len(student.fullname)
             worksheet.write(group_coordinates['row'],group_coordinates['col'], index+1, format_index)
             worksheet.write(group_coordinates['row'],group_coordinates['col']+1, f'{student.fullname}', format_name)
             worksheet.write_blank(group_coordinates['row'],group_coordinates['col']+2, 'blank', format_empty_right)
@@ -658,7 +684,16 @@ def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.work
         else:
             group_coordinates['col'] = 0
             group_coordinates['row'] += dif + row_gap_between_tables
-
+    
+    worksheet.set_column(0, 0, 5)
+    worksheet.set_column(1, 1, width)
+    worksheet.set_column(2, 2, 5)
+    worksheet.set_column(3, 3, 5)
+    worksheet.set_column(4, 4, width)
+    worksheet.set_column(5, 5, 5)
+    worksheet.set_column(6, 6, 5)
+    worksheet.set_column(7, 7, width)
+    worksheet.set_column(8, 8, 5)
     
 # -----------------------------------------------------------
 def LinkTableAndPointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student]):
