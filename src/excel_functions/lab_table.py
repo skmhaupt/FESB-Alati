@@ -110,6 +110,9 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
     if group_zero.group_size > 0:
         groups.append(group_zero)
 
+    for group in groups:
+        group.students.sort(key=lambda x: locale.strxfrm(x.surname))
+
     return cours_participants, groups
 
 # -----------------------------------------------------------
