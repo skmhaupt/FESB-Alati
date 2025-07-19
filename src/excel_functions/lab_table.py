@@ -215,7 +215,7 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 'bg_color': '#BFBFBF', 'left':0, 'right':0, 'border':1, 'bottom':5 , 'top':5})
     format_name_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
     format_average_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
-    format_group_header = workbook.add_format({'align': 'center', 'bg_color': '#BFBFBF'})
+    format_group_header = workbook.add_format({'align': 'center', 'text_wrap': True, 'bg_color': '#BFBFBF'})
     
     format_students = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':5, 'bottom':0 , 'top':0})
     format_bottom = workbook.add_format({'border':1, 'left':0, 'right':0, 'bottom':0, 'top':5 })
@@ -272,10 +272,41 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
 
     col+=1
     worksheet.write(row, col, f"GRUPA", format_group_header)
-    worksheet.set_column(col, col, 11)   # col 'GRUPA'
+    worksheet.set_column(col, col, 11)
     group_col = col #zero indexed
-    
+
+    col+=3  # skip 2 columns
+    worksheet.write(row, col, f"Studenti koji nisu polozili", format_group_header)
+    worksheet.write(row, col+1, f"Prikazati    (Da: +, Ne: -)", format_group_header)
+    worksheet.write(row, col+2, f"Nije polozilo", format_group_header)
+    worksheet.set_column(col, col, 24)
+    worksheet.set_column(col+1, col+1, 12)
+    worksheet.set_column(col+2, col+2, 12)
+
     worksheet.set_row(row, 33)    # row 1 -> height 55px
+
+    # -------------------
+    # get failed students
+    first_student_cell = xl_rowcol_to_cell(1, 0)
+    last_student_cell = xl_rowcol_to_cell(len(cours_participants), 0)
+
+    first_attendance_cell = xl_rowcol_to_cell(1, attendance_col)
+    last_attendance_cell = xl_rowcol_to_cell(len(cours_participants), attendance_col)
+    
+    first_grade_cell = xl_rowcol_to_cell(1, grade_col)
+    last_grade_cell = xl_rowcol_to_cell(len(cours_participants), grade_col)
+
+    first_failed_cell = xl_rowcol_to_cell(1, col)
+    last_failed_cell = xl_rowcol_to_cell(len(cours_participants), col)
+
+    first_absolved_cell = xl_rowcol_to_cell(1, 6)
+    last_absolved_cell = xl_rowcol_to_cell(len(cours_participants), 6)
+    
+    get_students_cell = xl_rowcol_to_cell(1, col+1)
+    
+    worksheet.write_formula(1,col, f"=IF({get_students_cell}=\"+\",FILTER({first_student_cell}:{last_student_cell},(({first_attendance_cell}:{last_attendance_cell}=\"NE\")+({first_grade_cell}:{last_grade_cell}<1/2))*(Studenti!{first_absolved_cell}:{last_absolved_cell}=\"\")),\"\")")
+    worksheet.write(1,col+1, "-", format_point_cell)
+    worksheet.write_formula(1,col+2, f"=SUMPRODUCT(({first_failed_cell}:{last_failed_cell}<>\"\")*1)", format_point_cell)
 
     # -------------------
     # write students
