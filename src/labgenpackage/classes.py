@@ -25,18 +25,19 @@ class CustomFormatter(logging.Formatter):
         return formatter.format(record)
 
 class Group:
-    def __init__(self, group_label, day, time, lab, group_size):
+    def __init__(self, group_label:str, day:str, time:str, lab:str, group_size:int):
         self.group_label: str = group_label
         self.day: str = day
         self.time: str = time
         self.lab: str = lab
         self.group_size: int = int(group_size)
         self.students: list[Student] = []
-        starttime, endtime = time.split("-",1)
-        starttime_h,starttime_m = starttime.split(":",1)
-        self.starttime: datetime = datetime.time(hour=int(starttime_h), minute=int(starttime_m))
-        endtime_h,endtime_m = endtime.split(":",1)
-        self.endtime: datetime = datetime.time(hour=int(endtime_h), minute=int(endtime_m))
+        if not time=="NaN":
+            starttime, endtime = time.split("-",1)
+            starttime_h,starttime_m = starttime.split(":",1)
+            self.starttime: datetime = datetime.time(hour=int(starttime_h), minute=int(starttime_m))
+            endtime_h,endtime_m = endtime.split(":",1)
+            self.endtime: datetime = datetime.time(hour=int(endtime_h), minute=int(endtime_m))
         
     def __str__(self):
         #Fix time string

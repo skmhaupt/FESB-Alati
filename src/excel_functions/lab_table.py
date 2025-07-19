@@ -61,6 +61,7 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
     groups: list[Group] = []
     grouplabels: set[str] = set()
     group: Group = None
+    group_zero: Group = Group("G0", "NaN", "NaN", "NaN", 0)  # for students that are not assigned a group
 
     # get all student and group data
     for student_number in range(num_of_students):
@@ -71,7 +72,7 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
         
         group_data = sh.cell(row = student_number+2, column = 6).value
 
-        if group_data == "Još nisu odabrali":
+        if group_data == "Još nisu odabrali" or group_data == "Jos nisu svrstani":
             group = None
         else:
             # pars string containing group data
@@ -95,12 +96,19 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
         if group:   # add group to student if he is in one
             student.group = group
             group.students.append(student)
+        else:
+            group_zero.group_size+=1
+            student.group = group_zero
+            group_zero.students.append(student)
         cours_participants.append(student)
-    
+
     # sort created groups list and students list
     groups.sort(key=lambda x: natural_keys(x.group_label))
     locale.setlocale(locale.LC_COLLATE, "croatian")
     cours_participants.sort(key=lambda x: locale.strxfrm(x.surname))
+    
+    if group_zero.group_size > 0:
+        groups.append(group_zero)
 
     return cours_participants, groups
 
@@ -284,14 +292,20 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
         group_cell = xl_rowcol_to_cell(row, group_col)
         
         if settings.no_eval_ex0.get():
-            worksheet.write_formula(hidden_cell, f"=SUM(COUNTIF({first_eval_cell}:{last_ex_cell},\">={settings.max_test_points/2}\"), COUNTIF({first_ex_cell},\"=+\"))>={settings.attendance}")
+            worksheet.write_formula(hidden_cell, f"=SUM(COUNTIF({first_eval_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\"), COUNTIF({first_ex_cell},\"=+\"))>={settings.attendance}")
         else:
-            worksheet.write_formula(hidden_cell, f"=COUNTIF({first_ex_cell}:{last_ex_cell},\">={settings.max_test_points/2}\")>={settings.attendance}")
+            worksheet.write_formula(hidden_cell, f"=COUNTIF({first_ex_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\")>={settings.attendance}")
         worksheet.write_formula(attendance_cell, f"=IF({hidden_cell}=TRUE,\"DA\",\"NE\")", format_attendance_cell)
         if settings.no_eval_ex0.get() and not settings.using_lab0.get():
-            worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num-1}*{settings.max_test_points})", format_grade_cell)
+            if settings.not_using_failed_points.get():
+                worksheet.write_formula(grade_cell, f"=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num-1}*{settings.max_test_points})", format_grade_cell)
+            else:
+                worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num-1}*{settings.max_test_points})", format_grade_cell)
         else:
-            worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num}*{settings.max_test_points})", format_grade_cell)
+            if settings.not_using_failed_points.get():
+                worksheet.write_formula(grade_cell, f"=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num}*{settings.max_test_points})", format_grade_cell)
+            else:
+                worksheet.write_formula(grade_cell, f"=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num}*{settings.max_test_points})", format_grade_cell)
         worksheet.write(group_cell, f"{student.group.group_label}", format_point_cell)
         
         if len(student.fullname) > width1: width1 = len(student.fullname)+1
@@ -387,6 +401,8 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     format_last_row_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':1, 'bottom':5})
     format_right_moste_last_row_center_cell = workbook.add_format({'align': 'center', 'border':1, 'right':5, 'bottom':5})
 
+    format_group0_bottom = workbook.add_format({'border':1, 'left':0, 'right':0, 'bottom':0 , 'top':5})
+
     if settings.cours_name == "":
         worksheet.write("E1", "Predmet Smjer",format_header)
     else:
@@ -395,6 +411,8 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
 
     max_group_size: int = 0
     for group in groups:
+        if group.group_label == 'G0':
+            continue
         if max_group_size < group.group_size: max_group_size = group.group_size
 
     # create ex labels
@@ -431,10 +449,14 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     first_ex_col2 = index_col2 + 2
     last_ex_col2 = first_ex_col2 + len(ex_labels) - 1
 
+    index_col_group0 = last_ex_col2 + gap_between_tables_col + 1
+    first_ex_col_group0 = index_col_group0 + 2
+    last_ex_col_group0 = first_ex_col_group0 + len(ex_labels) - 1
+
     index_col = index_col1
     table_header_row1: int = 5
     first_ex_col = first_ex_col1
-    for group in groups:
+    for counter, group in enumerate(groups):
         table_header_row2 = table_header_row1 + 1
         student_row = table_header_row2 + 1
 
@@ -492,6 +514,12 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
             worksheet.set_row(student_row, 18)  # student rows -> height 30px
             student_row+=1
             index+=1
+        
+        if group.group_label == 0:
+            worksheet.write_blank(student_row, index_col, "blank", format_group0_bottom)
+            worksheet.write_blank(student_row, index_col+1, "blank",format_group0_bottom)
+            for ex,_ in enumerate(ex_labels):
+                worksheet.write_blank(student_row, first_ex_col+ex, "blank", format_group0_bottom)
 
         # move to next table location
         if index_col == 0: 
@@ -501,13 +529,21 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
             table_header_row1 += gap_between_tables_row + max_group_size+1 + 2  # gap + indexed rows + header rows
             index_col = index_col1
             first_ex_col = first_ex_col1
+        
+        if counter == len(groups)-2:   # only true for last group
+            index_col = index_col_group0
+            table_header_row1 = 2
+            first_ex_col = first_ex_col_group0
 
     worksheet.set_column(index_col1, index_col1, group_label_width)
     worksheet.set_column(index_col2, index_col2, group_label_width)
+    worksheet.set_column(index_col_group0, index_col_group0, group_label_width)
     worksheet.set_column(index_col1+1, index_col1+1, student_width)
     worksheet.set_column(index_col2+1, index_col2+1, student_width)
+    worksheet.set_column(index_col_group0+1, index_col_group0+1, student_width)
     worksheet.set_column(first_ex_col1, last_ex_col1, ex_label_width)
     worksheet.set_column(first_ex_col2, last_ex_col2, ex_label_width)
+    worksheet.set_column(first_ex_col_group0, last_ex_col_group0, ex_label_width)
 
 def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, groups: list[Group]):
     format_title = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
@@ -537,9 +573,13 @@ def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.work
 
     max_group_size: int = 0
     for group in groups:
+        if group.group_label == 'G0':
+            continue
         if max_group_size < group.group_size: max_group_size = group.group_size
 
     for group in groups:
+        if group.group_label == 'G0':
+            continue
         starting_row = group_coordinates['row']
         match group.day:
             case 'PON':
@@ -627,6 +667,8 @@ def LinkTableAndPointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter
     if settings.using_lab0.get(): total_ex_num = settings.ex_num+1
     else: total_ex_num = settings.ex_num
     for index, student in enumerate(cours_participants):
+        # if student.group.group_label == 'G0':
+        #     continue
         student_table_coordinates = settings.student_coordinats[student.group.group_label]
         student_name = xl_rowcol_to_cell(student_table_coordinates["row"], student_table_coordinates["col"], True,True)
         last_ex = xl_rowcol_to_cell(student_table_coordinates["row"], student_table_coordinates["col"]+total_ex_num, True,True)

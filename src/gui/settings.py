@@ -39,7 +39,7 @@ def init():
     using_custom_exlabels = BooleanVar(value=False)
     no_eval_ex0 = BooleanVar(value=False)
     using_lab0 = BooleanVar(value=False)
-    not_using_failed_points = BooleanVar(value=False)
+    not_using_failed_points = BooleanVar(value=True)
     get_repeat_students = BooleanVar(value=False)
 
     max_test_points = 0

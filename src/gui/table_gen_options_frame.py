@@ -347,7 +347,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     # --------------------------------------------------------------------------------------------------------
     # button functions
     def browse_action(self,entry: ctk.CTkEntry):
-        filename = filedialog.askopenfilename(filetypes=[("Excel files", ".xlsx .xls")])
+        filename = filedialog.askopenfilename(filetypes=[("Excel files", "*.xlsx *.xls")])
         entry.configure(state="normal")
         entry.delete(0, "end")
         entry.insert(0,filename)
