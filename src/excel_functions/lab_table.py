@@ -1,4 +1,3 @@
-import xlsxwriter.worksheet
 from labgenpackage.classes import Student, Group
 from xlsxwriter.utility import xl_rowcol_to_cell
 from gui.util import CopyAndRename
@@ -21,13 +20,13 @@ class BadWorkbook(Exception):
 # Returns -> tuple[bool,bool] = (usable,type)
 # usable: true = good workbook, false = bad workbook
 # type: true = workbook from 'program', false = workbook from 'merlin'
-def CheckForValidWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.worksheet.Worksheet) -> tuple[bool,bool]:
+def CheckForValidInputWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.worksheet.Worksheet) -> tuple[bool,bool]:
     try:
         if not len(wb.sheetnames) == 1 or \
            not sh.max_column == 6 or \
            not sh.cell(row = 1, column = 1).value == "Prezime" or \
            not sh.cell(row = 1, column = 2).value == "Ime" or \
-           not (sh.cell(row = 1, column = 4).value == "ID broj" or "JMBAG"):
+           not (sh.cell(row = 1, column = 4).value == "ID broj" or sh.cell(row = 1, column = 4).value == "JMBAG"):
             raise BadWorkbook("Loaded workbook is not apropriet.")
         
         if sh.cell(row = 1, column = 3).value == "Email" and \
@@ -46,6 +45,37 @@ def CheckForValidWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.workshee
     except BadWorkbook as e:
         print(e)
         return False,False
+    except Exception:
+        print("Unexcpected error when validating workbook!")
+        raise
+
+# Checks if loaded workbook is usable.
+# Returns -> bool = usable
+# usable: true = good workbook, false = bad workbook
+def CheckForValidOldWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.worksheet.Worksheet) -> bool:
+    try:
+        if not len(wb.sheetnames) == 4 or \
+           not sh.max_column == 15 or \
+           not sh.cell(row = 1, column = 1).value == "Prezime" or \
+           not sh.cell(row = 1, column = 2).value == "Ime" or \
+           not sh.cell(row = 1, column = 3).value == "JMBAG" or \
+           not sh.cell(row = 1, column = 4).value == "Korisničko ime" or \
+           not sh.cell(row = 1, column = 5).value == "Email" or \
+           not sh.cell(row = 1, column = 6).value == "Grupa" or \
+           not sh.cell(row = 1, column = 7).value == "Priznat lab" or \
+           not sh.cell(row = 1, column = 8).value == "Priznat jednom" or \
+           not sh.cell(row = 1, column = 9).value == "Priznat dvaput" or \
+           not sh.cell(row = 1, column = 12).value == "Grupa" or \
+           not sh.cell(row = 1, column = 13).value == "Dan" or \
+           not sh.cell(row = 1, column = 14).value == "Vrijeme" or \
+           not sh.cell(row = 1, column = 15).value == "Dvorana":
+            raise BadWorkbook("Loaded workbook is not apropriet.")
+        else:
+            return True
+        
+    except BadWorkbook as e:
+        print(e)
+        return False
     except Exception:
         print("Unexcpected error when validating workbook!")
         raise
@@ -116,8 +146,33 @@ def LoadInputData(type: bool, sh: openpyxl.worksheet.worksheet.Worksheet) -> tup
     return cours_participants, groups
 
 # -----------------------------------------------------------
+# Loads data from old workbook
+# Returns -> list[Student] = repeat students
+# cours_participants: alfabeticly sorted students
+def LoadOldData(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.worksheet.worksheet.Worksheet, cours_participants: list[Student]) -> dict:
+    num_of_students = sh1.max_row - 1
+    attendance_column = sh2.max_column - 7
+    grade_columnn = sh2.max_column - 6
+    repeat_students: dict = {}
+    
+    for student_number in range(num_of_students):
+        jmbag:int = sh1.cell(row = student_number+2, column = 3).value
+
+        if any(student.jmbag == jmbag for student in cours_participants):
+            was_absolved = sh1.cell(row = student_number+2, column = 7).value
+            was_absolved_once = sh1.cell(row = student_number+2, column = 8).value
+            was_absolved_twice = sh1.cell(row = student_number+2, column = 9).value
+
+            # check if he passed
+            if sh2.cell(row=student_number+2, column=attendance_column).value == 'DA' and sh2.cell(row=student_number+2, column=grade_columnn).value >= 0.5:
+                repeat_students[jmbag] = [True, [was_absolved, was_absolved_once, was_absolved_twice]]
+            else:
+                repeat_students[jmbag] = [False, [was_absolved, was_absolved_once, was_absolved_twice]]
+    return repeat_students
+
+# -----------------------------------------------------------
 # Writes sheet with all student data (name, JMABG, username, Email, Group, ...)
-def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student], groups: list[Group]):
+def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, repeat_students: dict[int,list], cours_participants: list[Student], groups: list[Group]):
     format_left = workbook.add_format({'align': 'left'})
     format_center = workbook.add_format({'align': 'center'})
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF'})
@@ -128,7 +183,7 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     worksheet.write("D1", "Korisničko ime",format_header)
     worksheet.write("E1", "Email",format_header)
     worksheet.write("F1", "Grupa",format_header)
-    worksheet.write("G1", "Priznat lab",format_header)
+    worksheet.write("G1", "Oslobođen laba",format_header)
     worksheet.write("H1", "Priznat jednom",format_header)
     worksheet.write("I1", "Priznat dvaput",format_header)
 
@@ -141,6 +196,11 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     width7 = 15 # Priznat lab
     width8 = 19 # Priznat jednom
     width9 = 19 # Priznat dvaput
+
+    state0 = [None, None, None]
+    state1 = ['+', None, None]
+    state2 = [None, '+', None]
+    state3 = ['+', None, '+']
 
     row: int = 2
     for student in cours_participants:
@@ -162,6 +222,32 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
         if hasattr(student, 'group'):
             if len(f"{student.group.group_label}") > width6: width6 = len(f"{student.group.group_label}")+1
         
+        if any(jmbag == student.jmbag for jmbag in repeat_students.keys()):
+            data = repeat_students[student.jmbag]   # [bool,str,str,str] = [passed, absolved, absolved once, absolved twice]
+            
+            if data[0]: # passed last lab
+                if data[1] == state0:
+                    worksheet.write(f'G{row}', state1[0])
+                    worksheet.write(f'H{row}', state1[1])
+                    worksheet.write(f'I{row}', state1[2])
+                else:
+                    worksheet.write(f'G{row}', state3[0])
+                    worksheet.write(f'H{row}', state3[1])
+                    worksheet.write(f'I{row}', state3[2])
+            else:
+                if data[1] == state0:
+                    worksheet.write(f'G{row}', state0[0])
+                    worksheet.write(f'H{row}', state0[1])
+                    worksheet.write(f'I{row}', state0[2])
+                elif data[1] == state3:
+                    worksheet.write(f'G{row}', state3[0])
+                    worksheet.write(f'H{row}', state3[1])
+                    worksheet.write(f'I{row}', state3[2])
+                else:
+                    worksheet.write(f'G{row}', state2[0])
+                    worksheet.write(f'H{row}', state2[1])
+                    worksheet.write(f'I{row}', state2[2])
+
         worksheet.set_row(row-1, 18)  # student rows -> height 30px
 
         row+=1
@@ -764,19 +850,29 @@ def natural_keys(text):
 # -----------------------------------------------------------
 # Main function for call
 # Returns -> bool = (success)
-def gen_tables(input_file: str)-> bool:
+def gen_tables(input_file: str, old_file:str = None)-> bool:
     new_file = "data/cours_workbook.xlsx"
 
     input_wb = openpyxl.load_workbook(filename=input_file)
-    input_sh = input_wb.active
+    input_sh = input_wb.worksheets[0]
 
-    usable, type = CheckForValidWorkbook(input_wb,input_sh)
-    
+    usable, type = CheckForValidInputWorkbook(input_wb,input_sh)
     if not usable:
         return False
-
-    cours_participants, groups = LoadInputData(type, input_sh)
     
+    cours_participants, groups = LoadInputData(type, input_sh)
+
+    if old_file:
+        old_wb = openpyxl.load_workbook(filename=old_file, data_only=True)
+        old_sh1 = old_wb.worksheets[0]
+        usable = CheckForValidOldWorkbook(old_wb, old_sh1)
+        if not usable:
+            return False
+        
+        old_sh1 = old_wb['Studenti']
+        old_sh2 = old_wb['Bodovi']
+        repeat_students = LoadOldData(old_sh1, old_sh2, cours_participants)
+
     out_wb = xlsxwriter.Workbook(new_file)
     data_sheet = out_wb.add_worksheet("Studenti")
     point_worksheet = out_wb.add_worksheet("Bodovi")
@@ -786,7 +882,7 @@ def gen_tables(input_file: str)-> bool:
     WritePointsSheet(out_wb, point_worksheet, cours_participants)
     WriteTablesSheet(out_wb, table_worksheet, groups)
     LinkTableAndPointsSheet(out_wb, point_worksheet, cours_participants)
-    WriteDataSheet(out_wb, data_sheet, cours_participants, groups)
+    WriteDataSheet(out_wb, data_sheet, repeat_students, cours_participants, groups)
     WriteScheduleSheet(out_wb, schedule_worksheet, groups)
 
     out_wb.close()

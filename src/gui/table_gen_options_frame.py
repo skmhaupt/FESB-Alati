@@ -355,7 +355,12 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     def gen_tables(self):
         input_file = self.input_file_entry.get()
-        success = gen_tables(input_file)
+        old_file = self.get_old_file_entry.get()
+
+        if settings.get_repeat_students.get():
+            success = gen_tables(input_file, old_file)
+        else:
+            success = gen_tables(input_file)
 
         if success:
             self.gen_tables_button.configure(text="Preuzeto", text_color="green")
