@@ -2,7 +2,7 @@
 from customtkinter import BooleanVar
 
 def init():
-    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, ex_num, attendance, custom_ex_labels, max_test_points, min_average_required
+    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, acad_year, start_date, end_date, default_data_json, ex_num, attendance, custom_ex_labels, max_test_points, min_average_required
     global using_custom_exlabels, no_eval_ex0, using_lab0, not_using_failed_points, get_repeat_students  # BooleanVar
     global student_coordinats
 
@@ -28,8 +28,12 @@ def init():
     # this will hold the final resultgit 
     cours_participants_result = None
 
-    cours_name = ""
-    cours_number = ""
+    cours_name = ''
+    cours_number = ''
+    acad_year = ''
+    start_date = ''
+    end_date = ''
+    default_data_json = {'cours':'', 'cours_number':'', 'acad_year':'', 'start_date':'', 'end_date':''}
 
     ex_num = 0
     attendance = 0

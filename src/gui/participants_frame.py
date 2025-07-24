@@ -10,9 +10,10 @@ import logging, glob
 
 class ParticipantsFrame(ctk.CTkFrame):
     def __init__(self, master, logger: logging.Logger):
+        from gui.right_frame import RightFrame
         super().__init__(master)
 
-        self.controller = master    # in case ctk widgets from other sections have to be accessed
+        self.controller: RightFrame = master
         self.logger = logger
 
         self.grid_columnconfigure(1, weight=1)

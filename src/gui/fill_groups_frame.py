@@ -13,9 +13,10 @@ import logging, os, json, gui.util as util
 
 class FillGroupsFrame(ctk.CTkFrame):
     def __init__(self, master, logger: logging.Logger):
+        from gui.right_frame import RightFrame
         super().__init__(master)
 
-        self.controller = master    # in case ctk widgets from other sections have to be accessed
+        self.controller:RightFrame = master    # in case ctk widgets from other sections have to be accessed
         self.logger = logger
 
         self.grid_columnconfigure(0, weight=0)
@@ -25,7 +26,7 @@ class FillGroupsFrame(ctk.CTkFrame):
         self.grid_rowconfigure(2, weight=0)
         self.grid_rowconfigure(3, weight=0)
         self.grid_rowconfigure(4, weight=1)
-        self.controller = master
+        
         self.section_title_label = ctk.CTkLabel(self, text="Ispuna grupa", font=("Helvetica", 23))
         self.section_title_label.grid(row=0, column=0, padx=10, pady=(15, 0), sticky="nw")
 
@@ -139,16 +140,16 @@ class FillGroupsFrame(ctk.CTkFrame):
         settings.continue_answer = False
 
         # get cours data and save it to data.json
-        cours_name_entry: ctk.CTkEntry = self.controller.cours_frame.cours_name_entry
-        settings.cours_name = cours_name_entry.get()
-        cours_number_entry: ctk.CTkEntry = self.controller.cours_frame.cours_number_entry
-        settings.cours_number = cours_number_entry.get()
+        self.controller.cours_frame.get_data()
+        self.controller.controller.controller.table_gen.cours_frame.set_entries()
+
         with open("data/data.json", "r") as file:
             data:dict[str:str] = json.load(file)
         data["cours"] = settings.cours_name
         data["cours_number"] = settings.cours_number
+        data["acad_year"] = settings.acad_year
         json_object = json.dumps(data, indent=4)
-        self.logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}")
+        self.logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}; {settings.acad_year}")
         with open("data/data.json", "w") as file:
             file.write(json_object)
 
@@ -173,6 +174,8 @@ class FillGroupsFrame(ctk.CTkFrame):
 
         try:
             while running and counter<=100:
+                self.logger.info(f"///------------------------------------------------------------------///")
+                self.logger.info(f"\\\\\\------------------------------------------------------------------\\\\\\")
                 self.logger.info(f"Now running attempt {counter}.")
                 #Get cours participants
                 try:
@@ -215,6 +218,8 @@ class FillGroupsFrame(ctk.CTkFrame):
                 success, fill_errors = fill_groups(cours_participants_local, groups_local, 1)
                 if success:
                     running = False
+                    self.logger.info(f"///------------------------------------------------------------------///")
+                    self.logger.info(f"\\\\\\------------------------------------------------------------------\\\\\\")
                     self.logger.info("Successfully filled out all groups with no students remaining!")
                     for groups_on_day in groups_local.values():
                         for group in groups_on_day:

@@ -19,8 +19,6 @@ class GroupsFrame(ctk.CTkFrame):
 
         self.logger = logger
 
-        self.controller = master    # in case ctk widgets from other sections have to be accessed
-
         self.grid_columnconfigure(1, weight=1)  # column 1 is flex
         self.grid_rowconfigure(6, weight=1)     # rwo 6 is flex, subframe is in row 6 and it displays all the loaded groups
 

@@ -19,12 +19,13 @@ def CopyAndRename(srcname: str, dstname: str):
     copy(srcfile, dest_dir)
 
     # rename new file in downloads
-    if settings.cours_name == "":
-        settings.cours_name = "predmet"
-    if settings.cours_number == "":
-        settings.cours_number = "smjer"
+    if not settings.cours_name: settings.cours_name = "predmet"
+    if not settings.cours_number: settings.cours_number = "smjer"
+    if not settings.acad_year: settings.acad_year = "yyyy/yy"
+
+    acad_year1, acad_year2 = str.split(settings.acad_year,'/',1)
     
-    new_name = f"{dest_dir}/{settings.cours_name}-{settings.cours_number}-{dstname}.xlsx"
+    new_name = f"{dest_dir}/{settings.cours_name}-{settings.cours_number}-{acad_year1}_{acad_year2}-{dstname}.xlsx"
     name, extension = os.path.splitext(new_name)
     if not os.path.isfile(new_name):
         move(f"{dest_dir}/{srcname}", new_name)

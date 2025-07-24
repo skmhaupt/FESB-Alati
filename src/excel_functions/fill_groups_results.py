@@ -9,14 +9,15 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
         worksheet = workbook.add_worksheet()
 
         merge_format = workbook.add_format({"border":1, "bottom":5, "align": "center"})
+        center_format = workbook.add_format({'align': 'center'})
 
-        worksheet.write("A2", "Ime i prezime")
-        worksheet.write("B2", "JMBAG")
-        worksheet.write("C2", "E-Mail")
+        worksheet.write("A2", "Ime i prezime", center_format)
+        worksheet.write("B2", "JMBAG", center_format)
+        worksheet.write("C2", "E-Mail", center_format)
 
-        worksheet.write("E2", "Ime i prezime")
-        worksheet.write("F2", "JMBAG")
-        worksheet.write("G2", "E-Mail")
+        worksheet.write("E2", "Ime i prezime", center_format)
+        worksheet.write("F2", "JMBAG", center_format)
+        worksheet.write("G2", "E-Mail", center_format)
         
         width1 = len("Ime i prezime")+1
         width2 = len("JMBAG")+1
@@ -27,7 +28,7 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
             if width1 < len(f"{student.fullname}"):
                 width1 = len(f"{student.fullname}")+1
 
-            worksheet.write(f"B{row}", f"{student.jmbag}")
+            worksheet.write(f"B{row}", student.jmbag, center_format)
             if width2 < len(f"{student.jmbag}"):
                 width2 = len(f"{student.jmbag}")+1
 
@@ -52,7 +53,7 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
             if width1 < len(f"{student.fullname}"):
                 width1 = len(f"{student.fullname}")+1
 
-            worksheet.write(f"F{row}", f"{student.jmbag}")
+            worksheet.write(f"F{row}", student.jmbag, center_format)
             if width2 < len(f"{student.jmbag}"):
                 width2 = len(f"{student.jmbag}")+1
 

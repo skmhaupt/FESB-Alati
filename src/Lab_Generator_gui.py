@@ -43,20 +43,18 @@ def setup_logger() -> logging.Logger:
 
 #main function
 def main():
-    #init logger
     try:
+        #init logger
         logger = setup_logger()
-    except Exception:
-        raise
 
-    #init main app widget
-    app = App(logger)
+        #init main app widget
+        app = App(logger)
 
-    #init main loop
-    try:
+        #init main loop
         app.mainloop()
-    except Exception:
-        logger.exception("Exiting app!")
+
+    except Exception as e:
+        logger.exception(f"Error: {e}; exiting app!")
         exit()
 
 if __name__ == "__main__":
