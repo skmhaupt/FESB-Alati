@@ -60,10 +60,10 @@ def CheckForValidOldWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.works
            not sh.cell(row = 1, column = 4).value == 'Korisničko ime' or \
            not sh.cell(row = 1, column = 5).value == 'Email' or \
            not sh.cell(row = 1, column = 6).value == 'Grupa' or \
-           not sh.cell(row = 1, column = 7).value == 'Oslobođeni' or \
-           not sh.cell(row = 1, column = 8).value == 'Priznati jednom' or \
-           not sh.cell(row = 1, column = 9).value == 'Priznati dvaput' or \
-           not sh.cell(row = 1, column = 10).value == 'Ponavljaci' or \
+           not sh.cell(row = 1, column = 7).value == 'Oslobođen' or \
+           not sh.cell(row = 1, column = 8).value == 'Položio X puta' or \
+           not sh.cell(row = 1, column = 9).value == 'Položio u god.' or \
+           not sh.cell(row = 1, column = 10).value == 'Ponavljač' or \
            not sh.cell(row = 1, column = 12).value == 'Grupa' or \
            not sh.cell(row = 1, column = 13).value == 'Dan' or \
            not sh.cell(row = 1, column = 14).value == 'Vrijeme' or \
@@ -154,27 +154,30 @@ def LoadOldData(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.works
     grade_columnn = sh2.max_column - 6
     repeat_students: dict = {}
 
+    repeat_students['old_acad_year'] = sh1.cell(row=1,column=11).value
     for student_number in range(num_of_students):
         jmbag:int = sh1.cell(row = student_number+2, column = 3).value
 
         if any(student.jmbag == jmbag for student in cours_participants):
-            was_absolved = sh1.cell(row = student_number+2, column = 7).value
-            was_absolved_once = sh1.cell(row = student_number+2, column = 8).value
-            was_absolved_twice = sh1.cell(row = student_number+2, column = 9).value
+            was_absolved: str = sh1.cell(row = student_number+2, column = 7).value
+            passed_n_times: int = sh1.cell(row = student_number+2, column = 8).value
+            passed_in_years: str = sh1.cell(row = student_number+2, column = 9).value
+            if not passed_n_times: passed_n_times = 0
 
             # check if he passed
             if sh2.cell(row=student_number+2, column=attendance_column).value == 'DA' and sh2.cell(row=student_number+2, column=grade_columnn).value >= 0.5:
-                repeat_students[jmbag] = [True, [was_absolved, was_absolved_once, was_absolved_twice]]
+                repeat_students[jmbag] = [True, was_absolved, passed_n_times, passed_in_years]
             else:
-                repeat_students[jmbag] = [False, [was_absolved, was_absolved_once, was_absolved_twice]]
+                repeat_students[jmbag] = [False, was_absolved, passed_n_times, passed_in_years]
     return repeat_students
 
 # -----------------------------------------------------------
 # Writes sheet with all student data (name, JMABG, username, Email, Group, ...)
-def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, repeat_students: dict[int,list], cours_participants: list[Student], groups: list[Group]):
+def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, repeat_students: dict, cours_participants: list[Student], groups: list[Group]):
     format_left = workbook.add_format({'align': 'left'})
     format_center = workbook.add_format({'align': 'center'})
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF'})
+    format_white_text = workbook.add_format({'align': 'center', 'bg_color': '#FFFFFF', 'font_color': '#FFFFFF'})
 
     worksheet.write('A1', 'Prezime',format_header)
     worksheet.write('B1', 'Ime',format_header)
@@ -182,10 +185,11 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     worksheet.write('D1', 'Korisničko ime',format_header)
     worksheet.write('E1', 'Email',format_header)
     worksheet.write('F1', 'Grupa',format_header)
-    worksheet.write('G1', 'Oslobođeni',format_header)
-    worksheet.write('H1', 'Priznati jednom',format_header)
-    worksheet.write('I1', 'Priznati dvaput',format_header)
-    worksheet.write('J1', 'Ponavljaci',format_header)
+    worksheet.write('G1', 'Oslobođen',format_header)
+    worksheet.write('H1', 'Položio X puta',format_header)
+    worksheet.write('I1', 'Položio u god.',format_header)
+    worksheet.write('J1', 'Ponavljač',format_header)
+    worksheet.write('K1', f'{settings.acad_year}',format_white_text)
 
     width1 = len('Prezime')+1
     width2 = len('Ime')+1
@@ -193,15 +197,10 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     width4 = len('Korisničko ime')+1
     width5 = len('Email')+1
     width6 = 11 # grupa
-    width7 = 15.5 # Oslobođeni
-    width8 = 19 # Priznati jednom
-    width9 = 19 # Priznati dvaput
-    width10 = 15 # Ponavljaci
-
-    state0 = [None, None, None]
-    state1 = ['+', None, None]
-    state2 = [None, '+', None]
-    state3 = ['+', None, '+']
+    width7 = 15.5 # Oslobođen
+    width8 = 19 # Položio X puta
+    width9 = 19 # Položio u god.
+    width10 = 15 # Ponavljač
 
     row: int = 2
     for student in cours_participants:
@@ -225,35 +224,23 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
         
         if repeat_students:
             if any(jmbag == student.jmbag for jmbag in repeat_students.keys()):
-                data = repeat_students[student.jmbag]   # [bool,str,str,str] = [passed, absolved, absolved once, absolved twice]
+                data: list = repeat_students[student.jmbag]   # [bool,str,int,str] = [passed, was_absolved, passed_n_times, passed_in_years]
+                if data[0] or data[2]>=2: # passed last year or passed min needed times
+                    worksheet.write(f'G{row}', '+')
                 
-                if data[0]: # passed last lab
-                    if data[1] == state0:
-                        worksheet.write(f'G{row}', state1[0])
-                        worksheet.write(f'H{row}', state1[1])
-                        worksheet.write(f'I{row}', state1[2])
-                        worksheet.write(f'J{row}', '+')
-                    else:
-                        worksheet.write(f'G{row}', state3[0])
-                        worksheet.write(f'H{row}', state3[1])
-                        worksheet.write(f'I{row}', state3[2])
-                        worksheet.write(f'J{row}', '+')
-                else:
-                    if data[1] == state0:
-                        worksheet.write(f'G{row}', state0[0])
-                        worksheet.write(f'H{row}', state0[1])
-                        worksheet.write(f'I{row}', state0[2])
-                        worksheet.write(f'J{row}', '+')
-                    elif data[1] == state3:
-                        worksheet.write(f'G{row}', state3[0])
-                        worksheet.write(f'H{row}', state3[1])
-                        worksheet.write(f'I{row}', state3[2])
-                        worksheet.write(f'J{row}', '+')
-                    else:
-                        worksheet.write(f'G{row}', state2[0])
-                        worksheet.write(f'H{row}', state2[1])
-                        worksheet.write(f'I{row}', state2[2])
-                        worksheet.write(f'J{row}', '+')
+                passed_n_times: int = data[2]
+                passed_in_years = data[3]
+                if data[0]:
+                    passed_n_times+=1
+                    if not data[3]: passed_in_years = repeat_students['old_acad_year']
+                    else: passed_in_years = f'{data[3]}, {repeat_students['old_acad_year']}'
+                if not passed_in_years: passed_in_years = ''
+
+                if len(passed_in_years)>width9: width9 = len(passed_in_years)
+
+                worksheet.write(f'H{row}', passed_n_times)
+                worksheet.write(f'I{row}', f'{passed_in_years}')
+                worksheet.write(f'J{row}', '+')
 
         worksheet.set_row(row-1, 18)  # student rows -> height 30px
 
@@ -505,6 +492,7 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     
     worksheet.set_column(0,0 ,width1)
     worksheet.autofilter(0,group_col, row-1,group_col)    # filter by groups and exemptions
+    worksheet.hide_zero()
 
 # -----------------------------------------------------------
 # Writes sheet with all filled group tables
