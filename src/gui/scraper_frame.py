@@ -36,14 +36,14 @@ class ScraperFrame(ctk.CTkFrame):
         self.label_3 = ctk.CTkLabel(self, text='do - ')
         self.label_3.grid(row=1, column=3, padx=(5,0), pady=(10, 0), sticky='w')
         self.end_date_entry = ctk.CTkEntry(self, validate='all')
-        self.end_date_entry.grid(row=1, column=4, padx=(0, 5), pady=(10, 0), sticky='we')
+        self.end_date_entry.grid(row=1, column=4, padx=(0, 10), pady=(10, 0), sticky='we')
         self.end_date_entry.configure(placeholder_text='dd.mm.yyyy', validatecommand=(self.v_date, '%P', self.end_date_entry))
 
         self.schedule_scrapper_button = ctk.CTkButton(self,width=60 , text='Preuzmi raspored', command=self.ScrapSchedule_setup)
         self.schedule_scrapper_button.grid(row=2, column=0, padx=(10,0), pady=10, sticky='')
 
         self.subframe = ctk.CTkFrame(self)
-        self.subframe.grid(row=2, column=1, columnspan=4, padx=(5,5), pady=10,sticky='wens')
+        self.subframe.grid(row=2, column=1, columnspan=4, padx=10, pady=10,sticky='wens')
         self.subframe.grid_columnconfigure(0, weight=1)
         self.status_label = ctk.CTkLabel(self.subframe, text='Raspored studenta nije preuzet.')
         self.status_label.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='')

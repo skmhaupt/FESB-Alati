@@ -24,7 +24,7 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.entry_label = ctk.CTkLabel(self, text="Ulazna datoteka:")
         self.entry_label.grid(row=1, column=0, padx=(10, 5), pady=(10, 0), sticky="w")
 
-        self.csv_file_entry = ctk.CTkEntry(self, width=500, placeholder_text=".csv datoteka")   # this widget will containe the path to the .csv file
+        self.csv_file_entry = ctk.CTkEntry(self, placeholder_text=".csv datoteka")   # this widget will containe the path to the .csv file
         self.csv_file_entry.configure(state="readonly")
         self.csv_file_entry.grid(row=1, column=1, padx=(0, 5), pady=(10, 0), sticky="we")
         
