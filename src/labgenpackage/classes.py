@@ -41,10 +41,13 @@ class Group:
         
     def __str__(self):
         #Fix time string
-        self.time = self.time.replace(' ', '')
-        a,b = self.time.split("-")
-        self.time = f"{a} - {b}"
-        return f"{self.group_label} - {self.day} {self.time} ({self.lab})"
+        if self.time=="NaN":
+            time = "NaN"
+        else:
+            time = self.time.replace(' ', '')
+            a,b = self.time.split("-")
+            time = f"{a} - {b}"
+        return f"{self.group_label} - {self.day} {time} ({self.lab})"
     
     def __repr__(self):
         return f"{self.group_label}"

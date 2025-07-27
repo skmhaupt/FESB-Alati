@@ -146,7 +146,7 @@ def GenErrorDetailsWorkbook(logger: logging.Logger, weight_errors:list[Student],
         raise
 
 
-def GenResultsWorkbook():
+def GenResultsWorkbook(exempt_students:list[int]):
     workbook = xlsxwriter.Workbook("data/Filled_Groups.xlsx")
     worksheet = workbook.add_worksheet()
 
@@ -200,11 +200,14 @@ def GenResultsWorkbook():
         worksheet.write(f"C{row}", f"{student.email}", format1)
         worksheet.write(f"D{row}", student.jmbag, format1)
         worksheet.write(f"E{row}", f"{student.username}", format1)
-        if hasattr(student, "group"):
+        if student.jmbag in exempt_students:
+            worksheet.write(f"F{row}", "Oslobođen", format1)
+            groupstr = "Oslobođen"
+        elif hasattr(student, "group"):
             worksheet.write(f"F{row}", f"{student.group}", format1)
             groupstr = f"{student.group}"
         else:
-            worksheet.write(f"F{row}", "Jos nisu svrstani", format1)
+            worksheet.write(f"F{row}", "Još nisu svrstani", format1)
             groupstr = "Jos nisu svrstani"
 
         if width1 < len(f"{student.surname}"):

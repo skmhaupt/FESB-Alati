@@ -1,6 +1,6 @@
 import customtkinter as ctk
 import gui.settings as settings
-import re
+import re, json, logging
 
 # This frame has no special function, its contents are used by other sections. The user doesnt have to fill out its data.
 class CoursFrame(ctk.CTkFrame):
@@ -58,3 +58,22 @@ class CoursFrame(ctk.CTkFrame):
         self.cours_number_entry.insert(0,settings.cours_number)
         self.year_entry.delete(0, 'end')
         self.year_entry.insert(0,settings.acad_year)
+
+
+    
+    def save_data(self):
+        logger = logging.getLogger('my_app.coursframe')
+
+        settings.cours_name = self.cours_name_entry.get()
+        settings.cours_number = self.cours_number_entry.get()
+        settings.acad_year = self.year_entry.get()
+
+        with open("data/data.json", "r") as file:
+            data:dict[str:str] = json.load(file)
+        data["cours"] = settings.cours_name
+        data["cours_number"] = settings.cours_number
+        data["acad_year"] = settings.acad_year
+        json_object = json.dumps(data, indent=4)
+        logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}; {settings.acad_year}")
+        with open("data/data.json", "w") as file:
+            file.write(json_object)

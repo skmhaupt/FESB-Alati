@@ -2,7 +2,7 @@
 from customtkinter import BooleanVar
 
 def init():
-    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, acad_year, start_date, end_date, default_data_json, ex_num, attendance, custom_ex_labels, max_test_points, min_average_required
+    global loaded_data, total_places, cours_participants_global, alfa_prio_lvl, total_places, continue_answer, working, cours_participants_result, cours_name, cours_number, acad_year, start_date, end_date, default_data_json, ex_num, attendance, num_of_needed_passes, custom_ex_labels, max_test_points, min_average_required
     global exempting_students, using_custom_exlabels, no_eval_ex0, using_lab0, not_using_failed_points, get_repeat_students, freed_if_passed_last  # BooleanVar
     global student_coordinats
 
@@ -39,6 +39,8 @@ def init():
     attendance = 0
 
     custom_ex_labels = None
+
+    num_of_needed_passes = 2
 
     exempting_students = BooleanVar(value=False)
     freed_if_passed_last = BooleanVar(value=True)
