@@ -169,6 +169,7 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.fill_groups_button.grid()
             return
 
+        exempt_file = None
         if settings.exempting_students.get():
             exempt_file = self.exempt_file_entry.get()
             if not exempt_file:
