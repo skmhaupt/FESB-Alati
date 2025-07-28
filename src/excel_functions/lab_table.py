@@ -50,27 +50,34 @@ def CheckForValidInputWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.wor
 # Checks if loaded workbook is usable.
 # Returns -> bool = usable
 # usable: true = good workbook, false = bad workbook
-def CheckForValidOldWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.worksheet.Worksheet):
+def CheckForValidOldWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.worksheet.Worksheet) -> str:
     try:
-        if not len(wb.sheetnames) == 4 or \
-           not sh.max_column == 15 or \
+        if not (len(wb.sheetnames) == 4 or len(wb.sheetnames) == 1) or \
+           not (sh.max_column == 15 or sh.max_column == 10) or \
            not sh.cell(row = 1, column = 1).value == 'Prezime' or \
            not sh.cell(row = 1, column = 2).value == 'Ime' or \
            not sh.cell(row = 1, column = 3).value == 'JMBAG' or \
            not sh.cell(row = 1, column = 4).value == 'Korisničko ime' or \
-           not sh.cell(row = 1, column = 5).value == 'Email' or \
-           not sh.cell(row = 1, column = 6).value == 'Grupa' or \
-           not sh.cell(row = 1, column = 7).value == 'Oslobođen' or \
-           not sh.cell(row = 1, column = 8).value == 'Položio X puta' or \
-           not sh.cell(row = 1, column = 9).value == 'Položio u god.' or \
-           not sh.cell(row = 1, column = 10).value == 'Ponavljač' or \
-           not sh.cell(row = 1, column = 12).value == 'Grupa' or \
-           not sh.cell(row = 1, column = 13).value == 'Dan' or \
-           not sh.cell(row = 1, column = 14).value == 'Vrijeme' or \
-           not sh.cell(row = 1, column = 15).value == 'Dvorana':
+           not sh.cell(row = 1, column = 5).value == 'Email':
             raise BadWorkbook('Loaded old workbook is not apropriet.')
+
+        if sh.cell(row = 1, column = 6).value == 'Grupa' and \
+           sh.cell(row = 1, column = 7).value == 'Oslobođen' and \
+           sh.cell(row = 1, column = 8).value == 'Položio X puta' and \
+           sh.cell(row = 1, column = 9).value == 'Položio u god.' and \
+           sh.cell(row = 1, column = 10).value == 'Ponavljač' and \
+           sh.cell(row = 1, column = 12).value == 'Grupa' and \
+           sh.cell(row = 1, column = 13).value == 'Dan' and \
+           sh.cell(row = 1, column = 14).value == 'Vrijeme' and \
+           sh.cell(row = 1, column = 15).value == 'Dvorana':
+            return 'old table'
+        elif sh.cell(row = 1, column = 6).value == 'Oslobođen' and \
+             sh.cell(row = 1, column = 7).value == 'Položio X puta' and \
+             sh.cell(row = 1, column = 8).value == 'Položio u god.' and \
+             sh.cell(row = 1, column = 9).value == 'Želi ponavljati [+]':
+            return 'repeat table'
         else:
-            pass
+            raise BadWorkbook('Loaded old workbook is not apropriet.')
         
     except BadWorkbook as e:
         e.add_note('Prilozena stara excel datoteka za ponavljace nije prikladna!')
@@ -101,7 +108,7 @@ def LoadInputData(sh: openpyxl.worksheet.worksheet.Worksheet) -> tuple[list[Stud
         
         group_data = sh.cell(row = student_number+2, column = 6).value
 
-        if group_data == 'Još nisu odabrali' or group_data == 'Jos nisu svrstani':
+        if group_data == 'Još nisu odabrali' or group_data == 'Još nisu svrstani' or group_data == 'Oslobođen':
             group = None
         else:
             # pars string containing group data
@@ -145,10 +152,7 @@ def LoadInputData(sh: openpyxl.worksheet.worksheet.Worksheet) -> tuple[list[Stud
     return cours_participants, groups
 
 # -----------------------------------------------------------
-# Loads data from old workbook
-# Returns -> list[Student] = repeat students
-# cours_participants: alfabeticly sorted students
-def LoadOldData(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.worksheet.worksheet.Worksheet, cours_participants: list[Student]) -> dict:
+def LoadDataFromOldTable(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.worksheet.worksheet.Worksheet, cours_participants: list[Student]) -> dict:
     num_of_students = sh1.max_row - 1
     attendance_column = sh2.max_column - 7
     grade_columnn = sh2.max_column - 6
@@ -159,16 +163,46 @@ def LoadOldData(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.works
         jmbag:int = sh1.cell(row = student_number+2, column = 3).value
 
         if any(student.jmbag == jmbag for student in cours_participants):
-            was_absolved: str = sh1.cell(row = student_number+2, column = 7).value
             passed_n_times: int = sh1.cell(row = student_number+2, column = 8).value
             passed_in_years: str = sh1.cell(row = student_number+2, column = 9).value
             if not passed_n_times: passed_n_times = 0
 
             # check if he passed
             if sh2.cell(row=student_number+2, column=attendance_column).value == 'DA' and sh2.cell(row=student_number+2, column=grade_columnn).value >= 0.5:
-                repeat_students[jmbag] = [True, was_absolved, passed_n_times, passed_in_years]
+                passed_last_year = True  
             else:
-                repeat_students[jmbag] = [False, was_absolved, passed_n_times, passed_in_years]
+                passed_last_year = False
+    
+        if passed_last_year:
+            passed_n_times+=1
+            if not passed_in_years: passed_in_years = repeat_students['old_acad_year']
+            else: passed_in_years = f'{passed_in_years}, {repeat_students['old_acad_year']}'
+        if not passed_in_years: passed_in_years = ''
+        
+        absolved = ''
+        if passed_last_year or passed_n_times >= 2: # passed last year or passed min needed times
+            absolved = '+'
+
+        repeat_students[jmbag] = [absolved, passed_n_times, passed_in_years]
+
+    return repeat_students
+
+# -----------------------------------------------------------
+def LoadDataFromRepeatTable(sh: openpyxl.worksheet.worksheet.Worksheet):
+    num_of_students = sh.max_row - 1
+    repeat_students: dict = {}
+
+    repeat_students['old_acad_year'] = sh.cell(row=1,column=10).value
+    for student_number in range(num_of_students):
+        jmbag: int = sh.cell(row = student_number+2, column = 3).value
+        absolved: str = ''
+        if sh.cell(row = student_number+2, column = 6).value == '+' and not sh.cell(row = student_number+2, column = 9).value == '+':
+            absolved = '+'
+        passed_n_times: int = sh.cell(row = student_number+2, column = 7).value
+        passed_in_years: str = sh.cell(row = student_number+2, column = 8).value
+        if not passed_n_times: passed_n_times = 0
+        if not passed_in_years: passed_in_years = ''
+        repeat_students[jmbag] = [absolved, passed_n_times, passed_in_years]
     return repeat_students
 
 # -----------------------------------------------------------
@@ -224,23 +258,33 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
         
         if repeat_students:
             if any(jmbag == student.jmbag for jmbag in repeat_students.keys()):
-                data: list = repeat_students[student.jmbag]   # [bool,str,int,str] = [passed, was_absolved, passed_n_times, passed_in_years]
-                if data[0] or data[2]>=2: # passed last year or passed min needed times
-                    worksheet.write(f'G{row}', '+')
-                
-                passed_n_times: int = data[2]
-                passed_in_years = data[3]
-                if data[0]:
-                    passed_n_times+=1
-                    if not data[3]: passed_in_years = repeat_students['old_acad_year']
-                    else: passed_in_years = f'{data[3]}, {repeat_students['old_acad_year']}'
-                if not passed_in_years: passed_in_years = ''
-
-                if len(passed_in_years)>width9: width9 = len(passed_in_years)
-
+                data: list = repeat_students[student.jmbag]     # [str,int,str] = [absolved, passed_n_times, passed_in_years]
+                absolved: str = data[0]
+                passed_n_times: int = data[1]
+                passed_in_years: str = data[2]
+                worksheet.write(f'G{row}', f'{absolved}')
                 worksheet.write(f'H{row}', passed_n_times)
                 worksheet.write(f'I{row}', f'{passed_in_years}')
                 worksheet.write(f'J{row}', '+')
+
+
+                # data: list = repeat_students[student.jmbag]   # [bool,str,int,str] = [passed, was_absolved, passed_n_times, passed_in_years]
+                # if data[0] or data[2]>=2: # passed last year or passed min needed times
+                #     worksheet.write(f'G{row}', '+')
+                
+                # passed_n_times: int = data[2]
+                # passed_in_years = data[3]
+                # if data[0]:
+                #     passed_n_times+=1
+                #     if not data[3]: passed_in_years = repeat_students['old_acad_year']
+                #     else: passed_in_years = f'{data[3]}, {repeat_students['old_acad_year']}'
+                # if not passed_in_years: passed_in_years = ''
+
+                # if len(passed_in_years)>width9: width9 = len(passed_in_years)
+
+                # worksheet.write(f'H{row}', passed_n_times)
+                # worksheet.write(f'I{row}', f'{passed_in_years}')
+                # worksheet.write(f'J{row}', '+')
 
         worksheet.set_row(row-1, 18)  # student rows -> height 30px
 
@@ -864,13 +908,17 @@ def gen_tables(input_file: str, old_file:str = None)-> tuple[bool,str]:
         if old_file:
             old_wb = openpyxl.load_workbook(filename=old_file, data_only=True)
             old_sh1 = old_wb.worksheets[0]
-            CheckForValidOldWorkbook(old_wb, old_sh1)
-            logger.info('Valid old wb.')
-            
+            old_wb_type = CheckForValidOldWorkbook(old_wb, old_sh1)
+            logger.info(f'Valid {old_wb_type} wb.')            
             old_sh1 = old_wb['Studenti']
-            old_sh2 = old_wb['Bodovi']
-            repeat_students = LoadOldData(old_sh1, old_sh2, cours_participants)
-            logger.info('Loaded old data from old wb.')
+            if old_wb_type == 'old table':
+                old_sh2 = old_wb['Bodovi']
+                repeat_students = LoadDataFromOldTable(old_sh1, old_sh2, cours_participants)
+                logger.info('Loaded old data from old wb.')
+            elif old_wb_type == 'repeat table':
+                repeat_students = LoadDataFromRepeatTable(old_sh1)
+                logger.info('Loaded data from repeat students wb.')
+                pass
         else: repeat_students = None
 
         out_wb = xlsxwriter.Workbook(new_file)

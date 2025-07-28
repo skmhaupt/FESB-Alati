@@ -41,7 +41,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.num_lab_attend_subframe = ctk.CTkFrame(self.settings_subframe)
         self.num_lab_attend_subframe.grid(row=0, column=0, padx=5, pady=(5, 0), sticky='nwe')
         
-        self.num_labexc_label = ctk.CTkLabel(self.num_lab_attend_subframe, text='Broj vjezbi:')
+        self.num_labexc_label = ctk.CTkLabel(self.num_lab_attend_subframe, text='Broj vježbi:')
         self.num_labexc_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
 
         self.num_labexc_entry = ctk.CTkEntry(self.num_lab_attend_subframe, width=45, justify='center', validate='all', validatecommand=(self.v_num_labex, '%P'))
@@ -63,7 +63,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.custom_exlabels_subframe = ctk.CTkFrame(self.settings_subframe)
         self.custom_exlabels_subframe.grid(row=1, column=0, padx=5, pady=(5, 0), sticky='nwe')
 
-        self.custom_exlabels_label = ctk.CTkLabel(self.custom_exlabels_subframe, text='Rucno postavljanje labela za vjezbe:')
+        self.custom_exlabels_label = ctk.CTkLabel(self.custom_exlabels_subframe, text='Ručno postavljanje labela za vježbe:')
         self.custom_exlabels_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
 
         self.custom_exlabels_checkbox = ctk.CTkCheckBox(self.custom_exlabels_subframe, text='', width=24, command=self.eval_custom_exlabels_checkbox_event,variable=settings.using_custom_exlabels, onvalue=True, offvalue=False)
@@ -76,7 +76,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.evalex0_subframe = ctk.CTkFrame(self.settings_subframe)
         self.evalex0_subframe.grid(row=2, column=0, padx=5, pady=(5,0), sticky='nwe')
 
-        self.no_eval_ex0_label = ctk.CTkLabel(self.evalex0_subframe, text='Prva vjezba se ne ocjenjuje:')
+        self.no_eval_ex0_label = ctk.CTkLabel(self.evalex0_subframe, text='Prva vježba se ne ocjenjuje:')
         self.no_eval_ex0_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
         
         self.no_eval_ex0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text='', width=24, command=self.eval_ex0_checkbox_event,variable=settings.no_eval_ex0, onvalue=True, offvalue=False)
@@ -95,7 +95,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.preview_subframe = ctk.CTkFrame(self.settings_subframe)
         self.preview_subframe.grid(row=1, column=1,rowspan=2, padx=5, pady=5, sticky='nwe')
 
-        self.preview_title_label = ctk.CTkLabel(self.preview_subframe, text='Pretpregled:', font=('Helvetica', 15))
+        self.preview_title_label = ctk.CTkLabel(self.preview_subframe, width=400, anchor='w', text='Pretpregled:', font=('Helvetica', 15))
         self.preview_title_label.grid(row=0, column=0, padx=10, pady=(5,0), sticky='nw')
         
         self.preview_label = ctk.CTkLabel(self.preview_subframe, text='Prezime i ime | ... | grupe')
@@ -112,7 +112,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.max_points_entry = ctk.CTkEntry(self.grade_subframe, width=45, justify='center', validate='all', validatecommand=(self.v_max_points, '%P'))
         self.max_points_entry.grid(row=0, column=1, padx=5, pady=(5,0), sticky='nw')
 
-        self.dont_use_failed_points_label = ctk.CTkLabel(self.grade_subframe, text='Ne polozeni ulazni/izlazni vrijede 0 boda:')
+        self.dont_use_failed_points_label = ctk.CTkLabel(self.grade_subframe, text='Ne položeni ulazni/izlazni vrijede 0 boda:')
         self.dont_use_failed_points_label.grid(row=1, column=0, padx=5, pady=(5,0), sticky='nw')
         
         self.dont_use_failed_points_checkbox = ctk.CTkCheckBox(self.grade_subframe, text='', width=24,variable=settings.not_using_failed_points, onvalue=True, offvalue=False)
@@ -132,7 +132,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.get_repeat_students_subframe = ctk.CTkFrame(self.settings_subframe)
         self.get_repeat_students_subframe.grid(row=4, column=0, columnspan=2, padx=5, pady=(5,0), sticky='nwe')
 
-        self.get_repeat_students_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Odrediti ponavljace')
+        self.get_repeat_students_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Rad sa ponavljačima')
         self.get_repeat_students_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
 
         self.get_repeat_students_checkbox = ctk.CTkCheckBox(self.get_repeat_students_subframe, text='', width=24, command=self.eval_get_repeat_students_checkbox_event, variable=settings.get_repeat_students, onvalue=True, offvalue=False)
@@ -150,7 +150,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.input_file_entry.configure(state='readonly')
         self.input_file_entry.grid(row=0, column=1, padx=5, pady=5, sticky='nwe')
 
-        self.input_file_browse_button = ctk.CTkButton(self.input_file_subframe, width=60 , text='Pretrazi', command=lambda:self.browse_action(self.input_file_entry))
+        self.input_file_browse_button = ctk.CTkButton(self.input_file_subframe, width=60 , text='Pretraži', command=lambda:self.browse_action(self.input_file_entry))
         self.input_file_browse_button.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
 
         self.input_file_subframe.grid_columnconfigure(1, weight=1)
@@ -201,7 +201,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     def custom_exlabels_callback(self, P):
         ex_labels = str.split(P,',')
         settings.custom_ex_labels = ex_labels
-        if len(ex_labels) > settings.ex_num: self.error_label.configure(text='Previse labela!')
+        if len(ex_labels) > settings.ex_num: self.error_label.configure(text='Previše labela!')
         elif len(ex_labels) != settings.ex_num: self.error_label.configure(text='Nedovoljan broj labela!')
         else: self.error_label.configure(text='')
 
@@ -271,14 +271,14 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     def eval_get_repeat_students_checkbox_event(self):
         if settings.get_repeat_students.get():
-            self.get_old_file_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Tablica prosle ak. god.:')
+            self.get_old_file_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Tablica prosle ak. god. ili tablica sa ponavljačima:')
             self.get_old_file_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
 
             self.get_old_file_entry = ctk.CTkEntry(self.get_repeat_students_subframe, placeholder_text='Excel datoteka')
             self.get_old_file_entry.configure(state='readonly')
             self.get_old_file_entry.grid(row=0, column=3, padx=5, pady=5, sticky='nwe')
 
-            self.get_old_file_browse_button = ctk.CTkButton(self.get_repeat_students_subframe, width=60 , text='Pretrazi', command=lambda:self.browse_action(self.get_old_file_entry))
+            self.get_old_file_browse_button = ctk.CTkButton(self.get_repeat_students_subframe, width=60 , text='Pretraži', command=lambda:self.browse_action(self.get_old_file_entry))
             self.get_old_file_browse_button.grid(row=0, column=4, padx=5, pady=5, sticky='nw')
 
             self.get_repeat_students_subframe.grid_columnconfigure(3, weight=1)
@@ -290,7 +290,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     # --------------------------------------------------------------------------------------------------------
     # create/destroy widgets functions
     def create_lab0_widgets(self):
-        self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text='Koristiti nultu vjezbu (lab0):')
+        self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text='Koristiti nultu vježbu (lab0):')
         self.lab0_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
         self.lab0_checkbox = ctk.CTkCheckBox(self.evalex0_subframe, text='', width=24, command=self.eval_lab0_checkbox_event,variable=settings.using_lab0, onvalue=True, offvalue=False)
         self.lab0_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky='nw')
@@ -381,7 +381,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
                     if not old_file:
                         raise FileNotFoundError('Old file not provided!')
             except FileNotFoundError as e:
-                e.add_note('Nije zadana stara datoteka sa proslogodisnjim rezultatima!')
+                e.add_note('Nije zadana stara datoteka sa prošlogodišnjim rezultatima ili tablica sa ponavljačima!')
                 raise
 
             # get cours data and save it to data.json
@@ -402,18 +402,20 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             else: gen_tables(input_file)
 
             self.gen_tables_button.configure(text='Preuzeto', text_color='green')
-            self.error_label2.configure(text='Uspjesno generirana excel datoteka.', text_color='green')
+            self.error_label2.configure(text='Uspješno generirana excel datoteka.', text_color='green')
             logger.info('Successfuly created lab tables.')
         
         except (FileNotFoundError, BadWorkbook, ValueError) as e:
-            msg = e.__notes__[0]
-            self.gen_tables_button.configure(text='Pogreska', text_color='red')
+            if hasattr(e, '__notes__'):
+                msg = e.__notes__[0]
+            else: msg = 'Neočekivana pogreška!'
+            self.gen_tables_button.configure(text='Pogreška', text_color='red')
             self.error_label2.configure(text=msg, text_color='red')
             logger.warning(e)
 
         except Exception as e:
-            self.gen_tables_button.configure(text='Pogreska', text_color='red')
-            self.error_label2.configure(text='Neocekivana pogreska!', text_color='red')
+            self.gen_tables_button.configure(text='Pogreška', text_color='red')
+            self.error_label2.configure(text='Neočekivana pogreška!', text_color='red')
             logger.exception(e)
         
         finally:

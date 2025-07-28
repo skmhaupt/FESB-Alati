@@ -202,7 +202,7 @@ def GenResultsWorkbook(exempt_students:list[int]):
         worksheet.write(f"E{row}", f"{student.username}", format1)
         if student.jmbag in exempt_students:
             worksheet.write(f"F{row}", "Oslobođen", format1)
-            groupstr = "Oslobođen"
+            groupstr = "Osloboden"
         elif hasattr(student, "group"):
             worksheet.write(f"F{row}", f"{student.group}", format1)
             groupstr = f"{student.group}"
