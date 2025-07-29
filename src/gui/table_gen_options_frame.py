@@ -11,14 +11,12 @@ import logging, json
 class TableGenOptionsFrame(ctk.CTkFrame):
     def __init__(self, master):
         from gui.app_frame import TableGen
+
         super().__init__(master)
         
         self.grid_columnconfigure(0, weight=1)
 
         self.controller: TableGen = master
-
-        logger = logging.getLogger('my_app.table_gen')
-        logger.setLevel('INFO')
 
         self.section_title_label = ctk.CTkLabel(self, text='Postavke', font=('Helvetica', 23))
         self.section_title_label.grid(row=0, column=0, columnspan=2, padx=13, pady=(10, 0), sticky='nw')
@@ -360,6 +358,8 @@ class TableGenOptionsFrame(ctk.CTkFrame):
     def gen_tables(self):
         try:
             logger = logging.getLogger('my_app.table_gen')
+            logger.info('Checking data for lab table generator...')
+
             try:
                 if not settings.ex_num:
                     raise ValueError('Number of excercises is not set!')
@@ -385,19 +385,14 @@ class TableGenOptionsFrame(ctk.CTkFrame):
                 raise
 
             # get cours data and save it to data.json
-            self.controller.cours_frame.get_data()
-            self.controller.controller.group_gen.right_frame.cours_frame.set_entries()
+            try:
+                self.controller.cours_frame.save_data()
+                self.controller.controller.group_gen.right_frame.cours_frame.set_entries()
+            except Exception as e:
+                e.add_note('Failed saving to data.json')
+                raise
 
-            with open("data/data.json", "r") as file:
-                data:dict[str:str] = json.load(file)
-            data["cours"] = settings.cours_name
-            data["cours_number"] = settings.cours_number
-            data["acad_year"] = settings.acad_year
-            json_object = json.dumps(data, indent=4)
-            logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}; {settings.acad_year}")
-            with open("data/data.json", "w") as file:
-                file.write(json_object)
-
+            logger.info('Running lab table generator...')
             if settings.get_repeat_students.get(): gen_tables(input_file, old_file)
             else: gen_tables(input_file)
 

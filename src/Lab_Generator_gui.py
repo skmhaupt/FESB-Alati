@@ -48,13 +48,13 @@ def main():
         logger = setup_logger()
 
         #init main app widget
-        app = App(logger)
+        app = App()
 
         #init main loop
         app.mainloop()
 
     except Exception as e:
-        logger.exception(f"Error: {e}; exiting app!")
+        logger.exception(f"Error: {e}. Exiting app!")
         exit()
 
 if __name__ == "__main__":

@@ -35,7 +35,7 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.upload_button.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 0), sticky="")
 
         self.label_error = ctk.CTkLabel(self, text="", text_color="red")    # label for all errors
-        self.label_error.grid(row=2, column=1, columnspan=2, padx=10, pady=(10, 0), sticky="w")
+        self.label_error.grid(row=2, column=0, columnspan=2, padx=(35,0), pady=(10, 0), sticky="w")
 
         # subframe that will display loaded data
         self.subframe = ctk.CTkFrame(self)
@@ -154,7 +154,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             self.logger.info(f"Found {len(settings.cours_participants_global)} students!")
             self.label_error.configure(text="")
         except FileNotFoundError:   # this should never occur as it has already been verified in 'UploadAction'
-            self.logger.critical("File not founde. Returning from LoadParticipants()!")
+            self.logger.warning("File not founde. Returning from LoadParticipants()!")
             settings.cours_participants_global = None
             return
         except ValueError as error:

@@ -20,7 +20,7 @@ class RightFrame(ctk.CTkFrame):
         self.grid_rowconfigure(3, weight=1)
             
         # init 'CoursFrame'
-        self.cours_frame = CoursFrame(self)
+        self.cours_frame = CoursFrame(self, logger)
         self.cours_frame.grid(row=0, column=0, columnspan=2, padx=10, pady=10, sticky="ew")
 
         self.participants_frame = ParticipantsFrame(self,logger)

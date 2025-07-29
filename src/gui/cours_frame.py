@@ -4,8 +4,11 @@ import re, json, logging
 
 # This frame has no special function, its contents are used by other sections. The user doesnt have to fill out its data.
 class CoursFrame(ctk.CTkFrame):
-    def __init__(self, master):
+    def __init__(self, master, logger: logging.Logger):
         super().__init__(master)
+        
+        self.logger = logging.getLogger(f'{logger.name}.cours_frame')
+        self.logger.setLevel('INFO')
 
         self.v_year = (self.register(self.year_callback))
 
@@ -25,6 +28,7 @@ class CoursFrame(ctk.CTkFrame):
         self.year_entry.grid(row=0, column=5, padx=(0, 10), pady=10, sticky='e')
         self.year_entry.configure(placeholder_text='npr: yyyy/yy')
 
+        self.logger.info('Setting startup cours data.')
         if not settings.cours_name=='':
             self.cours_name_entry.insert(0,settings.cours_name)
         if not settings.cours_number=='':
@@ -46,10 +50,6 @@ class CoursFrame(ctk.CTkFrame):
             return True
         else: return False
     
-    def get_data(self):
-        settings.cours_name = self.cours_name_entry.get()
-        settings.cours_number = self.cours_number_entry.get()
-        settings.acad_year = self.year_entry.get()
     
     def set_entries(self):
         self.cours_name_entry.delete(0, 'end')
@@ -58,22 +58,33 @@ class CoursFrame(ctk.CTkFrame):
         self.cours_number_entry.insert(0,settings.cours_number)
         self.year_entry.delete(0, 'end')
         self.year_entry.insert(0,settings.acad_year)
+        self.logger.info('Cours entries set with internal data.')
 
-
-    
-    def save_data(self):
-        logger = logging.getLogger('my_app.coursframe')
-
+    def get_data(self):
         settings.cours_name = self.cours_name_entry.get()
         settings.cours_number = self.cours_number_entry.get()
         settings.acad_year = self.year_entry.get()
 
-        with open("data/data.json", "r") as file:
-            data:dict[str:str] = json.load(file)
-        data["cours"] = settings.cours_name
-        data["cours_number"] = settings.cours_number
-        data["acad_year"] = settings.acad_year
-        json_object = json.dumps(data, indent=4)
-        logger.info(f"Saving cours data: {settings.cours_name} - {settings.cours_number}; {settings.acad_year}")
-        with open("data/data.json", "w") as file:
-            file.write(json_object)
+    def save_data(self):
+        self.logger.info('Saving cours data from entry...')
+        self.logger.debug(f'cours data: {settings.cours_name} - {settings.cours_number}; {settings.acad_year}')
+        
+        self.get_data()
+
+        try:    
+            with open('data/data.json', 'r') as file:
+                data:dict[str:str] = json.load(file)
+            data['cours'] = settings.cours_name
+            data['cours_number'] = settings.cours_number
+            data['acad_year'] = settings.acad_year
+
+            json_object = json.dumps(data, indent=4)
+            with open("data/data.json", "w") as file:
+                file.write(json_object)
+
+            self.logger.info(f"Data saved to data.json.")
+
+        except Exception as e:
+            self.logger.critical('Failed saving data!')
+            self.logger.exception(e)
+            raise
