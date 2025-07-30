@@ -9,7 +9,7 @@ import logging
 
 class RepeatStudentsFrame(ctk.CTkFrame):
     def __init__(self, master):
-        from gui.right_frame import RightFrame
+        from gui.group_gen.right_frame import RightFrame
         super().__init__(master)
 
         self.controller: RightFrame = master

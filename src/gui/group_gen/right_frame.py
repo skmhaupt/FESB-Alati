@@ -1,7 +1,7 @@
-from gui.repeat_students_frame import RepeatStudentsFrame
-from gui.participants_frame import ParticipantsFrame
-from gui.fill_groups_frame import FillGroupsFrame
-from gui.scraper_frame import ScraperFrame
+from gui.group_gen.repeat_students_frame import RepeatStudentsFrame
+from gui.group_gen.participants_frame import ParticipantsFrame
+from gui.group_gen.fill_groups_frame import FillGroupsFrame
+from gui.group_gen.scraper_frame import ScraperFrame
 from gui.cours_frame import CoursFrame
 
 import customtkinter as ctk

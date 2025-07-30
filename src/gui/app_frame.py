@@ -1,7 +1,7 @@
-from gui.table_gen_options_frame import TableGenOptionsFrame
-from gui.groups_frame import GroupsFrame
+from gui.lab_table_gen.table_gen_options_frame import TableGenOptionsFrame
+from gui.group_gen.groups_frame import GroupsFrame
 from gui.cours_frame import CoursFrame
-from gui.right_frame import RightFrame
+from gui.group_gen.right_frame import RightFrame
 from pathlib import Path
 
 import customtkinter as ctk

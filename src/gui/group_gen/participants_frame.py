@@ -10,7 +10,7 @@ import logging, glob
 
 class ParticipantsFrame(ctk.CTkFrame):
     def __init__(self, master, logger: logging.Logger):
-        from gui.right_frame import RightFrame
+        from gui.group_gen.right_frame import RightFrame
         super().__init__(master)
 
         self.controller: RightFrame = master
