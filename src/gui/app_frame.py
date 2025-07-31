@@ -84,11 +84,11 @@ class GroupsGen(ctk.CTkFrame):
         self.controller: TabView = master.master
 
         #init groups frame
-        self.schedule_frame = GroupsFrame(self,logger)
+        self.schedule_frame = GroupsFrame(self)
         self.schedule_frame.grid(row=0, column=0, padx=(5,0), pady=0, sticky="nswe")
 
         #init right frame - containes all other sections
-        self.right_frame = RightFrame(self,logger)
+        self.right_frame = RightFrame(self)
         self.right_frame.grid(row=0, column=1, padx=(0,5), pady=0, sticky="nsew")
 
 class TableGen(ctk.CTkFrame):

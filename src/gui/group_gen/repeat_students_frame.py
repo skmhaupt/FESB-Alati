@@ -103,11 +103,14 @@ class RepeatStudentsFrame(ctk.CTkFrame):
                 e.add_note('Nije zadana stara datoteka sa proslogodisnjim rezultatima!')
                 raise
 
-            self.controller.cours_frame.save_data()
-            self.controller.controller.controller.table_gen.cours_frame.set_entries()
+            try:
+                self.controller.cours_frame.save_data()
+                self.controller.controller.controller.table_gen.cours_frame.set_entries()
+            except Exception as e:
+                e.add_note('Failed saving to data.json')
+                raise
 
             gen_repeat_students(old_file, settings.cours_participants_global)
-
 
         except (FileNotFoundError, BadWorkbook, ValueError) as e:
                 msg = e.__notes__[0]

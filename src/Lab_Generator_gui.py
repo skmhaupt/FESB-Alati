@@ -1,7 +1,7 @@
 from labgenpackage.classes import CustomFormatter
 from gui.app_frame import App
 
-import logging, logging.config
+import sys, logging, logging.config
 
 #Logger setup
 def setup_logger() -> logging.Logger:
@@ -53,9 +53,13 @@ def main():
         #init main loop
         app.mainloop()
 
+    except KeyboardInterrupt:
+        sys.exit(0)
     except Exception as e:
         logger.exception(f"Error: {e}. Exiting app!")
-        exit()
+        sys.exit("Unexpected error")
+    finally:
+        logger.info("Closing program.")
 
 if __name__ == "__main__":
     main()

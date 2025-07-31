@@ -4,10 +4,10 @@ from excel_functions.repeat_students import get_exempt_students
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
-from excel_functions.lab_table import BadWorkbook
 from labgenpackage.fill_groups import fill_groups
 from labgenpackage.classes import Student, Group
 from customtkinter import filedialog
+from gui.util import BrowseAction
 from threading import Thread
 
 import customtkinter as ctk
@@ -15,12 +15,13 @@ import gui.settings as settings
 import logging, os, gui.util as util
 
 class FillGroupsFrame(ctk.CTkFrame):
-    def __init__(self, master, logger: logging.Logger):
+    def __init__(self, master):
         from gui.group_gen.right_frame import RightFrame
         super().__init__(master)
 
         self.controller:RightFrame = master    # in case ctk widgets from other sections have to be accessed
-        self.logger = logger
+        logger = logging.getLogger("my_app.group_gen.fill_groups")
+        logger.setLevel("INFO")
 
         self.grid_columnconfigure(0, weight=0)
         self.grid_columnconfigure(1, weight=0)
@@ -72,6 +73,8 @@ class FillGroupsFrame(ctk.CTkFrame):
 
     def eval_exempt_checkbox_event(self):
         if settings.exempting_students.get():
+            logger = logging.getLogger("my_app.group_gen.fill_groups")
+
             self.exempt_subframe = ctk.CTkFrame(self)
             self.exempt_subframe.grid(row=1, column=1, columnspan=2, rowspan=3, padx=10, pady=(0,10),sticky="wens")
 
@@ -82,17 +85,10 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.exempt_file_entry.configure(state='readonly')
             self.exempt_file_entry.grid(row=1, column=0, padx=10, pady=(0,5), sticky='n')
 
-            self.exempt_file_browse_button = ctk.CTkButton(self.exempt_subframe, width=60 , text='Pretrazi', command=lambda:self.browse_action(self.exempt_file_entry))
+            self.exempt_file_browse_button = ctk.CTkButton(self.exempt_subframe, width=60 , text='Pretrazi', command=lambda:BrowseAction(('Excel files', '*.xlsx *.xls'),self.exempt_file_entry,logger))
             self.exempt_file_browse_button.grid(row=2, column=0, padx=10, pady=5, sticky='n')
         else:
             self.exempt_subframe.destroy()
-    
-    def browse_action(self,entry: ctk.CTkEntry):
-        filename = filedialog.askopenfilename(filetypes=[('Excel files', '*.xlsx *.xls')])
-        entry.configure(state='normal')
-        entry.delete(0, 'end')
-        entry.insert(0,filename)
-        entry.configure(state='readonly')
     
     # ask user if he wants to run the main section even if the number of places is smaller than the number of students
     def CheckIfUserWantsToContinue(self)->bool:
@@ -151,11 +147,13 @@ class FillGroupsFrame(ctk.CTkFrame):
 
     # Is called on 'fill_groups_button' press. Makes all needed preparations before running main task thread
     def FillGroups_setup(self):
+        logger = logging.getLogger("my_app.group_gen.fill_groups")
+
         self.fill_groups_button.grid_remove()
         util.ClearSubframe(self.subframe)
 
         if settings.working:    # only one section can run at a time. This prevents unpredictable errors. - temporary fix
-            self.logger.warning("Already runing another section! Cant upload new groups.")
+            logger.warning("Already runing another section! Cant upload new groups.")
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Vec je pokrenuta druga sekcija.\nSacekajte dok ne zavrsi sa izvodenjem.", text_color="red")
             self.warning_label.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
             self.fill_groups_button.grid()
@@ -173,7 +171,7 @@ class FillGroupsFrame(ctk.CTkFrame):
         if settings.exempting_students.get():
             exempt_file = self.exempt_file_entry.get()
             if not exempt_file:
-                self.logger.warning("Missing exempt file.")
+                logger.warning("Missing exempt file.")
                 self.warning_label = ctk.CTkLabel(self.subframe, text=f"Nedostaje datoteka sa oslobodenim studentima.", text_color="red")
                 self.warning_label.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
                 settings.working = False
@@ -182,14 +180,24 @@ class FillGroupsFrame(ctk.CTkFrame):
             
         # check if sufficient space is available in loaded groups
         if settings.total_places < len(settings.cours_participants_global) and not settings.continue_answer:
+            logger.warning("Not enough space in groups!")
             self.CheckIfUserWantsToContinue()
             settings.working = False
             self.fill_groups_button.grid()
             return
         settings.continue_answer = False
 
-        self.controller.cours_frame.save_data()
-        self.controller.controller.controller.table_gen.cours_frame.set_entries()
+        try:
+            self.controller.cours_frame.save_data()
+            self.controller.controller.controller.table_gen.cours_frame.set_entries()
+        except Exception as e:
+            e.add_note('Failed saving to data.json')
+            logger.exception(e)
+            self.warning_label = ctk.CTkLabel(self.subframe, text=f"Neocekivana pogresk!", text_color="red")
+            self.warning_label.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
+            settings.working = False
+            self.fill_groups_button.grid()
+            return
 
         self.main_task_progressbar = ctk.CTkProgressBar(self, orientation="horizontal", mode="determinate", determinate_speed=2)
         self.main_task_progressbar.grid(row=3, column=0, padx=10, pady=10, sticky="we")
@@ -199,6 +207,8 @@ class FillGroupsFrame(ctk.CTkFrame):
         scrapper_thread.start()
     
     def FillGroups_thread(self,exempt_file:str):
+        logger = logging.getLogger("my_app.group_gen.fill_groups")
+
         success = False
         weight_errors:list[Student] = []
         fill_errors:list[Student] = []
@@ -211,63 +221,68 @@ class FillGroupsFrame(ctk.CTkFrame):
         groups_local: dict[str, list[Group]]
 
         try:
+            logger.info("Filling groups...")
             exempt_students:list[int] = []
             if settings.exempting_students.get():
                 exempt_students = get_exempt_students(exempt_file)
             
             while running and counter<=100:
-                self.logger.info(f"///------------------------------------------------------------------///")
-                self.logger.info(f"\\\\\\------------------------------------------------------------------\\\\\\")
-                self.logger.info(f"Now running attempt {counter}.")
+                logger.info(f"///------------------------------------------------------------------///")
+                logger.info(f"Now running attempt {counter}.")
                 #Get cours participants
                 try:
-                    self.logger.info("Starting participants parser!")   
+                    logger.info("Starting participants parser!")   
                     cours_participants_local, _ = pars_cours_participants()
                     cours_participants_copy = cours_participants_local.copy()   # a shallow copy is needed to preserve the results as data is poped from the dict
-                    self.logger.info(f"Found {len(cours_participants_local)} students in participants file.")
+                    logger.info(f"Found {len(cours_participants_local)} students in participants file.")
                 except TypeError:
-                    raise self.logger.exception("Failed parsing participants!")
+                    logger.exception("Failed parsing participants!")
+                    raise
                 
                 #Get lab group schedule
                 try:
-                    self.logger.info("Starting schedule parser!")
+                    logger.info("Starting schedule parser!")
                     groups_local, _, _ = pars_schedule_file()
                     numofgroups:int = 0
                     day: str
                     for day in groups_local:
                         numofgroups += len(groups_local[day])
-                        self.logger.info(f"Found {len(groups_local[day])} groups for {day}")
-                    self.logger.info(f"Found {numofgroups} groups in total!")
+                        logger.debug(f"Found {len(groups_local[day])} groups for {day}")
+                    logger.info(f"Found {numofgroups} groups in total!")
                 except Exception:
-                    self.logger.error('Failed parsing schedule!')
+                    logger.error('Failed parsing schedule!')
                     raise
 
                 #Get schedule for every student
                 try:
+                    logger.info("Parsing all student scheduels.")
                     schedule_scraper(cours_participants_local, False)
                 except Exception:
-                    self.logger.error("Error when scraping schedule!")
+                    logger.error("Error when scraping schedule!")
                     raise
                 
                 #Generate starting weights; weight_errors are students that cant join any group at all
                 try:
+                    logger.info("Generating starting weights.")
                     weight_errors = weight_generator(cours_participants_local, groups_local, settings.alfa_prio_lvl)
                 except Exception:
-                    self.logger.error("Error generating starting weights!")
+                    logger.error("Error generating starting weights!")
                     raise
                 
                 # fill groups with students
+                logger.info("Filling groups...")
                 success, fill_errors = fill_groups(cours_participants_local, groups_local, exempt_students)
                 if success:
                     running = False
-                    self.logger.info(f"///------------------------------------------------------------------///")
-                    self.logger.info(f"\\\\\\------------------------------------------------------------------\\\\\\")
-                    self.logger.info("Successfully filled out all groups with no students remaining!")
+                    logger.info(f"///------------------------------------------------------------------///")
+                    logger.info("/// SUMMARY:")
+                    logger.info("Successfully filled out all groups with no students remaining!")
                     for groups_on_day in groups_local.values():
                         for group in groups_on_day:
-                            self.logger.info(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
-                            self.logger.info("------------------------------------------------------------------")
+                            logger.info(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+                            logger.info("------------------------------------------------------------------")
                 else:
+                    logger.warning("Failed assigning all students to a group.")
                     counter += 1
             
             # display results of fill_groups
@@ -279,8 +294,8 @@ class FillGroupsFrame(ctk.CTkFrame):
             settings.working = False
 
         except ValueError as e:
-            self.logger.warning(f"Bad exempt file: {e}")
-            self.logger.exception(e)
+            logger.warning(f"Bad exempt file: {e}")
+            logger.exception(e)
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Datoteka sa oslobodenim studentima nije ispravna.", text_color="red")
             self.warning_label.grid(row=0, column=0, padx=5, pady=(5, 0), sticky="w")
             self.fill_groups_button.grid()
@@ -288,8 +303,8 @@ class FillGroupsFrame(ctk.CTkFrame):
             settings.working = False
             return
         except Exception as e:
-            self.logger.error("Error filling groups!")
-            self.logger.exception(e)
+            logger.error("Error filling groups!")
+            logger.exception(e)
             self.LoadStatus(success, weight_errors, fill_errors, exempt_students)
             self.fill_groups_button.grid()
             self.main_task_progressbar.destroy()
@@ -297,6 +312,7 @@ class FillGroupsFrame(ctk.CTkFrame):
             return
     
     def LoadStatus(self,success:bool, weight_errors:list[Student], fill_errors:list[Student], exempt_students:list[int]):
+        logger = logging.getLogger("my_app.group_gen.fill_groups")
         if success:
             self.status_header_label = ctk.CTkLabel(self.subframe, text="Grupe popunjene.",font=("Helvetica", 18))
         else:
@@ -312,18 +328,18 @@ class FillGroupsFrame(ctk.CTkFrame):
             self.label_4.grid(row=1, column=0, padx=5, pady=(0, 5), sticky="w")
             self.label_5 = ctk.CTkLabel(self.errorsubframe, text="Preuzmi datoteku sa detaljima:")
             self.label_5.grid(row=2, column=0, padx=5, pady=(0, 5), sticky="w")
-            self.button_3 = ctk.CTkButton(self.errorsubframe, width=60, text="Preuzmi", command=lambda:self.CopyErrorWeightsToDownloads(weight_errors,fill_errors))
+            self.button_3 = ctk.CTkButton(self.errorsubframe, width=60, text="Preuzmi", command=lambda:self.CopyErrorWeightsToDownloads(weight_errors,fill_errors,logger))
             self.button_3.grid(row=2, column=0, columnspan=2, padx=(150,20), pady=(0, 5), sticky="e")
 
         self.label_6 = ctk.CTkLabel(self.subframe, text="Excel datoteka sa popunjenim grupama:")
         self.label_6.grid(row=2, column=0, padx=(20,0), pady=10, sticky="w")
-        self.button_2 = ctk.CTkButton(self.subframe, width=60, text="Preuzmi", command=lambda:self.CopyFilledGroupsToDownloads(exempt_students))
+        self.button_2 = ctk.CTkButton(self.subframe, width=60, text="Preuzmi", command=lambda:self.CopyFilledGroupsToDownloads(exempt_students,logger))
         self.button_2.grid(row=2, column=0, columnspan=2, padx=(120,0), pady=10, sticky="")
 
         self.subframe.grid_columnconfigure(0, weight=1)
         self.subframe.grid_rowconfigure(0, weight=0)
 
-    def CopyErrorWeightsToDownloads(self,weight_errors:list[Student],fill_errors:list[Student]):
+    def CopyErrorWeightsToDownloads(self,weight_errors:list[Student],fill_errors:list[Student], logger: logging.Logger):
         try:
             GenErrorDetailsWorkbook(self.logger, weight_errors, fill_errors)
 
@@ -337,9 +353,9 @@ class FillGroupsFrame(ctk.CTkFrame):
         except Exception:
             self.button_3.configure(text="Pogreska", text_color="red")
             self.button_3.after(2000, lambda: util.ResetButton(self.button_3, "Preuzmi", "white"))
-            self.logger.exception("Error with downloading Error_detailes.xlsx")
+            logger.exception("Error with downloading Error_detailes.xlsx")
         
-    def CopyFilledGroupsToDownloads(self, exempt_students:list[int]):
+    def CopyFilledGroupsToDownloads(self, exempt_students:list[int], logger:logging.Logger):
         try:
             GenResultsWorkbook(exempt_students)
 
@@ -353,5 +369,5 @@ class FillGroupsFrame(ctk.CTkFrame):
         except Exception as e:
             self.button_2.configure(text="Pogreska", text_color="red")
             self.button_2.after(2000, lambda: util.ResetButton(self.button_2, "Preuzmi", "white"))
-            self.logger.critical("Error when moving excel result file to downloads.")
-            self.logger.critical(e)
+            logger.critical("Error when moving excel result file to downloads.")
+            logger.critical(e)

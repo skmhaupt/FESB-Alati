@@ -90,8 +90,8 @@ def variable_sort(cours_participants: dict[str, Student], groups: dict[str, list
 
     for day in groups:
         for group in groups[day]:
-            logger.info(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
-            logger.info("------------------------------------------------------------------")
+            logger.debug(f"Group: {group} filled with {len(group.students)} students: {*group.students,}")
+            logger.debug("------------------------------------------------------------------")
     
     if zero_weight_users:
         logger.critical(f"No free group left for students: {*zero_weight_users,}")
