@@ -1,6 +1,6 @@
 from labgenpackage.schedule_parser import pars_schedule_file
 from labgenpackage.classes import Group
-from customtkinter import filedialog
+from gui.util import BrowseAction
 from pathlib import Path
 from shutil import copy
 
@@ -14,12 +14,11 @@ import logging, glob
 # 'group' variable is created it is only used in this section to display data that will be
 # loaded in the main section 'Fill_groups' later on.
 class GroupsFrame(ctk.CTkFrame):
-    def __init__(self, master, logger: logging.Logger):
+    def __init__(self, master):
         super().__init__(master)
 
-        self.logger = logger
-
-        self.controller = master    # in case ctk widgets from other sections have to be accessed
+        logger = logging.getLogger("my_app.group_gen.groups")
+        logger.setLevel("INFO")
 
         self.grid_columnconfigure(1, weight=1)  # column 1 is flex
         self.grid_rowconfigure(6, weight=1)     # rwo 6 is flex, subframe is in row 6 and it displays all the loaded groups
@@ -34,7 +33,7 @@ class GroupsFrame(ctk.CTkFrame):
         self.txt_file_entry.configure(state="readonly")
         self.txt_file_entry.grid(row=2, column=0, columnspan=2, padx=(10, 5), pady=(0, 0), sticky="we")
 
-        self.browse_button = ctk.CTkButton(self,width=60 , text="Pretrazi", command=self.BrowseAction)  # button to get path to .txt file
+        self.browse_button = ctk.CTkButton(self,width=60 , text="Pretrazi", command=lambda:BrowseAction(("Text Files", "*.txt"),self.txt_file_entry,logger))  # button to get path to .txt file
         self.browse_button.grid(row=2, column=2, padx=(0, 10), pady=(0, 0), sticky="we")
 
         self.upload_button = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)  # button to load the selected .txt file
@@ -60,28 +59,21 @@ class GroupsFrame(ctk.CTkFrame):
         except FileNotFoundError:
             return
         except Exception:
-            self.logger.error("Error when loading groups on startup!")
+            logger.error("Error when loading groups on startup!")
             return
-    
-    # get path to .txt file from user
-    def BrowseAction(self):
-        filename = filedialog.askopenfilename()
-        self.txt_file_entry.configure(state="normal")
-        self.txt_file_entry.delete(0, "end")
-        self.txt_file_entry.insert(0,filename)
-        self.txt_file_entry.configure(state="readonly")
-        self.logger.info(f"Selected file: {filename}")
 
     # 'UploadAction' runs from 'upload_button'. Sets 'loaded_data[0]' to False in order to block the main section from starting.
     # (loaded_data[0]: bool = flag for groups_loaded)
     # Makes preparations for 'LoadGroups'
     def UploadAction(self):
+        logger = logging.getLogger("my_app.group_gen.groups")
+
         # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         settings.loaded_data[0] = False
         util.ClearSubframe(self.subframe)
         
         if settings.working:    # only one section can run at a time. This prevents unpredictable errors. - temporary fix
-            self.logger.warning("Already runing another section! Cant upload new groups.")
+            logger.warning("Already runing another section! Cant upload new groups.")
 
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Vec je pokrenuta druga sekcija.\nSacekajte dok ne zavrsi sa izvodenjem", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
@@ -95,18 +87,16 @@ class GroupsFrame(ctk.CTkFrame):
         
         # get path to input .txt file and check for errors
         input_txt_file = self.txt_file_entry.get()
-        if(input_txt_file==""):
-            self.logger.warning("Select a .txt file befor uploading.")
+        if input_txt_file.endswith(".txt"):
+            logger.info(f"File to upload: {input_txt_file}")
+        elif(input_txt_file==""):
+            logger.warning("No .txt file selected befor uploading.")
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Nije zadana .txt datoteka.", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             settings.working = False
             return
-        
-        elif input_txt_file.endswith(".txt"):
-            self.logger.info(f"{self.txt_file_entry.get()}")
-        
         else:
-            self.logger.warning("Input file hase to be a .txt file.")
+            logger.warning("Input file is not a .txt file.")
             self.warning_label = ctk.CTkLabel(self.subframe, text=f"Odabrana pogresna datoteka.", text_color="red")
             self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
             settings.working = False
@@ -115,35 +105,29 @@ class GroupsFrame(ctk.CTkFrame):
         #get path to old existing .txt file and delete it
         fpath: Path
         fpaths: list = glob.glob("data/*.txt")
-
-        if(len(fpaths) > 1):    # this is unexpected and schould ony happen if there is a bug
-            self.logger.critical(f"Found {len(fpaths)} old .txt files, there has to be only one!")
-            self.logger.critical(f"Erasing all \'.txt\' files!")
-
+        if(len(fpaths) == 0): 
+            logger.info("No old .txt file found!")
+        elif(len(fpaths) > 1):    # this is unexpected and schould ony happen if there is a bug
+            logger.critical(f"Found {len(fpaths)} old .txt files, there has to be only one!")
+            logger.critical(f"Erasing all \'.txt\' files!")
             try:
                 for pathstr in fpaths:
-                    self.logger.critical(f"Erasing {pathstr}")
+                    logger.critical(f"Erasing {pathstr}")
                     delpath = Path(pathstr)
                     delpath.unlink()
-
             except Exception:
-                #self.logger.critical(f"Failed to delete old txt file {pathstr}")
-                self.UnexpectedErrorMsg(f"Failed to delete old txt file {pathstr}")
+                logger.critical(f"Failed to delete old txt file {pathstr}")
+                self.UnexpectedErrorMsg()
                 settings.working = False
                 return
-            
-        elif(len(fpaths) == 0): 
-            self.logger.info("No old .txt file found!")
-        
         else:
             fpath = Path(fpaths[0])
             try:
                 fpath.unlink()
-                self.logger.info(f"Deleted old .txt file {fpath}!")
-            
+                logger.info(f"Deleted old .txt file {fpath}!")
             except Exception:
-                #self.logger.critical(f"Failed to delete old txt file {fpath}")
-                self.UnexpectedErrorMsg(f"Failed to delete old txt file {fpath}")
+                logger.critical(f"Failed to delete old txt file {fpath}")
+                self.UnexpectedErrorMsg()
                 settings.working = False
                 return
         
@@ -151,10 +135,10 @@ class GroupsFrame(ctk.CTkFrame):
         fpath = Path(input_txt_file)
         try:
             copy(fpath, "data/")
-            self.logger.info(f"Uploaded new file: {fpath}!")
+            logger.info(f"Uploaded new file: {fpath}!")
         except Exception:
-            #self.logger.critical(f"Failed to copy new file: {fpath}!")
-            self.UnexpectedErrorMsg(f"Failed to copy new file: {fpath}!")
+            logger.critical(f"Failed to upload new file: {fpath}!")
+            self.UnexpectedErrorMsg()
             settings.working = False
             return
 
@@ -165,51 +149,58 @@ class GroupsFrame(ctk.CTkFrame):
     # function for a test and displays sucesfuly loaded groups and errors. The main section of the program will not run until
     # this section sets loaded_data[0] to True. (loaded_data[0]: bool = flag for groups_loaded)
     def LoadGroups(self)->str:
+        logger = logging.getLogger("my_app.group_gen.groups")
+        
         # loaded_data = [groups_loaded, cours_loaded, participants_loaded, student_schedule_loaded]
         settings.loaded_data[0] = False     # this will probably always already be false at this point
 
         try:
+            logger.info("Loading groups from .txt file...")
             groups, filename, group_errors = pars_schedule_file()
             util.ClearSubframe(self.subframe)   # this is called in case there is data on startup
         except ValueError:
+            logger.warning("No groups in uploaded .txt file.")
             self.NoGroupsInUploadedFile()
             return
         except FileNotFoundError:   # this should only ever occur on startup as it has already been verified in 'UploadAction'
-            self.logger.warning("Found no .txt schedule file on startup.")
+            logger.warning("Found no .txt schedule file on startup.")
             raise
         except Exception:
-            #self.logger.critical("Failed parcing participants!")
-            self.UnexpectedErrorMsg("Failed parcing participants!")
+            logger.critical("Failed parcing participants!")
+            self.UnexpectedErrorMsg()
             return
 
         row:int = 2
         group:Group
         settings.total_places = 0
         if group_errors:
+            logger.warning("Found potential errors in .txt file.")
             self.group_error_label = ctk.CTkLabel(self.subframe, text=f"Moguca greska u datoteci!", text_color="red")
             self.group_error_label.grid(row=row, column=0, columnspan=5, padx=5, pady=(5, 0), sticky="we")
             row+=1
             
         for line in group_errors:
+            logger.warning(f"Potential error in line: {line}")
             self.group_error_label = ctk.CTkLabel(self.subframe, text=f"{line}", text_color="red")
             self.group_error_label.grid(row=row, column=0, columnspan=5, padx=5, pady=(5, 0), sticky="we")
             row+=1
 
-        for groups_in_day in groups.values():   # display all loaded groups in subframe and set 'settings.total_places' global var
+        for groups_in_day in groups.values():
             for group in groups_in_day:
+                logger.debug(f"Adding label for group: {group}")
                 self.AddGrouplabel(row,group)
                 settings.total_places+=group.group_size
                 row+=1
-        self.logger.info(f"Found {row-2} groups. With {settings.total_places} places in total.")
+        logger.info(f"Found {row-2} groups. With {settings.total_places} places in total.")
         
-        # display summary of loaded data
         self.loaded_schedule_label.configure(text=f"Ucitani raspored: {filename}")
         self.num_of_groups_label.configure(text=f"Broj grupa: {row-2}")
         self.num_of_places_label.configure(text=f"Broj dostupnih mjesat: {settings.total_places}")
 
         settings.loaded_data[0] = True  # set flag for groups_loaded, this is here because 'UploadAction' is not called on startup
 
-    # If uploaded file doesnt containe any groups this function displays the error msg.
+        logger.info("Groups loaded from .txt file.")
+        
     def NoGroupsInUploadedFile(self):
         self.loaded_schedule_label.configure(text=f"Nije ucitan raspored grupa.")
         self.num_of_groups_label.configure(text=f"Broj grupa: N/A")
@@ -245,7 +236,6 @@ class GroupsFrame(ctk.CTkFrame):
         self.group_label5.grid(row=row, column=4, padx=5, pady=(5, 0), sticky="we")
 
     # display unexpected error msg in subframe
-    def UnexpectedErrorMsg(self, errormsg:str):
-        self.logger.critical(errormsg)
+    def UnexpectedErrorMsg(self):
         self.warning_label = ctk.CTkLabel(self.subframe, text=f"Neocekivana pogreska.\nPokusajte ponovo.", text_color="red")
         self.warning_label.grid(row=2, column=0, padx=5, pady=(5, 0), sticky="w")
