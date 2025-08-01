@@ -2,7 +2,7 @@ import logging, gui.settings as settings
 from labgenpackage.participants_parser import pars_cours_participants
 from labgenpackage.schedule_scraper import schedule_scraper
 
-def FindeGroups(frame):
+def FindeGroups(frame, start_date, end_date):
     from gui.group_finder.group_finder_frame import GroupFinderFrame
     frame: GroupFinderFrame = frame
     logger = logging.getLogger('my_app.group_finder')
@@ -31,7 +31,7 @@ def FindeGroups(frame):
     
 
     try:
-        csvMissing, csvEmpty = schedule_scraper(participatns,True,settings.start_date,settings.end_date)    # true = run scraper and get loaded data
+        csvMissing, csvEmpty = schedule_scraper(participatns,True,start_date,end_date)    # true = run scraper and get loaded data
     except FileNotFoundError:   # csv file not loaded, this should never happen as it was already checked
         logger.critical("No participants uploaded for scrapper!")
         frame.status_label.configure(text="Nastupila neocekivana pogreska!", text_color='red')
@@ -45,6 +45,8 @@ def FindeGroups(frame):
         return
     
 
+    for student in participatns.values():
+        logger.debug(f"{student.schedule}")
     print(participatns)
     print(csv_path)
     

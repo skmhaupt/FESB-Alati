@@ -73,4 +73,4 @@ def GroupFinder_setup(frame):
     start_date = f'{dd:02}-{mm:02}-{yyyy:04}'
     end_date = f'{dd2:02}-{mm2:02}-{yyyy2:04}'
 
-    FindeGroups(frame)
+    FindeGroups(frame,start_date,end_date)

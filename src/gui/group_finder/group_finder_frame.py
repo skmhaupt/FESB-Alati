@@ -21,7 +21,7 @@ class GroupFinderFrame(ctk.CTkFrame):
 
         self.controller: TableGen = master
         logger = logging.getLogger('my_app.group_finder')
-        logger.setLevel("INFO")
+        logger.setLevel("DEBUG")
 
         self.section_title_label = ctk.CTkLabel(self, text='Nadoknade', font=('Helvetica', 23))
         self.section_title_label.grid(row=0, column=0, padx=13, pady=10, sticky='nw')
