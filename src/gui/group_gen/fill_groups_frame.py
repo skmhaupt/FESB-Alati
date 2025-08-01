@@ -232,7 +232,7 @@ class FillGroupsFrame(ctk.CTkFrame):
                 #Get cours participants
                 try:
                     logger.info("Starting participants parser!")   
-                    cours_participants_local, _ = pars_cours_participants()
+                    cours_participants_local, _ = pars_cours_participants(data_dir_path="data")
                     cours_participants_copy = cours_participants_local.copy()   # a shallow copy is needed to preserve the results as data is poped from the dict
                     logger.info(f"Found {len(cours_participants_local)} students in participants file.")
                 except TypeError:
