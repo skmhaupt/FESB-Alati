@@ -4,7 +4,7 @@ from os import path
 
 import logging, glob, re
 
-def pars_schedule_file()->list[dict[str, list[Group]], str, list[str]]:
+def pars_groups_file()->list[dict[str, list[Group]], str, list[str]]:
 
     logger = logging.getLogger('my_app.schedule_parsere')
     logger.setLevel('INFO')

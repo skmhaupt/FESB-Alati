@@ -1,4 +1,4 @@
-from labgenpackage.schedule_parser import pars_schedule_file
+from labgenpackage.groups_parser import pars_groups_file
 from labgenpackage.classes import Group
 from gui.util import BrowseAction
 from pathlib import Path
@@ -10,7 +10,7 @@ import gui.util as util
 import logging, glob
 
 # GroupFrame crates the section used for uploading a group.txt file.
-# The only function that is used from the main program is 'pars_schedule_file', and while a
+# The only function that is used from the main program is 'pars_groups_file', and while a
 # 'group' variable is created it is only used in this section to display data that will be
 # loaded in the main section 'Fill_groups' later on.
 class GroupsFrame(ctk.CTkFrame):
@@ -145,7 +145,7 @@ class GroupsFrame(ctk.CTkFrame):
         self.LoadGroups()
         settings.working = False
 
-    # 'LoadGroups' runs on sturtup and when loading new .txt file after the 'UploadAction' function. It runs the 'pars_schedule_file'
+    # 'LoadGroups' runs on sturtup and when loading new .txt file after the 'UploadAction' function. It runs the 'pars_groups_file'
     # function for a test and displays sucesfuly loaded groups and errors. The main section of the program will not run until
     # this section sets loaded_data[0] to True. (loaded_data[0]: bool = flag for groups_loaded)
     def LoadGroups(self)->str:
@@ -156,7 +156,7 @@ class GroupsFrame(ctk.CTkFrame):
 
         try:
             logger.info("Loading groups from .txt file...")
-            groups, filename, group_errors = pars_schedule_file()
+            groups, filename, group_errors = pars_groups_file()
             util.ClearSubframe(self.subframe)   # this is called in case there is data on startup
         except ValueError:
             logger.warning("No groups in uploaded .txt file.")

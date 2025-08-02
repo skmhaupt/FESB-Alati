@@ -1,7 +1,7 @@
 from excel_functions.fill_groups_results import GenErrorDetailsWorkbook, GenResultsWorkbook
 from labgenpackage.participants_parser import pars_cours_participants
 from excel_functions.repeat_students import get_exempt_students
-from labgenpackage.schedule_parser import pars_schedule_file
+from labgenpackage.groups_parser import pars_groups_file
 from labgenpackage.schedule_scraper import schedule_scraper
 from labgenpackage.weight_generator import weight_generator
 from labgenpackage.fill_groups import fill_groups
@@ -242,7 +242,7 @@ class FillGroupsFrame(ctk.CTkFrame):
                 #Get lab group schedule
                 try:
                     logger.info("Starting schedule parser!")
-                    groups_local, _, _ = pars_schedule_file()
+                    groups_local, _, _ = pars_groups_file()
                     numofgroups:int = 0
                     day: str
                     for day in groups_local:
