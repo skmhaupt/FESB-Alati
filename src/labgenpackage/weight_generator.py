@@ -21,11 +21,15 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
         total_places: int = 0
 
         for day in groups:
+            logger.debug("//////////////////////////////////////////////////////////////////////////////////////////////////////")
             logger.debug(f"Working on day: {day}")
             for group in groups[day]:
+                logger.debug("===========================================================================")
                 logger.debug(f"Workong on group: {group}")
                 total_places += group.group_size
                 for student in cours_participants.values():
+                    logger.debug("##################################################")
+                    logger.debug(f"Working on student: {student}")
                     canjoin: bool = True
                     #dayappointments = []
                     if student.schedule:
@@ -37,18 +41,27 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                     #check if dayappointments is empty
                     if dayappointments:
                         appointment: list[datetime]
+                        logger.debug(f"All appointments for the day: {dayappointments}")
                         for appointment in dayappointments:
                             appstarttime: datetime = appointment[0]
                             appendtime: datetime = appointment[1]
+                            logger.debug(f"Appointment: {appointment}. Start time: {appstarttime}, End time: {appendtime}")
                             #check if group overlaps with schedule
+                            logger.debug(f"Group start time: {group.starttime}, end time: {group.endtime}")
                             if group.starttime <= appstarttime < group.endtime:
                                 canjoin = False
+                                logger.debug("Collision.")
                             elif group.starttime < appendtime <= group.endtime:
                                 canjoin = False
+                                logger.debug("Collision.")
+                            else: logger.debug("No collision.")
+                            logger.debug("---------------------------------------")
 
                     if canjoin:
                         student.weight += group.group_size
-                        student.groups.append(group)                    
+                        student.groups.append(group)
+                        logger.debug("Can join group.")
+                    else: logger.debug("Can't join group.")             
 
         for user in cours_participants.copy():
             if cours_participants[user].weight == 0:
