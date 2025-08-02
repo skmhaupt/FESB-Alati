@@ -31,7 +31,7 @@ def FindeGroups(frame, start_date, end_date):
     
 
     try:
-        csvMissing, csvEmpty = schedule_scraper(participatns,True,start_date,end_date)    # true = run scraper and get loaded data
+        schedule_scraper(participatns,"gui/group_finder/data/timetables",start_date,end_date)    # true = run scraper and get loaded data
     except FileNotFoundError:   # csv file not loaded, this should never happen as it was already checked
         logger.critical("No participants uploaded for scrapper!")
         frame.status_label.configure(text="Nastupila neocekivana pogreska!", text_color='red')

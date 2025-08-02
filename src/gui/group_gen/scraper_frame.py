@@ -1,5 +1,6 @@
 from excel_functions.fill_groups_results import GenScraperDetailesWorkbook
 from labgenpackage.schedule_scraper import schedule_scraper
+from labgenpackage.schedule_parser import schedule_parser
 from labgenpackage.classes import Student
 from threading import Thread
 from gui.util import ValidateDate
@@ -103,7 +104,7 @@ class ScraperFrame(ctk.CTkFrame):
             if settings.cours_participants_global:
                 logger.info('Loading old data...')
                 cours_participants_local = listcopy.deepcopy(settings.cours_participants_global)    # work on deepcopy so the original doesnt have to be reset
-                csvMissing, csvEmpty = schedule_scraper(cours_participants_local,False)   # false = get loaded data without running the scraper
+                csvMissing, csvEmpty = schedule_parser(cours_participants_local,'data/timetables')   # false = get loaded data without running the scraper
                 settings.loaded_data[3] = True
         except FileNotFoundError:
             logger.warning('No old data found on startup for schedule_scrapper.')
@@ -260,7 +261,8 @@ class ScraperFrame(ctk.CTkFrame):
         cours_participants_local = listcopy.deepcopy(settings.cours_participants_global)    # work on deepcopy so the original doesnt have to be reset
 
         try:
-            csvMissing, csvEmpty = schedule_scraper(cours_participants_local,True,settings.start_date,settings.end_date)    # true = run scraper and get loaded data
+            schedule_scraper(cours_participants_local,'data/timetables',settings.start_date,settings.end_date)
+            csvMissing, csvEmpty = schedule_parser(cours_participants_local,'data/timetables')
             self.scrapper_progressbar.stop()
             self.scrapper_progressbar.grid_remove()
             self.status_label.grid()

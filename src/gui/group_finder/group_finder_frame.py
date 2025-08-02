@@ -1,6 +1,4 @@
-from gui.util import ValidateDate
 from threading import Thread
-from labgenpackage.schedule_scraper import schedule_scraper
 from gui.group_finder.finder_setup import GroupFinder_setup
 
 from gui.util import BrowseAction
