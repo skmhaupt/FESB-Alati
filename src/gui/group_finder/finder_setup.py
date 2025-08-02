@@ -8,6 +8,7 @@ import logging, gui.settings as settings
 
 def GroupFinder_setup(frame):
     from gui.group_finder.group_finder_frame import GroupFinderFrame
+    
     frame: GroupFinderFrame = frame
     logger = logging.getLogger('my_app.group_finder')
     
@@ -73,4 +74,12 @@ def GroupFinder_setup(frame):
     start_date = f'{dd:02}-{mm:02}-{yyyy:04}'
     end_date = f'{dd2:02}-{mm2:02}-{yyyy2:04}'
 
-    FindeGroups(frame,start_date,end_date)
+    timeslot_length = frame.timeslot_length_entry.get()
+    if not timeslot_length: 
+        logger.warning('No timeslot length provided.')
+        frame.status_label.configure(text='Treba zadati broj potrebnih sati.', text_color='red')
+        frame.DoneWorking()
+        return
+    using_breaks = frame.using_breaks.get()
+
+    FindeGroups(frame, start_date, end_date, int(timeslot_length), using_breaks)

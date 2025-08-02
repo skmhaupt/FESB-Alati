@@ -58,11 +58,25 @@ class GroupFinderFrame(ctk.CTkFrame):
         self.end_date_entry.configure(placeholder_text='dd.mm.yyyy', validatecommand=(self.v_date, '%P', self.end_date_entry))
 
         # -------------------------
+        self.v_timeslot = (self.register(self.timeslot_callback))
+        self.timeslot_length_label = ctk.CTkLabel(self.subframe, text="Broj sati (po 45min):")
+        self.timeslot_length_label.grid(row=2, column=0, padx=(10,5), pady=(10,0), sticky="w")
+        self.timeslot_length_entry = ctk.CTkEntry(self.subframe,width=45, validate='all', validatecommand=(self.v_timeslot, '%P'))
+        self.timeslot_length_entry.grid(row=2, column=1, padx=(0,5), pady=(10,0), sticky="w")
+        self.timeslot_length_entry.insert(0,"0")
+
+        self.using_breaks = ctk.BooleanVar(value=True)
+        self.break_label = ctk.CTkLabel(self.subframe, text="Sa pauzama:")
+        self.break_label.grid(row=2, column=2, padx=(0,10), pady=(10,0), sticky="")
+        self.break_checkbox = ctk.CTkCheckBox(self.subframe, width=24, text="", variable=self.using_breaks, onvalue=True, offvalue=False)
+        self.break_checkbox.grid(row=2, column=2, padx=0, pady=(10,0), sticky="e")
+
+        # -------------------------
         self.finde_groups_button = ctk.CTkButton(self.subframe, width=60 , text="Odredi grupe", command=lambda: GroupFinder_setup(self))
-        self.finde_groups_button.grid(row=2, column=0, padx=(10,5), pady=10)
+        self.finde_groups_button.grid(row=5, column=0, padx=(10,5), pady=10)
 
         self.subframe2 = ctk.CTkFrame(self.subframe)
-        self.subframe2.grid(row=2, column=1, columnspan=4, padx=(5,10), pady=10, sticky="nsew")
+        self.subframe2.grid(row=5, column=1, columnspan=4, padx=(5,10), pady=10, sticky="nsew")
 
         self.status_label = ctk.CTkLabel(self.subframe2, text="")
         self.status_label.grid(row=0, column=0, padx=5, pady=5)
@@ -94,6 +108,11 @@ class GroupFinderFrame(ctk.CTkFrame):
                 entry.after(1, lambda: entry.delete(4,ctk.END))
             return True
         elif re.fullmatch('[0-9]{2}.[0-9]{2}.[0-9]{0,4}', P): return True
+        else: return False
+
+    def timeslot_callback(self, P):
+        if str.isdigit(P): return True
+        elif P=="": return True
         else: return False
     
     def HandleFGButton(self):
