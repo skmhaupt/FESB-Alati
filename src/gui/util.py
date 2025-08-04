@@ -64,10 +64,11 @@ def DelOldFile(dir:str, file_type:str, logger: logging.Logger):
             logger.exception(e)
             raise
 
-def CopyAndRename(srcname: str, dstname: str):
+def CopyAndRename(srcpath: str, dstname: str):
     dest_dir = Path.home() / "Downloads"
-    srcfile = f"data/{srcname}"
-    copy(srcfile, dest_dir)
+    #srcfile = f"data/{srcname}"
+    srcname = os.path.basename(srcpath)
+    copy(srcpath, dest_dir)
 
     if not settings.cours_name: settings.cours_name = "predmet"
     if not settings.cours_number: settings.cours_number = "smjer"

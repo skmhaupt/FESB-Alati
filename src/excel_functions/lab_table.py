@@ -937,7 +937,7 @@ def gen_tables(input_file: str, old_file:str = None)-> tuple[bool,str]:
 
         out_wb.close()
 
-        CopyAndRename(srcname='cours_workbook.xlsx', dstname='lab_tablice')
+        CopyAndRename(srcpath='data/cours_workbook.xlsx', dstname='lab_tablice')
         logger.info('Copied wb to downloads folder.')
         
         delpath=Path(new_file)

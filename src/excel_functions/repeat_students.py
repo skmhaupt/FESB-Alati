@@ -217,7 +217,7 @@ def gen_repeat_students(old_file:str = None, cours_participants:dict[str, Studen
 
         out_wb.close()
 
-        CopyAndRename(srcname='repeats_workbook.xlsx', dstname='ponavljaci')
+        CopyAndRename(srcpath='data/repeats_workbook.xlsx', dstname='ponavljaci')
         logger.info('Copied wb to downloads folder.')
         
         delpath=Path(new_file)

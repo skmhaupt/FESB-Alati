@@ -1,4 +1,6 @@
-import xlsxwriter, datetime
+from datetime import datetime
+from gui.util import CopyAndRename
+import xlsxwriter
 
 
 def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,datetime]], cours_name:str, cours_number:str, acad_year:int):
@@ -33,6 +35,8 @@ def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,
             worksheet.set_column(col, col, 20)
 
         workbook.close()
+
+        CopyAndRename(srcpath="gui/group_finder/data/FoundAppointments.xlsx", dstname="dostupni_termini")
 
     except Exception:
         raise

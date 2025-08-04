@@ -152,7 +152,7 @@ class ScraperFrame(ctk.CTkFrame):
             raise
         
         try:
-            util.CopyAndRename(srcname='Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
+            util.CopyAndRename(srcpath='data/Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
             os.unlink('data/Student_schedules_Error_detailes.xlsx')
         except Exception:
             logger.exception('Error with downloading Student_schedules_Error_detailes.xlsx')

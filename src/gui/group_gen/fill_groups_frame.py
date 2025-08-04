@@ -343,7 +343,7 @@ class FillGroupsFrame(ctk.CTkFrame):
         try:
             GenErrorDetailsWorkbook(logger, weight_errors, fill_errors)
 
-            util.CopyAndRename(srcname="Error_detailes.xlsx", dstname="Greske_pri_punjenju_grupa")
+            util.CopyAndRename(srcpath="data/Error_detailes.xlsx", dstname="Greske_pri_punjenju_grupa")
 
             os.unlink("data/Error_detailes.xlsx")
             
@@ -359,7 +359,7 @@ class FillGroupsFrame(ctk.CTkFrame):
         try:
             GenResultsWorkbook(exempt_students)
 
-            util.CopyAndRename(srcname="Filled_Groups.xlsx", dstname="Popunjene_Grupe")
+            util.CopyAndRename(srcpath="data/Filled_Groups.xlsx", dstname="Popunjene_Grupe")
 
             os.unlink("data/Filled_Groups.xlsx")
             
