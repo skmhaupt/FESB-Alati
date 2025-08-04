@@ -213,6 +213,8 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF'})
     format_white_text = workbook.add_format({'align': 'center', 'bg_color': '#FFFFFF', 'font_color': '#FFFFFF'})
 
+    format_jmbag = workbook.add_format({'num_format': '0000000000', 'align': 'center'})
+
     worksheet.write('A1', 'Prezime',format_header)
     worksheet.write('B1', 'Ime',format_header)
     worksheet.write('C1', 'JMBAG',format_header)
@@ -240,7 +242,7 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
     for student in cours_participants:
         worksheet.write(f'A{row}', student.surname)
         worksheet.write(f'B{row}', student.name)
-        worksheet.write(f'C{row}', student.jmbag)
+        worksheet.write(f'C{row}', student.jmbag, format_jmbag)
         worksheet.write(f'D{row}', student.username)
         worksheet.write(f'E{row}', student.email)
         if hasattr(student, 'group'):

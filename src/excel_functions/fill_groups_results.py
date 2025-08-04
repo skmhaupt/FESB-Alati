@@ -10,6 +10,7 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
 
         merge_format = workbook.add_format({"border":1, "bottom":5, "align": "center"})
         center_format = workbook.add_format({'align': 'center'})
+        jmbag_format = workbook.add_format({'num_format': '0000000000', 'align': 'center'})
 
         worksheet.write("A2", "Ime i prezime", center_format)
         worksheet.write("B2", "JMBAG", center_format)
@@ -28,7 +29,7 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
             if width1 < len(f"{student.fullname}"):
                 width1 = len(f"{student.fullname}")+1
 
-            worksheet.write(f"B{row}", student.jmbag, center_format)
+            worksheet.write(f"B{row}", student.jmbag, jmbag_format)
             if width2 < len(f"{student.jmbag}"):
                 width2 = len(f"{student.jmbag}")+1
 
@@ -53,7 +54,7 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
             if width1 < len(f"{student.fullname}"):
                 width1 = len(f"{student.fullname}")+1
 
-            worksheet.write(f"F{row}", student.jmbag, center_format)
+            worksheet.write(f"F{row}", student.jmbag, jmbag_format)
             if width2 < len(f"{student.jmbag}"):
                 width2 = len(f"{student.jmbag}")+1
 
@@ -161,6 +162,8 @@ def GenResultsWorkbook(exempt_students:list[int]):
     format_bottom_surname = workbook.add_format({'align': 'center', 'border':1, 'left':5, 'right':0, 'bottom':5 , 'top':0})
     format_center = workbook.add_format({'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0 , 'top':0})
     format_bottom_center = workbook.add_format({'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':0})
+    format_jmbag = workbook.add_format({'num_format': '0000000000', 'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0 , 'top':0})
+    format_bottom_jmbag = workbook.add_format({'num_format': '0000000000', 'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':0})
     
     worksheet.write("A1", "Prezime", format_header_first)
     worksheet.write("B1", "Ime", format_header)
@@ -192,13 +195,15 @@ def GenResultsWorkbook(exempt_students:list[int]):
         if student is cours_participants_list[-1]: 
             format = format_bottom_surname
             format1 = format_bottom_center
+            format2 = format_bottom_jmbag
         else: 
             format = format_surname
             format1 = format_center
+            format2 = format_jmbag
         worksheet.write(f"A{row}", f"{student.surname}", format)
         worksheet.write(f"B{row}", f"{student.name}", format1)
         worksheet.write(f"C{row}", f"{student.email}", format1)
-        worksheet.write(f"D{row}", student.jmbag, format1)
+        worksheet.write(f"D{row}", student.jmbag, format2)
         worksheet.write(f"E{row}", f"{student.username}", format1)
         if student.jmbag in exempt_students:
             worksheet.write(f"F{row}", "Oslobođen", format1)
