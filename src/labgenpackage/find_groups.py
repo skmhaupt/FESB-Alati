@@ -1,11 +1,11 @@
 from labgenpackage.classes import Student
 import datetime, logging
 
-def FindeGroups(participatns: dict[str,Student], start_date:str, end_date:str, timeslot_length:int, using_breaks:bool) -> list[tuple[datetime,datetime]]:
+def FindeGroups(participatns: dict[str,Student], start_date:str, end_date:str, timeslot_length:int, using_breaks:bool) -> list[tuple[datetime.datetime,datetime.datetime]]:
     logger = logging.getLogger("my_app.finde_groups")
     logger.setLevel("INFO")
 
-    appointments_all_can_join:list[tuple[datetime,datetime]] = []
+    appointments_all_can_join:list[tuple[datetime.datetime,datetime.datetime]] = []
     break_length = 15
     cours_length = 45
     num_of_breaks = timeslot_length - 1
@@ -40,7 +40,7 @@ def FindeGroups(participatns: dict[str,Student], start_date:str, end_date:str, t
         for student in participatns.values():
             if date in student.schedule.keys():
                 student_ap_list = student.schedule[date]
-                student_ap: tuple[datetime,datetime]
+                student_ap: tuple[datetime.datetime,datetime.datetime]
 
                 for student_ap in student_ap_list:
                     student_ap_start = student_ap[0].time()

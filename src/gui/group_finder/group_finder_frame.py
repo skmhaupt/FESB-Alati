@@ -72,7 +72,7 @@ class GroupFinderFrame(ctk.CTkFrame):
         self.break_checkbox.grid(row=2, column=2, padx=0, pady=(10,0), sticky="e")
 
         # -------------------------
-        self.finde_groups_button = ctk.CTkButton(self.subframe, width=60 , text="Odredi grupe", command=lambda: GroupFinder_setup(self))
+        self.finde_groups_button = ctk.CTkButton(self.subframe, width=60 , text="Odredi grupe", command=self.HandleFGButton)
         self.finde_groups_button.grid(row=5, column=0, padx=(10,5), pady=10)
 
         self.subframe2 = ctk.CTkFrame(self.subframe)
@@ -81,11 +81,8 @@ class GroupFinderFrame(ctk.CTkFrame):
         self.status_label = ctk.CTkLabel(self.subframe2, text="")
         self.status_label.grid(row=0, column=0, padx=5, pady=5)
 
-        self.participants_file_label = ctk.CTkLabel(self.subframe2, text="Trenutno ucitana datoteka: NaN")
-        self.participants_file_label.grid(row=1, column=0, padx=5, pady=(0,5))
-
         self.num_of_groups_label = ctk.CTkLabel(self.subframe2, text="Broj dostupnih grupa: Nan")
-        self.num_of_groups_label.grid(row=2, column=0, padx=5, pady=(0,5))
+        self.num_of_groups_label.grid(row=1, column=0, padx=5, pady=(0,5))
 
     # ------------------------------------------
     def date_callback(self, P, entry: str):
@@ -119,12 +116,24 @@ class GroupFinderFrame(ctk.CTkFrame):
         finde_groups_thread = Thread(target=GroupFinder_setup, args=[self])
         finde_groups_thread.start()
 
-    def DoneWorking(self):
+    def DoneWorking(self, error:bool):
         self.progressbar.stop()
         self.progressbar.destroy()
         self.finde_groups_button.grid()
+        if error:
+            self.ErrorButton()
+        else:
+            self.DownloadedButton()
         settings.working = False
 
     def SetProgressBar(self):
         self.progressbar = ctk.CTkProgressBar(self.subframe, width=100, orientation='horizontal', mode='determinate', determinate_speed=2)
-        self.progressbar.grid(row=2, column=0, padx=(10,5), pady=10)
+        self.progressbar.grid(row=5, column=0, padx=(10,5), pady=10)
+
+    def DownloadedButton(self):
+        self.finde_groups_button.configure(text="Preuzeto", text_color="green")
+        self.finde_groups_button.after(2000, lambda: ResetButton(self.finde_groups_button, "Odredi grupe", "white"))
+
+    def ErrorButton(self):
+        self.finde_groups_button.configure(text="Pogreska", text_color="red")
+        self.finde_groups_button.after(2000, lambda: ResetButton(self.finde_groups_button, "Odredi grupe", "white"))

@@ -1,6 +1,5 @@
 from gui.group_finder.group_finder import FindeGroups
 from gui.util import ValidateDate, DelOldFile
-from threading import Thread
 from pathlib import Path
 from shutil import copy
 
@@ -27,12 +26,12 @@ def GroupFinder_setup(frame):
     if not participants:
         logger.warning('No .csv file provided.')
         frame.status_label.configure(text='Nije zadana datoteka sa studentima.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     elif not participants.endswith(".csv"):
         logger.warning('Provided file is not a csv. file')
         frame.status_label.configure(text='Zadana datoteka mora biti .csv formata.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     else:
         fpath = Path(participants)
@@ -45,7 +44,7 @@ def GroupFinder_setup(frame):
             logger.critical(f'Failed to upload new file: {fpath}!')
             logger.exception(e)
             frame.status_label.configure(text='Neocekivana pogreska.', text_color='red')
-            frame.DoneWorking()
+            frame.DoneWorking(error=True)
             return
 
     start_date:str = frame.start_date_entry.get()
@@ -55,12 +54,12 @@ def GroupFinder_setup(frame):
     if not valid:
         logger.warning(f'Entered invalid start date: {start_date}')
         frame.status_label.configure(text='Pogreska sa prvim datumom.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     if not valid2:
         logger.warning(f'Entered invalid end date: {end_date}')
         frame.status_label.configure(text='Pogreska sa drugim datumom.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     if not yyyy2 <= yyyy: pass
     elif not mm2 <= mm: pass
@@ -68,7 +67,7 @@ def GroupFinder_setup(frame):
     else: 
         logger.warning('Start date is later than end date.')
         frame.status_label.configure(text='Drugi datum je prije prvog.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     logger.info(f'Entered valid dates: {start_date}, {end_date}')
     start_date = f'{dd:02}-{mm:02}-{yyyy:04}'
@@ -78,7 +77,7 @@ def GroupFinder_setup(frame):
     if not timeslot_length: 
         logger.warning('No timeslot length provided.')
         frame.status_label.configure(text='Treba zadati broj potrebnih sati.', text_color='red')
-        frame.DoneWorking()
+        frame.DoneWorking(error=True)
         return
     using_breaks = frame.using_breaks.get()
 

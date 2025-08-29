@@ -10,6 +10,7 @@ def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,
 
         header_format = workbook.add_format({'align': 'center', 'font_size': 12, 'bold': False})
         center_format = workbook.add_format({'align': 'center'})
+        center_format_blue = workbook.add_format({'align': 'center', 'bg_color': '#C5D9F1'})
         dates_format = workbook.add_format({'align': 'center', 'border':1, 'top':0, 'bottom':5, 'right':0, 'left':0})
 
         worksheet.write("B2", f"Dostupni termini za {cours_name} {cours_number}", header_format)
@@ -27,7 +28,13 @@ def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,
                 col+=1
             row = ap_dates[date][0]
             col2=ap_dates[date][1]
-            worksheet.write(row,col2, f"{ap_start} - {ap_end}", center_format)
+            if col2%2:
+                if row%2: format = center_format_blue
+                else: format = center_format
+            else:
+                if row%2: format = center_format
+                else: format = center_format_blue
+            worksheet.write(row,col2, f"{ap_start} - {ap_end}", format)
             row+=1
             ap_dates[date] = (row, col2)
         

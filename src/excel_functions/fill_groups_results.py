@@ -20,9 +20,9 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
         worksheet.write("F2", "JMBAG", center_format)
         worksheet.write("G2", "E-Mail", center_format)
         
-        width1 = len("Ime i prezime")+1
-        width2 = len("JMBAG")+1
-        width3 = len("E-Mail")+1
+        width1 = 17 # 160px
+        width2 = 13 # 124px
+        width3 = 17 # 160px
         row: int = 3
         for student in csvMissing:
             worksheet.write(f"A{row}", f"{student.fullname}")
@@ -30,8 +30,6 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
                 width1 = len(f"{student.fullname}")+1
 
             worksheet.write(f"B{row}", student.jmbag, jmbag_format)
-            if width2 < len(f"{student.jmbag}"):
-                width2 = len(f"{student.jmbag}")+1
 
             worksheet.write(f"C{row}", f"{student.email}")
             if width3 < len(f"{student.email}"):
@@ -45,7 +43,6 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
         worksheet.merge_range("A1:C1", "Studenti kojima nije uspjesno preuzet raspored", merge_format)
         
         width1 = len("Ime i prezime")+1
-        width2 = len("JMBAG")+1
         width3 = len("E-Mail")+1
         row: int = 3
         for student in csvEmpty:
@@ -55,8 +52,6 @@ def GenScraperDetailesWorkbook(csvMissing:list[Student], csvEmpty:list[Student])
                 width1 = len(f"{student.fullname}")+1
 
             worksheet.write(f"F{row}", student.jmbag, jmbag_format)
-            if width2 < len(f"{student.jmbag}"):
-                width2 = len(f"{student.jmbag}")+1
 
             worksheet.write(f"G{row}", f"{student.email}")
             if width3 < len(f"{student.email}"):
