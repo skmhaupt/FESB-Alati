@@ -1,8 +1,9 @@
-from threading import Thread
 from gui.group_finder.finder_setup import GroupFinder_setup
-
 from gui.util import BrowseAction
 from gui.util import ResetButton
+from threading import Thread
+from pathlib import Path
+from shutil import copy
 
 import gui.settings as settings
 import customtkinter as ctk
@@ -25,8 +26,17 @@ class GroupFinderFrame(ctk.CTkFrame):
         self.section_title_label.grid(row=0, column=0, padx=13, pady=10, sticky='nw')
 
         # ------------------------------------------------------------------
+        self.subframe0 = ctk.CTkFrame(self)
+        self.subframe0.grid(row=1, column=0, padx=5, pady=5, sticky='')
+
+        self.helper_file_label = ctk.CTkLabel(self.subframe0, text="Pomocni alat za generiranje ulazne .csv datoteke:")
+        self.helper_file_label.grid(row=0, column=0, padx=(10, 5), pady=10, sticky="w")
+
+        self.helper_file_button = ctk.CTkButton(self.subframe0, width=60 , text="Preuzmi", command=self.HandleHFButton)
+        self.helper_file_button.grid(row=0, column=1, padx=(0, 10), pady=10, sticky="w")
+        # ------------------------------------------------------------------
         self.subframe = ctk.CTkFrame(self)
-        self.subframe.grid(row=1, column=0, padx=5, pady=5, sticky='')
+        self.subframe.grid(row=2, column=0, padx=5, pady=5, sticky='')
 
         # -------------------------
         self.entry_label = ctk.CTkLabel(self.subframe, text="Ulazna datoteka:")
@@ -111,6 +121,12 @@ class GroupFinderFrame(ctk.CTkFrame):
         if str.isdigit(P): return True
         elif P=="": return True
         else: return False
+
+    def HandleHFButton(self):
+        dest_dir = Path.home() / "Downloads"
+        copy('.\gui\group_finder\Tablica_za_izvlacenje.xlsm', dest_dir)
+        self.helper_file_button.configure(text="Preuzeto", text_color="green")
+        self.helper_file_button.after(2000, lambda: ResetButton(self.helper_file_button, "Preuzmi", "white"))
     
     def HandleFGButton(self):
         finde_groups_thread = Thread(target=GroupFinder_setup, args=[self])
