@@ -35,7 +35,7 @@ def GroupFinder_setup(frame):
         return
     else:
         fpath = Path(participants)
-        data_dir = 'gui/group_finder/data'
+        data_dir = 'data/group_finder'
         try:
             DelOldFile(data_dir,'csv', logger)
             copy(fpath, data_dir)

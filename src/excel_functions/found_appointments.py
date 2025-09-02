@@ -5,7 +5,7 @@ import xlsxwriter
 
 def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,datetime]], cours_name:str, cours_number:str, acad_year:int):
     try:
-        workbook = xlsxwriter.Workbook("gui/group_finder/data/FoundAppointments.xlsx")
+        workbook = xlsxwriter.Workbook("data/group_finder/FoundAppointments.xlsx")
         worksheet = workbook.add_worksheet("Termini")
 
         header_format = workbook.add_format({'align': 'center', 'font_size': 12, 'bold': False})
@@ -43,7 +43,7 @@ def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,
 
         workbook.close()
 
-        CopyAndRename(srcpath="gui/group_finder/data/FoundAppointments.xlsx", dstname="dostupni_termini")
+        CopyAndRename(srcpath="data/group_finder/FoundAppointments.xlsx", dstname="dostupni_termini")
 
     except Exception:
         raise

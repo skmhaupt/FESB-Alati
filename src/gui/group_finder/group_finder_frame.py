@@ -124,7 +124,7 @@ class GroupFinderFrame(ctk.CTkFrame):
 
     def HandleHFButton(self):
         dest_dir = Path.home() / "Downloads"
-        copy('.\gui\group_finder\Tablica_za_izvlacenje.xlsm', dest_dir)
+        copy(r'tools\Tablica_za_izvlacenje.xlsm', dest_dir)
         self.helper_file_button.configure(text="Preuzeto", text_color="green")
         self.helper_file_button.after(2000, lambda: ResetButton(self.helper_file_button, "Preuzmi", "white"))
     

@@ -15,7 +15,7 @@ def FindeGroups(frame, start_date, end_date,timeslot_length:int,using_breaks:boo
     participatns = None
     try:
         logger.info("Loading participants from .csv file...")
-        participatns, csv_path = pars_cours_participants("gui/group_finder/data")
+        participatns, csv_path = pars_cours_participants("data/group_finder")
         logger.info(f"Found {len(participatns)} students!")
         frame.status_label.configure(text="")
     except FileNotFoundError:
@@ -36,7 +36,7 @@ def FindeGroups(frame, start_date, end_date,timeslot_length:int,using_breaks:boo
     
 
     try:
-        timetables_dir = "gui/group_finder/data/timetables"
+        timetables_dir = "data/group_finder/timetables"
         schedule_scraper(cours_participants=participatns, dest_dir=timetables_dir, startdate=start_date, enddate=end_date)
         csvMissing, csvEmpty = schedule_parser_2(cours_participants=participatns, src_dir=timetables_dir)
     except FileNotFoundError:

@@ -20,8 +20,11 @@ class App(ctk.CTk):
         settings.init()
         Path("data").mkdir(exist_ok=True)
         Path("data/timetables").mkdir(exist_ok=True)
-        Path("gui/group_finder/data").mkdir(exist_ok=True)
-        Path("gui/group_finder/data/timetables").mkdir(exist_ok=True)
+        Path("data/group_finder").mkdir(exist_ok=True)
+        Path("data/group_finder/timetables").mkdir(exist_ok=True)
+        
+        #Path("gui/group_finder/data").mkdir(exist_ok=True)
+        #Path("gui/group_finder/data/timetables").mkdir(exist_ok=True)
 
         #Expected data is dict {"cours", "cours_number", "acad_year", "startdate", "enddate"}
         try:
