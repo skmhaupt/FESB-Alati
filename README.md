@@ -31,11 +31,15 @@
 
 ## Opis programa
 
-Cilj programa je olakšati stvaranje rasporeda za nastavu na FESB-u.
+Ovaj program sadrži skup pomočnih alata kojima se nastoji olakšati priprema nastave za FESB. Trenutno sadrži alate za pripremu grupa, generiranje lab tablica (sa opcijom evidentiranja ponavljača) i pronalaska termina za nadoknade. 
 
-Korisnik unosi željeni raspored grupa i listu studenta. Zatim program preuzima postojeće rasporede za svakog studenta kako bi onda popunio sve grupe izbjegavajući preklapanja. U slučaj neuspješnog razvrstavanja dostupne su informacije o pogreškama koje olakšavaju ispravljanje rasporeda.
+Kod alata za pripremu grupa korisnik unosi željeni raspored grupa i listu studenata. Zatim program preuzima postojeće rasporede za svakog studenta kako bi onda popunio sve grupe izbjegavajući preklapanja. U slučaj neuspješnog razvrstavanja dostupne su informacije o pogreškama koje olakšavaju ispravljanje rasporeda.
 
-Sustav za preuzimanje rasporeda studenata je napravio Stipe Jurković (Stipe.Jurkovic.00@fesb.hr)
+Generiranje lab tablica se može koristiti kao nastavak na prvi alat, ali i kao zasebni alat koji se može primjeniti na rezultat merlin ankete za lab grupe.
+
+Alat za nadoknade omogučava jednostavno pronalaženje termina u kojima su svi studenti dostupni.
+
+Sustav za preuzimanje rasporeda studenata ('src/Raspored_scraping') je napravio Stipe Jurković (Stipe.Jurkovic.00@fesb.hr)
 
 ## Instaliranje programa
 
