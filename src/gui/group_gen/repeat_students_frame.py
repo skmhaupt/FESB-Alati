@@ -87,6 +87,7 @@ class RepeatStudentsFrame(ctk.CTkFrame):
     def get_repeat_students(self):
         try:
             logger = logging.getLogger('my_app.group_gen')
+            self.error_label.configure(text='')
 
             try:
                 if not settings.cours_participants_global:
