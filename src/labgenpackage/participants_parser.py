@@ -3,7 +3,7 @@ import csv
 import glob
 import logging
 
-def pars_cours_participants() -> tuple[dict[str, Student], str]:
+def pars_cours_participants(data_dir_path:str) -> tuple[dict[str, Student], str]:
     
     try:
         logger = logging.getLogger("my_app.participants_parsere")
@@ -12,7 +12,7 @@ def pars_cours_participants() -> tuple[dict[str, Student], str]:
         
         #get path to file
         fpath: str
-        fpaths: list = glob.glob("data/*.csv")
+        fpaths: list = glob.glob(f"{data_dir_path}/*.csv")
         if(len(fpaths) > 1):
             logger.critical(f"Found {len(fpaths)} .csv files, there can only be one!")
             raise FileNotFoundError

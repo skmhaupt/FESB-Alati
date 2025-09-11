@@ -1,5 +1,4 @@
 from labgenpackage.participants_parser import pars_cours_participants
-from customtkinter import filedialog
 from gui.util import BrowseAction
 from pathlib import Path
 from shutil import copy
@@ -26,17 +25,17 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.entry_label = ctk.CTkLabel(self, text="Ulazna datoteka:")
         self.entry_label.grid(row=1, column=0, padx=(10, 5), pady=(10, 0), sticky="w")
 
-        self.csv_file_entry = ctk.CTkEntry(self, placeholder_text=".csv datoteka")   # this widget will containe the path to the .csv file
+        self.csv_file_entry = ctk.CTkEntry(self, placeholder_text=".csv datoteka")
         self.csv_file_entry.configure(state="readonly")
         self.csv_file_entry.grid(row=1, column=1, padx=(0, 5), pady=(10, 0), sticky="we")
-        
-        self.browse_button = ctk.CTkButton(self,width=60 , text="Pretrazi", command=lambda:BrowseAction(("CSV Files", "*.csv"),self.csv_file_entry,logger))  # button to get path to .csv file
+
+        self.browse_button = ctk.CTkButton(self,width=60 , text="Pretrazi", command=lambda:BrowseAction(("CSV Files", "*.csv"),self.csv_file_entry,logger))
         self.browse_button.grid(row=1, column=2, padx=(0, 10), pady=(10, 0), sticky="e")
 
-        self.upload_button = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)  # button to load the selected .csv file
+        self.upload_button = ctk.CTkButton(self,width=125 , text="Ucitaj datoteku", command=self.UploadAction)
         self.upload_button.grid(row=2, column=0, columnspan=3, padx=10, pady=(10, 0), sticky="")
 
-        self.label_error = ctk.CTkLabel(self, text="", text_color="red")    # label for all errors
+        self.label_error = ctk.CTkLabel(self, text="", text_color="red")
         self.label_error.grid(row=2, column=0, columnspan=2, padx=(35,0), pady=(10, 0), sticky="w")
 
         # subframe that will display loaded data
@@ -47,7 +46,7 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.label_1.grid(row=0, column=0, padx=(10, 5), pady=(10, 0), sticky="w")
         self.loaded_csv_file_name_label = ctk.CTkLabel(self.subframe, text="Trenutno nije ucitana .csv datoteka!")
         self.loaded_csv_file_name_label.grid(row=0, column=1, padx=(10, 10), pady=(10, 0), sticky="w")
-        
+
         self.label_2 = ctk.CTkLabel(self.subframe, text="Broj ucitanih studenta:")
         self.label_2.grid(row=1, column=0, padx=(10, 5), pady=(0, 10), sticky="w")
         self.num_of_students_label = ctk.CTkLabel(self.subframe, text="Trenutno nije ucitana .csv datoteka!")
@@ -57,6 +56,11 @@ class ParticipantsFrame(ctk.CTkFrame):
         self.first_load = True
         self.LoadParticipants()
         self.first_load = False
+
+    # def ResetLabel(self):
+    #     self.loaded_csv_file_name_label.configure(text="Trenutno nije ucitana .csv datoteka!")
+    #     self.num_of_students_label.configure(text="Trenutno nije ucitana .csv datoteka!")
+    #     settings.loaded_data[2] = False
 
     # 'UploadAction' runs from 'upload_button'. Sets 'loaded_data[2]' to False in order to block the main section from starting.
     # (loaded_data[2]: bool = flag for participants_loaded)
@@ -88,7 +92,7 @@ class ParticipantsFrame(ctk.CTkFrame):
             self.label_error.configure(text="Zadana neispravna datoteka.")
             settings.working = False
             return
-        
+
         #get path to old existing .csv file and delete it
         fpath: Path
         fpaths: list = glob.glob("data/*.csv")
@@ -116,7 +120,7 @@ class ParticipantsFrame(ctk.CTkFrame):
                 self.label_error.configure(text="Neocekivana pogreska.")
                 settings.working = False
                 return
-        
+
         #get new selected .csv file
         fpath = Path(input_csv_file)
         try:
@@ -143,7 +147,7 @@ class ParticipantsFrame(ctk.CTkFrame):
 
         try:
             logger.info("Loading participants from .csv file...")
-            settings.cours_participants_global, fpath = pars_cours_participants()
+            settings.cours_participants_global, fpath = pars_cours_participants(data_dir_path="data")
             logger.info(f"Found {len(settings.cours_participants_global)} students!")
             self.label_error.configure(text="")
         except FileNotFoundError:   # this should never occur as it has already been verified in 'UploadAction'

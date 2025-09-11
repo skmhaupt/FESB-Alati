@@ -1,7 +1,9 @@
 from excel_functions.fill_groups_results import GenScraperDetailesWorkbook
 from labgenpackage.schedule_scraper import schedule_scraper
+from labgenpackage.schedule_parser import schedule_parser
 from labgenpackage.classes import Student
 from threading import Thread
+from gui.util import ValidateDate
 # from pathlib import Path
 # from shutil import copy
 
@@ -102,7 +104,7 @@ class ScraperFrame(ctk.CTkFrame):
             if settings.cours_participants_global:
                 logger.info('Loading old data...')
                 cours_participants_local = listcopy.deepcopy(settings.cours_participants_global)    # work on deepcopy so the original doesnt have to be reset
-                csvMissing, csvEmpty = schedule_scraper(cours_participants_local,False)   # false = get loaded data without running the scraper
+                csvMissing, csvEmpty = schedule_parser(cours_participants_local,'data/timetables')   # false = get loaded data without running the scraper
                 settings.loaded_data[3] = True
         except FileNotFoundError:
             logger.warning('No old data found on startup for schedule_scrapper.')
@@ -150,7 +152,7 @@ class ScraperFrame(ctk.CTkFrame):
             raise
         
         try:
-            util.CopyAndRename(srcname='Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
+            util.CopyAndRename(srcpath='data/Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
             os.unlink('data/Student_schedules_Error_detailes.xlsx')
         except Exception:
             logger.exception('Error with downloading Student_schedules_Error_detailes.xlsx')
@@ -185,8 +187,8 @@ class ScraperFrame(ctk.CTkFrame):
         start_date:str = self.start_date_entry.get()
         end_date:str = self.end_date_entry.get()
         
-        valid, dd, mm, yyyy = self.ValidateDate(start_date,logger)
-        valid2, dd2, mm2, yyyy2 = self.ValidateDate(end_date,logger)
+        valid, dd, mm, yyyy = ValidateDate(start_date,logger)
+        valid2, dd2, mm2, yyyy2 = ValidateDate(end_date,logger)
         
         if not valid:
             logger.warning(f'Entered invalid start date: {start_date}')
@@ -259,7 +261,8 @@ class ScraperFrame(ctk.CTkFrame):
         cours_participants_local = listcopy.deepcopy(settings.cours_participants_global)    # work on deepcopy so the original doesnt have to be reset
 
         try:
-            csvMissing, csvEmpty = schedule_scraper(cours_participants_local,True,settings.start_date,settings.end_date)    # true = run scraper and get loaded data
+            schedule_scraper(cours_participants_local,'data/timetables',settings.start_date,settings.end_date)
+            csvMissing, csvEmpty = schedule_parser(cours_participants_local,'data/timetables')
             self.scrapper_progressbar.stop()
             self.scrapper_progressbar.grid_remove()
             self.status_label.grid()
@@ -305,20 +308,3 @@ class ScraperFrame(ctk.CTkFrame):
                 self.details_button.grid_remove()
         self.scrapper_progressbar = ctk.CTkProgressBar(self.subframe, orientation='horizontal', mode='determinate', determinate_speed=2)
         self.scrapper_progressbar.grid(row=0, column=0, padx=5, pady=10, sticky='we')
-
-    # ------------------------------------------
-    def ValidateDate(self, date:str, logger:logging.Logger)->list:
-        if not len(date.split('.'))==3:
-            return [False, None, None, None]
-        dd, mm, yyyy = date.split('.')
-        if not dd.isdigit() or not 0 < int(dd) <= 31:
-            logger.warning(f'Error with dd: {dd}')
-            return [False, None, None, None]
-        elif not mm.isdigit() or not 0 < int(mm) <= 12:
-            logger.warning(f'Error with mm: {mm}')
-            return [False, None, None, None]
-        elif not yyyy.isdigit() or not 2024 < int(yyyy) < 2100:
-            logger.warning(f'Error with yyyy: {yyyy}')
-            return [False, None, None, None]
-        else:
-            return [True, int(dd), int(mm), int(yyyy)]

@@ -1,11 +1,12 @@
-from customtkinter import filedialog
-from excel_functions.lab_table import gen_tables
-from gui.util import ResetButton
 from excel_functions.lab_table import BadWorkbook
+from excel_functions.lab_table import gen_tables
+from customtkinter import filedialog
+from gui.util import BrowseAction
+from gui.util import ResetButton
 
 import gui.settings as settings
 import customtkinter as ctk
-import logging, json
+import logging
 
 # This frame has no special function, its contents are used by other sections. The user doesnt have to fill out its data.
 class TableGenOptionsFrame(ctk.CTkFrame):
@@ -17,6 +18,8 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
 
         self.controller: TableGen = master
+        logger = logging.getLogger('my_app.table_gen')
+        logger.setLevel("INFO")
 
         self.section_title_label = ctk.CTkLabel(self, text='Postavke', font=('Helvetica', 23))
         self.section_title_label.grid(row=0, column=0, columnspan=2, padx=13, pady=(10, 0), sticky='nw')
@@ -148,7 +151,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.input_file_entry.configure(state='readonly')
         self.input_file_entry.grid(row=0, column=1, padx=5, pady=5, sticky='nwe')
 
-        self.input_file_browse_button = ctk.CTkButton(self.input_file_subframe, width=60 , text='Pretraži', command=lambda:self.browse_action(self.input_file_entry))
+        self.input_file_browse_button = ctk.CTkButton(self.input_file_subframe, width=60 , text='Pretraži', command=lambda:BrowseAction(('Excel files', '*.xlsx *.xls'), self.input_file_entry,logger))
         self.input_file_browse_button.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
 
         self.input_file_subframe.grid_columnconfigure(1, weight=1)
@@ -269,6 +272,8 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     def eval_get_repeat_students_checkbox_event(self):
         if settings.get_repeat_students.get():
+            logger = logging.getLogger('my_app.table_gen')
+
             self.get_old_file_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Tablica prosle ak. god. ili tablica sa ponavljačima:')
             self.get_old_file_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
 
@@ -276,7 +281,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             self.get_old_file_entry.configure(state='readonly')
             self.get_old_file_entry.grid(row=0, column=3, padx=5, pady=5, sticky='nwe')
 
-            self.get_old_file_browse_button = ctk.CTkButton(self.get_repeat_students_subframe, width=60 , text='Pretraži', command=lambda:self.browse_action(self.get_old_file_entry))
+            self.get_old_file_browse_button = ctk.CTkButton(self.get_repeat_students_subframe, width=60 , text='Pretraži', command=lambda:BrowseAction(('Excel files', '*.xlsx *.xls'), self.get_old_file_entry,logger))
             self.get_old_file_browse_button.grid(row=0, column=4, padx=5, pady=5, sticky='nw')
 
             self.get_repeat_students_subframe.grid_columnconfigure(3, weight=1)
@@ -348,13 +353,6 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     # --------------------------------------------------------------------------------------------------------
     # button functions
-    def browse_action(self,entry: ctk.CTkEntry):
-        filename = filedialog.askopenfilename(filetypes=[('Excel files', '*.xlsx *.xls')])
-        entry.configure(state='normal')
-        entry.delete(0, 'end')
-        entry.insert(0,filename)
-        entry.configure(state='readonly')
-
     def gen_tables(self):
         try:
             logger = logging.getLogger('my_app.table_gen')

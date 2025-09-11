@@ -8,6 +8,7 @@
 
 #local data
 /src/data/
+/src/gui/group_finder/data
 #Raspored_scraping/data
 
 # Distribution / packaging

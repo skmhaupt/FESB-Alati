@@ -1,7 +1,8 @@
 from gui.lab_table_gen.table_gen_options_frame import TableGenOptionsFrame
+from gui.group_finder.group_finder_frame import GroupFinderFrame
 from gui.group_gen.groups_frame import GroupsFrame
-from gui.cours_frame import CoursFrame
 from gui.group_gen.right_frame import RightFrame
+from gui.cours_frame import CoursFrame
 from pathlib import Path
 
 import customtkinter as ctk
@@ -18,6 +19,12 @@ class App(ctk.CTk):
         logger.info("Startup setup.")
         settings.init()
         Path("data").mkdir(exist_ok=True)
+        Path("data/timetables").mkdir(exist_ok=True)
+        Path("data/group_finder").mkdir(exist_ok=True)
+        Path("data/group_finder/timetables").mkdir(exist_ok=True)
+        
+        #Path("gui/group_finder/data").mkdir(exist_ok=True)
+        #Path("gui/group_finder/data/timetables").mkdir(exist_ok=True)
 
         #Expected data is dict {"cours", "cours_number", "acad_year", "startdate", "enddate"}
         try:
@@ -65,12 +72,15 @@ class TabView(ctk.CTkTabview):
         # create tabs
         self.add("groups_gen")
         self.add("table_gen")
+        self.add("group_finder")
 
         # add widgets on tabs
         self.group_gen = GroupsGen(master=self.tab("groups_gen"))
         self.group_gen.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
         self.table_gen = TableGen(master=self.tab("table_gen"))
         self.table_gen.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
+        self.group_finder = GroupFinder(master=self.tab("group_finder"))
+        self.group_finder.grid(row=0, column=0, padx=0, pady=0, sticky="nswe")
 
         self.grid_columnconfigure(0, weight=1)
         
@@ -108,3 +118,19 @@ class TableGen(ctk.CTkFrame):
 
         self.grid_columnconfigure(0, weight=1)
         self.table_gen_options_frame.grid_columnconfigure(0, weight=1)
+
+class GroupFinder(ctk.CTkFrame):
+    def __init__(self, master:ctk.CTkFrame):
+        super().__init__(master)
+
+        logger = logging.getLogger("my_app.group_finder")
+        logger.setLevel("INFO")
+
+        self.controller: TabView = master.master
+
+        self.cours_frame = CoursFrame(self, logger)
+        self.cours_frame.grid(row=0,column=0, padx=5, pady=5, sticky="we")
+
+        self.group_finder_frame = GroupFinderFrame(self)
+        self.group_finder_frame.grid(row=1,column=0, padx=5, pady=5, sticky="we")
+

@@ -63,7 +63,7 @@ class RepeatStudentsFrame(ctk.CTkFrame):
             self.error_label.grid(row=3, column=0, columnspan=3, padx=10, pady=(5,0))
 
             self.get_repeat_students_button = ctk.CTkButton(self.rules_subframe, width=125 , text="Preuzmi ponavljače", command=self.get_repeat_students)
-            self.get_repeat_students_button.grid(row=4, column=0, columnspan=3, padx=10, pady=15)
+            self.get_repeat_students_button.grid(row=4, column=0, columnspan=3, padx=10, pady=(5, 15))
 
         else:
             self.rules_subframe.destroy()
@@ -87,6 +87,7 @@ class RepeatStudentsFrame(ctk.CTkFrame):
     def get_repeat_students(self):
         try:
             logger = logging.getLogger('my_app.group_gen')
+            self.error_label.configure(text='')
 
             try:
                 if not settings.cours_participants_global:
@@ -111,6 +112,8 @@ class RepeatStudentsFrame(ctk.CTkFrame):
                 raise
 
             gen_repeat_students(old_file, settings.cours_participants_global)
+
+            self.get_repeat_students_button.configure(text='Preuzeto', text_color='green')
 
         except (FileNotFoundError, BadWorkbook, ValueError) as e:
                 msg = e.__notes__[0]

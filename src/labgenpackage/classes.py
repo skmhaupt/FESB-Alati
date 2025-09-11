@@ -74,7 +74,7 @@ class Student:
         self.group: Group               #the group the student has been assigned to
 
     def __str__(self):
-        return f"{self.fullname}({self.jmbag}), Username: {self.username}, E-Mail: {self.email}"
+        return f"{self.fullname}({self.jmbag:010}), Username: {self.username}, E-Mail: {self.email}"
     
     def __repr__(self):
         return f"{self.fullname}"

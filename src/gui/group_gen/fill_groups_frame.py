@@ -1,8 +1,8 @@
 from excel_functions.fill_groups_results import GenErrorDetailsWorkbook, GenResultsWorkbook
 from labgenpackage.participants_parser import pars_cours_participants
 from excel_functions.repeat_students import get_exempt_students
-from labgenpackage.schedule_parser import pars_schedule_file
-from labgenpackage.schedule_scraper import schedule_scraper
+from labgenpackage.groups_parser import pars_groups_file
+from labgenpackage.schedule_parser import schedule_parser
 from labgenpackage.weight_generator import weight_generator
 from labgenpackage.fill_groups import fill_groups
 from labgenpackage.classes import Student, Group
@@ -232,7 +232,7 @@ class FillGroupsFrame(ctk.CTkFrame):
                 #Get cours participants
                 try:
                     logger.info("Starting participants parser!")   
-                    cours_participants_local, _ = pars_cours_participants()
+                    cours_participants_local, _ = pars_cours_participants(data_dir_path="data")
                     cours_participants_copy = cours_participants_local.copy()   # a shallow copy is needed to preserve the results as data is poped from the dict
                     logger.info(f"Found {len(cours_participants_local)} students in participants file.")
                 except TypeError:
@@ -242,7 +242,7 @@ class FillGroupsFrame(ctk.CTkFrame):
                 #Get lab group schedule
                 try:
                     logger.info("Starting schedule parser!")
-                    groups_local, _, _ = pars_schedule_file()
+                    groups_local, _, _ = pars_groups_file()
                     numofgroups:int = 0
                     day: str
                     for day in groups_local:
@@ -256,7 +256,7 @@ class FillGroupsFrame(ctk.CTkFrame):
                 #Get schedule for every student
                 try:
                     logger.info("Parsing all student scheduels.")
-                    schedule_scraper(cours_participants_local, False)
+                    schedule_parser(cours_participants_local,"data/timetables")
                 except Exception:
                     logger.error("Error when scraping schedule!")
                     raise
@@ -341,9 +341,9 @@ class FillGroupsFrame(ctk.CTkFrame):
 
     def CopyErrorWeightsToDownloads(self,weight_errors:list[Student],fill_errors:list[Student], logger: logging.Logger):
         try:
-            GenErrorDetailsWorkbook(self.logger, weight_errors, fill_errors)
+            GenErrorDetailsWorkbook(logger, weight_errors, fill_errors)
 
-            util.CopyAndRename(srcname="Error_detailes.xlsx", dstname="Greske_pri_punjenju_grupa")
+            util.CopyAndRename(srcpath="data/Error_detailes.xlsx", dstname="Greske_pri_punjenju_grupa")
 
             os.unlink("data/Error_detailes.xlsx")
             
@@ -359,7 +359,7 @@ class FillGroupsFrame(ctk.CTkFrame):
         try:
             GenResultsWorkbook(exempt_students)
 
-            util.CopyAndRename(srcname="Filled_Groups.xlsx", dstname="Popunjene_Grupe")
+            util.CopyAndRename(srcpath="data/Filled_Groups.xlsx", dstname="Popunjene_Grupe")
 
             os.unlink("data/Filled_Groups.xlsx")
             
