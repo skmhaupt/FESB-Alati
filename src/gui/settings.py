@@ -11,7 +11,7 @@ def init():
 
     # table gen data
     global ex_num, attendance, num_of_needed_passes, custom_ex_labels, max_test_points, min_average_required, student_coordinats
-    global exempting_students, using_custom_exlabels, no_eval_ex0, using_lab0, not_using_failed_points  # BooleanVar
+    global exempting_students, using_custom_exlabels, attendance_only, using_extra_points, no_eval_ex0, using_lab0, not_using_failed_points  # BooleanVar
 
     # ---------------------------------------------------------------------
     # app data
@@ -60,6 +60,8 @@ def init():
     custom_ex_labels = None
 
     using_custom_exlabels = BooleanVar(value=False)
+    attendance_only = BooleanVar(value=False)
+    using_extra_points = BooleanVar(value=False)
     no_eval_ex0 = BooleanVar(value=False)
     using_lab0 = BooleanVar(value=False)
     not_using_failed_points = BooleanVar(value=True)

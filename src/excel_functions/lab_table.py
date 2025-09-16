@@ -338,10 +338,11 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
 
 # -----------------------------------------------------------
 # Writes sheet that containes all points, average and attendance
-def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student]):
+def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, cours_participants: list[Student], attendance_only:bool, extra_points:bool):
     format_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 'bg_color': '#BFBFBF', 'left':0, 'right':0, 'border':1, 'bottom':5 , 'top':5})
     format_name_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':5, 'right':5, 'bottom':5 , 'top':5})
     format_average_header = workbook.add_format({'font_size': 12, 'bold': False, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
+    format_bonus_points_header = workbook.add_format({'font_size': 12, 'bold': False, 'text_wrap': True, 'align': 'center', 'bg_color': '#BFBFBF', 'border':1, 'left':0, 'right':5, 'bottom':5 , 'top':5})
     format_group_header = workbook.add_format({'align': 'center', 'text_wrap': True, 'bg_color': '#BFBFBF'})
     
     format_students = workbook.add_format({'align': 'left', 'border':1, 'left':5, 'right':5, 'bottom':0 , 'top':0})
@@ -349,6 +350,7 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
 
     format_attendance_cell = workbook.add_format({'align': 'center', 'border':1, 'left':5, 'right':1, 'bottom':0, 'top':0})
     format_grade_cell = workbook.add_format({'num_format': '0.00%', 'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0, 'top':0})
+    format_total_points_cell = workbook.add_format({'align': 'center', 'border':1, 'left':0, 'right':5, 'bottom':0, 'top':0})
     format_point_cell = workbook.add_format({'align': 'center'})
 
     format_green1_bg = workbook.add_format({'bg_color': '#9BBB59'})
@@ -392,10 +394,14 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     worksheet.set_column(col, col, 14)  # col 'ZADOVOLJENA PRISUTNOST' -> width 133px
     attendance_col = col    #zero indexed
 
-    col+=1
-    worksheet.write(row, col, f'PROSJEK',format_average_header)
-    worksheet.set_column(col, col, 9)   # col 'PROSJEK' -> width 88px
-    grade_col = col   #zero indexed
+    if not attendance_only or extra_points:
+        col+=1
+        if extra_points:
+            worksheet.write(row, col, f'DODATNI BODOVI',format_bonus_points_header)
+        else:
+            worksheet.write(row, col, f'PROSJEK',format_average_header)
+        worksheet.set_column(col, col, 9)   # col 'PROSJEK' -> width 88px
+        grade_col = col   #zero indexed
 
     col+=1
     worksheet.write(row, col, f'GRUPA', format_group_header)
@@ -420,8 +426,9 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     first_attendance_cell = xl_rowcol_to_cell(1, attendance_col)
     last_attendance_cell = xl_rowcol_to_cell(len(cours_participants), attendance_col)
     
-    first_grade_cell = xl_rowcol_to_cell(1, grade_col)
-    last_grade_cell = xl_rowcol_to_cell(len(cours_participants), grade_col)
+    if not attendance_only:
+        first_grade_cell = xl_rowcol_to_cell(1, grade_col)
+        last_grade_cell = xl_rowcol_to_cell(len(cours_participants), grade_col)
 
     first_failed_cell = xl_rowcol_to_cell(1, col)
     last_failed_cell = xl_rowcol_to_cell(len(cours_participants), col)
@@ -431,7 +438,10 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     
     get_students_cell = xl_rowcol_to_cell(1, col+1)
     
-    worksheet.write_formula(1,col, f'=IF({get_students_cell}=\"+\",FILTER({first_student_cell}:{last_student_cell},(({first_attendance_cell}:{last_attendance_cell}=\"NE\")+({first_grade_cell}:{last_grade_cell}<1/2))*(Studenti!{first_absolved_cell}:{last_absolved_cell}=\"\")),\"\")')
+    if attendance_only:
+        worksheet.write_formula(1,col, f'=IF({get_students_cell}=\"+\",FILTER({first_student_cell}:{last_student_cell},({first_attendance_cell}:{last_attendance_cell}=\"NE\")*(Studenti!{first_absolved_cell}:{last_absolved_cell}=\"\")),\"\")')
+    else:
+        worksheet.write_formula(1,col, f'=IF({get_students_cell}=\"+\",FILTER({first_student_cell}:{last_student_cell},(({first_attendance_cell}:{last_attendance_cell}=\"NE\")+({first_grade_cell}:{last_grade_cell}<1/2))*(Studenti!{first_absolved_cell}:{last_absolved_cell}=\"\")),\"\")')
     worksheet.write(1,col+1, '-', format_point_cell)
     worksheet.write_formula(1,col+2, f'=SUMPRODUCT(({first_failed_cell}:{last_failed_cell}<>\"\")*1)', format_point_cell)
 
@@ -449,26 +459,35 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
         last_ex_cell = xl_rowcol_to_cell(row, last_ex_col)
         hidden_cell = xl_rowcol_to_cell(row, last_ex_col+1)
         attendance_cell = xl_rowcol_to_cell(row, attendance_col)
-        grade_cell = xl_rowcol_to_cell(row, grade_col)
+        if not attendance_only:
+            grade_cell = xl_rowcol_to_cell(row, grade_col)
         group_cell = xl_rowcol_to_cell(row, group_col)
         
-        if settings.no_eval_ex0.get():
-            worksheet.write_formula(hidden_cell, f'=SUM(COUNTIF({first_eval_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\"), COUNTIF({first_ex_cell},\"=+\"))>={settings.attendance}')
-        else:
-            worksheet.write_formula(hidden_cell, f'=COUNTIF({first_ex_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\")>={settings.attendance}')
-        worksheet.write_formula(attendance_cell, f'=IF({hidden_cell}=TRUE,\"DA\",\"NE\")', format_attendance_cell)
-        if settings.no_eval_ex0.get() and not settings.using_lab0.get():
-            if settings.not_using_failed_points.get():
-                worksheet.write_formula(grade_cell, f'=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num-1}*{settings.max_test_points})', format_grade_cell)
+        if not attendance_only:
+            if settings.no_eval_ex0.get():
+                worksheet.write_formula(hidden_cell, f'=SUM(COUNTIF({first_eval_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\"), COUNTIF({first_ex_cell},\"=+\"))>={settings.attendance}')
             else:
-                worksheet.write_formula(grade_cell, f'=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num-1}*{settings.max_test_points})', format_grade_cell)
-        else:
-            if settings.not_using_failed_points.get():
-                worksheet.write_formula(grade_cell, f'=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num}*{settings.max_test_points})', format_grade_cell)
+                worksheet.write_formula(hidden_cell, f'=COUNTIF({first_ex_cell}:{last_ex_cell},\">={int(settings.max_test_points/2)}\")>={settings.attendance}')
+            worksheet.write_formula(attendance_cell, f'=IF({hidden_cell}=TRUE,\"DA\",\"NE\")', format_attendance_cell)
+            if settings.no_eval_ex0.get() and not settings.using_lab0.get():
+                if settings.not_using_failed_points.get():
+                    worksheet.write_formula(grade_cell, f'=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num-1}*{settings.max_test_points})', format_grade_cell)
+                else:
+                    worksheet.write_formula(grade_cell, f'=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num-1}*{settings.max_test_points})', format_grade_cell)
             else:
-                worksheet.write_formula(grade_cell, f'=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num}*{settings.max_test_points})', format_grade_cell)
+                if settings.not_using_failed_points.get():
+                    worksheet.write_formula(grade_cell, f'=SUMIF({first_eval_cell}:{last_ex_cell}, \">={int(settings.max_test_points/2)}\")/({settings.ex_num}*{settings.max_test_points})', format_grade_cell)
+                else:
+                    worksheet.write_formula(grade_cell, f'=SUM({first_eval_cell}:{last_ex_cell})/({settings.ex_num}*{settings.max_test_points})', format_grade_cell)
+        else:
+            if extra_points:
+                worksheet.write_formula(hidden_cell, f'=(COUNTIF({first_ex_cell}:{last_ex_cell},\"=+\")+COUNTIF({first_ex_cell}:{last_ex_cell},\">0\"))>={settings.attendance}')
+                worksheet.write_formula(grade_cell, f'=SUM({first_ex_cell}:{last_ex_cell})', format_total_points_cell)
+            else:
+                worksheet.write_formula(hidden_cell, f'=COUNTIF({first_ex_cell}:{last_ex_cell},\"=+\")>={settings.attendance}')
+            worksheet.write_formula(attendance_cell, f'=IF({hidden_cell}=TRUE,\"DA\",\"NE\")', format_attendance_cell)
+
         worksheet.write(group_cell, f'{student.group.group_label}', format_point_cell)
-        
         if len(student.fullname) > width1: width1 = len(student.fullname)+1
         worksheet.set_row(row, 18)  # student rows -> height 30px
 
@@ -492,34 +511,56 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     })
 
     # conditional formating for grade
-    worksheet.conditional_format(1,grade_col, row-1,grade_col, {
-        'type':     'cell',
-        'criteria': '>=',
-        'value':    settings.min_average_required/100,
-        'format':   format_green2_bg
-    })
-    worksheet.conditional_format(1,grade_col, row-1,grade_col, {
-        'type':     'cell',
-        'criteria': '<',
-        'value':    settings.min_average_required/100,
-        'format':   format_red2_bg
-    })
+    if not attendance_only:
+        worksheet.conditional_format(1,grade_col, row-1,grade_col, {
+            'type':     'cell',
+            'criteria': '>=',
+            'value':    settings.min_average_required/100,
+            'format':   format_green2_bg
+        })
+        worksheet.conditional_format(1,grade_col, row-1,grade_col, {
+            'type':     'cell',
+            'criteria': '<',
+            'value':    settings.min_average_required/100,
+            'format':   format_red2_bg
+        })
 
     # conditional formating for points
-    worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
-        'type':     'cell',
-        'criteria': 'between',
-        'minimum':  settings.max_test_points/2,
-        'maximum':  settings.max_test_points,
-        'format':   format_green1_bg
-    })
-    worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
-        'type':     'cell',
-        'criteria': 'between',
-        'minimum':  1,
-        'maximum':  settings.max_test_points/2 - 0.001,
-        'format':   format_red1_bg
-    })
+    if not attendance_only:
+        worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+            'type':     'cell',
+            'criteria': 'between',
+            'minimum':  settings.max_test_points/2,
+            'maximum':  settings.max_test_points,
+            'format':   format_green1_bg
+        })
+        worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+            'type':     'cell',
+            'criteria': 'between',
+            'minimum':  1,
+            'maximum':  settings.max_test_points/2 - 0.001,
+            'format':   format_red1_bg
+        })
+    else:
+        worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+            'type':     'text',
+            'criteria': 'containing',
+            'value':    '+',
+            'format':   format_green1_bg
+        })
+        worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+            'type':     'text',
+            'criteria': 'containing',
+            'value':    '-',
+            'format':   format_red1_bg
+        })
+        if extra_points:
+            worksheet.conditional_format(1,first_eval_col, row-1,last_ex_col, {
+                'type':     'cell',
+                'criteria': '>',
+                'value':    0,
+                'format':   format_green2_bg
+            })
 
     # conditional formating for no_eval
     if settings.no_eval_ex0.get():
@@ -707,6 +748,7 @@ def WriteTablesSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     worksheet.set_column(first_ex_col2, last_ex_col2, ex_label_width)
     worksheet.set_column(first_ex_col_group0, last_ex_col_group0, ex_label_width)
 
+# ----------------------------------------------------------
 def WriteScheduleSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook.Worksheet, groups: list[Group]):
     format_title = workbook.add_format({'font_size': 15, 'bold': True, 'align': 'center'})
 
@@ -923,14 +965,20 @@ def gen_tables(input_file: str, old_file:str = None)-> tuple[bool,str]:
                 pass
         else: repeat_students = None
 
+        attendance_only = settings.attendance_only.get()
+        extra_points = settings.using_extra_points.get()
+
         out_wb = xlsxwriter.Workbook(new_file)
         data_sheet = out_wb.add_worksheet('Studenti')
-        point_worksheet = out_wb.add_worksheet('Bodovi')
+        if attendance_only:
+            point_worksheet = out_wb.add_worksheet('Prisutnost')
+        else:
+            point_worksheet = out_wb.add_worksheet('Bodovi')
         table_worksheet = out_wb.add_worksheet('Tablice')
         schedule_worksheet = out_wb.add_worksheet('Raspored')
         logger.info('Created output wb and sheets.')
         
-        WritePointsSheet(out_wb, point_worksheet, cours_participants)
+        WritePointsSheet(out_wb, point_worksheet, cours_participants, attendance_only, extra_points)
         WriteTablesSheet(out_wb, table_worksheet, groups)
         LinkTableAndPointsSheet(out_wb, point_worksheet, cours_participants)
         WriteDataSheet(out_wb, data_sheet, repeat_students, cours_participants, groups)

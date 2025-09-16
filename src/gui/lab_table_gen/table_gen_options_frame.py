@@ -73,9 +73,20 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         self.custom_exlabels_subframe.grid_columnconfigure(1, weight=1)
 
         # ----------------------------------------------------------------------------------------------------
+        # attendance only
+        self.attendance_only_subframe = ctk.CTkFrame(self.settings_subframe)
+        self.attendance_only_subframe.grid(row=2, column=0, padx=5, pady=(5,0), sticky='nwe')
+
+        self.attendance_only_label = ctk.CTkLabel(self.attendance_only_subframe, text='Tablice samo za prisutnost:')
+        self.attendance_only_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
+        
+        self.attendance_only_checkbox = ctk.CTkCheckBox(self.attendance_only_subframe, text='', width=24, command=self.eval_attendance_checkbox_event,variable=settings.attendance_only, onvalue=True, offvalue=False)
+        self.attendance_only_checkbox.grid(row=0, column=1, padx=5, pady=5, sticky='nw')
+
+        # ----------------------------------------------------------------------------------------------------
         # evaluation of exercise 0 or 1
         self.evalex0_subframe = ctk.CTkFrame(self.settings_subframe)
-        self.evalex0_subframe.grid(row=2, column=0, padx=5, pady=(5,0), sticky='nwe')
+        self.evalex0_subframe.grid(row=3, column=0, padx=5, pady=(5,0), sticky='nwe')
 
         self.no_eval_ex0_label = ctk.CTkLabel(self.evalex0_subframe, text='Prva vježba se ne ocjenjuje:')
         self.no_eval_ex0_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
@@ -105,7 +116,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         # ----------------------------------------------------------------------------------------------------
         # grade subframe subframe
         self.grade_subframe = ctk.CTkFrame(self.settings_subframe)
-        self.grade_subframe.grid(row=3, column=0, padx=5, pady=(5,0), sticky='nwe')
+        self.grade_subframe.grid(row=4, column=0, padx=5, pady=(5,0), sticky='nwe')
 
         self.max_points_label = ctk.CTkLabel(self.grade_subframe, text='Max broj bodova na ulaznom/izlaznom:')
         self.max_points_label.grid(row=0, column=0, padx=5, pady=(5,0), sticky='nw')
@@ -131,7 +142,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         # ----------------------------------------------------------------------------------------------------
         # repeat students
         self.get_repeat_students_subframe = ctk.CTkFrame(self.settings_subframe)
-        self.get_repeat_students_subframe.grid(row=4, column=0, columnspan=2, padx=5, pady=(5,0), sticky='nwe')
+        self.get_repeat_students_subframe.grid(row=5, column=0, columnspan=2, padx=5, pady=(5,0), sticky='nwe')
 
         self.get_repeat_students_label = ctk.CTkLabel(self.get_repeat_students_subframe, text='Rad sa ponavljačima')
         self.get_repeat_students_label.grid(row=0, column=0, padx=5, pady=5, sticky='nw')
@@ -142,7 +153,7 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         # ----------------------------------------------------------------------------------------------------
         # input file
         self.input_file_subframe = ctk.CTkFrame(self.settings_subframe)
-        self.input_file_subframe.grid(row=5, column=0, columnspan=2, padx=5, pady=5, sticky='nwe')
+        self.input_file_subframe.grid(row=6, column=0, columnspan=2, padx=5, pady=5, sticky='nwe')
 
         self.input_file_label = ctk.CTkLabel(self.input_file_subframe, text='Ulazna datoteka:')
         self.input_file_label.grid(row=0, column=0, padx=5, pady=5, sticky='')
@@ -159,10 +170,10 @@ class TableGenOptionsFrame(ctk.CTkFrame):
         # ----------------------------------------------------------------------------------------------------
         # generate tables and errors
         self.gen_tables_button = ctk.CTkButton(self.settings_subframe, width=60, text='Generiraj Tablice', command=self.gen_tables)
-        self.gen_tables_button.grid(row=6, column=0, padx=50, pady=10, sticky='nw')
+        self.gen_tables_button.grid(row=7, column=0, padx=50, pady=10, sticky='nw')
 
         self.error_label2 = ctk.CTkLabel(self.settings_subframe, width=140, text='', text_color='red')
-        self.error_label2.grid(row=6, column=0, columnspan=2, padx=180, pady=10, sticky='nw')
+        self.error_label2.grid(row=7, column=0, columnspan=2, padx=180, pady=10, sticky='nw')
 
         # ----------------------------------------------------------------------------------------------------
         # set default entry values
@@ -250,7 +261,15 @@ class TableGenOptionsFrame(ctk.CTkFrame):
             self.update_ex_preview_label()
             if settings.no_eval_ex0.get():
                 self.create_lab0_widgets()
-    
+
+    def eval_attendance_checkbox_event(self):
+        if settings.attendance_only.get():
+            self.create_extr_points_widgets()
+        elif hasattr(self, 'extra_points_label') and hasattr(self, 'extra_points_checkbox'):
+            if settings.using_extra_points.get():
+                settings.using_extra_points.set(False)
+            self.destroy_extr_points_widgets()
+
     def eval_ex0_checkbox_event(self):
         if settings.no_eval_ex0.get() and not settings.using_custom_exlabels.get():
             self.create_lab0_widgets()
@@ -292,6 +311,16 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     # --------------------------------------------------------------------------------------------------------
     # create/destroy widgets functions
+    def create_extr_points_widgets(self):
+        self.extra_points_label = ctk.CTkLabel(self.attendance_only_subframe, text='Dodatni bodovi:')
+        self.extra_points_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
+        self.extra_points_checkbox = ctk.CTkCheckBox(self.attendance_only_subframe, text='', width=24,variable=settings.using_extra_points, onvalue=True, offvalue=False)
+        self.extra_points_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky='nw')
+    
+    def destroy_extr_points_widgets(self):
+        if self.extra_points_label.winfo_exists(): self.extra_points_label.destroy()
+        if self.extra_points_checkbox.winfo_exists(): self.extra_points_checkbox.destroy()
+
     def create_lab0_widgets(self):
         self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text='Koristiti nultu vježbu (lab0):')
         self.lab0_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
