@@ -1,6 +1,6 @@
 <a id="readme-top"></a>
 
-# Lab-Generator
+# FESB Alati
 
 <details>
   <summary>Sadrzaj</summary>

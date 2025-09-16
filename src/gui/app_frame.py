@@ -54,7 +54,7 @@ class App(ctk.CTk):
             logger.critical("Unexpected error with data.jsonfile !")
             raise
 
-        self.title("Lab generator")
+        self.title("FESB Alati")
         #self.geometry("1100x980")
         #self.resizable(False, False)
         ctk.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
