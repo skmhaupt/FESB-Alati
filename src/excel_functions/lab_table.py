@@ -397,7 +397,8 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
     if not attendance_only or extra_points:
         col+=1
         if extra_points:
-            worksheet.write(row, col, f'DODATNI BODOVI',format_bonus_points_header)
+            extra_points_col = col
+            worksheet.write(row, extra_points_col, f'DODATNI BODOVI',format_bonus_points_header)
         else:
             worksheet.write(row, col, f'PROSJEK',format_average_header)
         worksheet.set_column(col, col, 9)   # col 'PROSJEK' -> width 88px
@@ -461,6 +462,8 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
         attendance_cell = xl_rowcol_to_cell(row, attendance_col)
         if not attendance_only:
             grade_cell = xl_rowcol_to_cell(row, grade_col)
+        else:
+            extra_points_cell = xl_rowcol_to_cell(row, extra_points_col)
         group_cell = xl_rowcol_to_cell(row, group_col)
         
         if not attendance_only:
@@ -482,7 +485,7 @@ def WritePointsSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbo
         else:
             if extra_points:
                 worksheet.write_formula(hidden_cell, f'=(COUNTIF({first_ex_cell}:{last_ex_cell},\"=+\")+COUNTIF({first_ex_cell}:{last_ex_cell},\">0\"))>={settings.attendance}')
-                worksheet.write_formula(grade_cell, f'=SUM({first_ex_cell}:{last_ex_cell})', format_total_points_cell)
+                worksheet.write_formula(extra_points_cell, f'=SUM({first_ex_cell}:{last_ex_cell})', format_total_points_cell)
             else:
                 worksheet.write_formula(hidden_cell, f'=COUNTIF({first_ex_cell}:{last_ex_cell},\"=+\")>={settings.attendance}')
             worksheet.write_formula(attendance_cell, f'=IF({hidden_cell}=TRUE,\"DA\",\"NE\")', format_attendance_cell)
