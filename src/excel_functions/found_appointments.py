@@ -19,7 +19,7 @@ def GenFoundAppointmentsWorkbook(appointments_all_can_join: list[tuple[datetime,
         col = 0
         for appointment in appointments_all_can_join:
             date = appointment[0].date()
-            date = f"{date}"
+            date = f"{date.strftime("%d.%m.%Y")}"
             ap_start = appointment[0].time()
             ap_end = appointment[1].time()
             if not date in ap_dates.keys():
