@@ -44,7 +44,7 @@ Sustav za preuzimanje rasporeda studenata ('src/Raspored_scraping') je napravio 
 ## Instaliranje programa
 
 Windows:
-1. Preuzeti 'FESB_Alati-v1.1.0.zip' sa poveznice [Release](https://github.com/skmhaupt/FESB-Alati/releases/latest).
+1. Preuzeti 'FESB_Alati-v#.#.#.zip' sa poveznice [Release](https://github.com/skmhaupt/FESB-Alati/releases/latest).
 2. Rraspakirati preuzeti direktorij.
 3. Program se pokreće otvaranjem 'FESB_Alati-v1.1.0.exe' datoteke
 4. Po želji napraviti poveznicu za 'FESB_Alati-v1.1.0.exe' datoteku na radnu površinu.
@@ -203,6 +203,8 @@ Ovom funkcijom se generiraju tablice za evidenciju lab vježbi. Za rad je potreb
 Također se može, umjesto datoteke iz prethodne sekcije, koristiti i datoteka sa merlina koja se dobije ako su studenti birali grupe kroz anketu.
 
 Pretpregled prikazuje kako će izgledati zaglavlje osnovne tablica sa bodovima. Ukoliko korisnik zada 'broj vježbi = 3', u pretpregledu ce se prikazati 'Prezime i ime | Lab1 | Lab2 | Lab3 | Grupe'. Ukoliko korisnik ne želi koristiti labele 'Lab1, Lab2,...' ima opciju ručnog postavljanja labela, ali mora voditi računa o tome da se broj labela poklapa sa brojem vježbi. 
+
+Postavka 'Tablice samo za prisutnost:' se koristi ako na vježbama nema provjere znanja. Također je uz ovu postavku dostupna i postavka 'Dodatni bodovi' koja uz evidenciju prisutnosti daje mogučnost upisivanja bodova. Postavke oko bodoba za ulazne/izlazne se zanemaruju kad se generira tablica samo za prisutnost.
 
 Postavka 'Prva vježba se ne ocjenjuje:' se koristi ako na prvoj vježbi nema provjere znanja, odnosno kad je potrebna samo prisutnost. Time vježba jedan ne nosi bodove i ne ulazi u prosjek, ali se racuna pri potrebnoj prisutnosti. Ako se uključi ova postavka pojavit če se druga postavka za 'lab0'. Ova druga postavka je korisna ukoliko se koristi takozvana 'nulta vježba'. U slučaj korištenja ove druge postavke, če se u excel tablici ubaciti novi stupac 'Lab0'. Novi 'Lab0' stupac je sad taj koji se ne ocjenjuje umjesto 'Lab1' stupac. __Postavka za 'lab0' nije dostupna ukoliko se ručno postavljaju labele.__ 
 
