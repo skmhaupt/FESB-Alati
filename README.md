@@ -44,7 +44,7 @@ Sustav za preuzimanje rasporeda studenata ('src/Raspored_scraping') je napravio 
 ## Instaliranje programa
 
 Windows:
-1. Preuzeti 'Lab_Generator-v1.0.1-alpha.zip' sa poveznice [Release](https://github.com/skmhaupt/FESB-Alati/releases/latest).
+1. Preuzeti 'FESB_Alati-v1.1.0.zip' sa poveznice [Release](https://github.com/skmhaupt/FESB-Alati/releases/latest).
 2. Rraspakirati preuzeti direktorij.
 3. Program se pokreće otvaranjem 'FESB_Alati-v1.1.0.exe' datoteke
 4. Po želji napraviti poveznicu za 'FESB_Alati-v1.1.0.exe' datoteku na radnu površinu.
