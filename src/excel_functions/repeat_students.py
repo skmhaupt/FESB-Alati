@@ -165,11 +165,10 @@ def WriteDataSheet(workbook: xlsxwriter.Workbook, worksheet: xlsxwriter.workbook
             
             worksheet.write(f'G{row}', passed_n_times)
             worksheet.write(f'H{row}', f'{passed_in_years}')
-        
 
-        worksheet.set_row(row-1, 18)  # student rows -> height 30px
+            worksheet.set_row(row-1, 18)  # student rows -> height 30px
 
-        row+=1
+            row+=1
     
     worksheet.set_column(0, 0, width1, format_left)
     worksheet.set_column(1, 1, width2, format_left)

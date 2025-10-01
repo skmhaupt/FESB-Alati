@@ -12,7 +12,7 @@
     <li>
       <a href="#generator-grupa">Generator grupa</a>
       <ul>
-        <li><a href="#priprema-ulaznih-podataka-za-ispunu-grupa">Priprema ulaznih podataka</a></li>
+        <li><a href="#priprema-ulaznih-podataka">Priprema ulaznih podataka</a></li>
         <li><a href="#generator-grupa-1">Generator grupa</a>
           <ul>
             <li><a href="#grupe">Grupe</a></li>
@@ -73,7 +73,7 @@ pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\R
 - [x] Funkcija za pronalaženje termina nadoknada
 - [x] Funkcija za generiranje tablica za lab vježbe
 - [ ] Bolje pračenje koraka preuzimanja studentskih rasporeda
-- [ ] Tablice koje su samo za evidenciju prisutnosti (bez bodova)
+- [x] Tablice koje su samo za evidenciju prisutnosti (bez bodova)
 - [ ] Novi UI
 
 <p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
