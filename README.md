@@ -68,6 +68,9 @@ pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\R
 > [!NOTE]
 > ~~Pri pokretanju raznih sekcija istovremeno moze nastupiti pogreska. Npr. ako se pokrene ućitavanje grupa dok se već radi preuzimanje studentskih rasporeda nastane nepovratna greška. - Trenutno nema mjera za ispravljanje pogreške te ako se slučajno izazove se predlaže ponovno preuzimanje programa. - U što kračem roku će biti dostupna verzija sa privremenim rješenjem.~~ - Pokretanje različitih sekcija istovremeno je blokirano. - U budućnosti se možda napravi rješenje za grešku.
 
+> [!NOTE]
+> Ukoliko oslobodeni studenti ne mogu biti pridjeljeni niti jednoj grupi program izbacuje gresku unatoc tome sto ih ne razvrstava. Greska se moze zanemariti, ali zahtjeva rucnu provjeru. -> Ocekivani ispravak: ignorirati oslobodene studente prilikom javljanja pogreska u razvrstavanju.
+
 ## U planu
 
 - [x] Funkcija za pronalaženje termina nadoknada
@@ -75,6 +78,7 @@ pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\R
 - [ ] Bolje pračenje koraka preuzimanja studentskih rasporeda
 - [x] Tablice koje su samo za evidenciju prisutnosti (bez bodova)
 - [ ] Novi UI
+- [ ] Ignorirati oslobodene studente pri ispisu greska u razvrstavanju
 
 <p align="right">(<a href="#readme-top">povratak na vrh</a>)</p>
 
