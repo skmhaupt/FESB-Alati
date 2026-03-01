@@ -54,6 +54,12 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                             elif group.starttime < appendtime <= group.endtime:
                                 canjoin = False
                                 logger.debug("Collision.")
+                            elif  appstarttime <=  group.starttime < appendtime:
+                                canjoin = False
+                                logger.debug("Collision.")
+                            elif appstarttime < group.endtime <= appendtime:
+                                canjoin = False
+                                logger.debug("Collision.")
                             else: logger.debug("No collision.")
                             logger.debug("---------------------------------------")
 
