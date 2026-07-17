@@ -40,7 +40,7 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
 
                     #check if dayappointments is empty
                     if dayappointments:
-                        appointment: list[datetime]
+                        # appointment: list[datetime]
                         logger.debug(f"All appointments for the day: {dayappointments}")
                         for appointment in dayappointments:
                             appstarttime: datetime = appointment[0]
@@ -48,19 +48,29 @@ def weight_generator(cours_participants: dict[str, Student], groups: dict[str, l
                             logger.debug(f"Appointment: {appointment}. Start time: {appstarttime}, End time: {appendtime}")
                             #check if group overlaps with schedule
                             logger.debug(f"Group start time: {group.starttime}, end time: {group.endtime}")
-                            if group.starttime <= appstarttime < group.endtime:
+                            # if group.starttime <= appstarttime < group.endtime:
+                            #     canjoin = False
+                            #     logger.debug("Collision.")
+                            # elif group.starttime < appendtime <= group.endtime:
+                            #     canjoin = False
+                            #     logger.debug("Collision.")
+                            # elif  appstarttime <=  group.starttime < appendtime:
+                            #     canjoin = False
+                            #     logger.debug("Collision.")
+                            # elif appstarttime < group.endtime <= appendtime:
+                            #     canjoin = False
+                            #     logger.debug("Collision.")
+                            # else: logger.debug("No collision.")
+                            # logger.debug("---------------------------------------")
+                            
+                            # Short Logic
+                            if appstarttime < group.starttime and appendtime <= group.starttime: 
+                                logger.debug("No collision.")
+                            elif appstarttime >= group.endtime: 
+                                logger.debug("No collision.")
+                            else: 
                                 canjoin = False
                                 logger.debug("Collision.")
-                            elif group.starttime < appendtime <= group.endtime:
-                                canjoin = False
-                                logger.debug("Collision.")
-                            elif  appstarttime <=  group.starttime < appendtime:
-                                canjoin = False
-                                logger.debug("Collision.")
-                            elif appstarttime < group.endtime <= appendtime:
-                                canjoin = False
-                                logger.debug("Collision.")
-                            else: logger.debug("No collision.")
                             logger.debug("---------------------------------------")
 
                     if canjoin:
