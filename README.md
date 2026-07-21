@@ -65,7 +65,7 @@ pyinstaller --noconfirm --onedir --windowed --add-data "C:\Users\sebas\AppData\R
 
 ## Poznate greške
 
-> [!CRITICAL]
+> [!CAUTION]
 > ~~Nisu pokriveni svi slučajevi preklapanja u rasporedu.~~ -> Ispravljeno
 
 > [!NOTE]
