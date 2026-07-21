@@ -138,7 +138,6 @@ def schedule_parser_2(cours_participants: dict[str, Student],src_dir:str) -> tup
     fpath: str
     for fpath in fpaths:
         #open csv file
-        print(fpath)
         try:
             schedule:dict[str, list[tuple]] = {}
             user: str = fpath.split("\\",1)[1].split("_",1)[0]
@@ -148,8 +147,8 @@ def schedule_parser_2(cours_participants: dict[str, Student],src_dir:str) -> tup
                 if os.path.getsize(fpath) == 0:
                     cours_participants[user].schedule = schedule
                     raise ValueError
-                print("-----------------------------------------------------------------")
-                print(f"Student: {cours_participants[user]}")
+                logger.debug("-----------------------------------------------------------------")
+                logger.debug(f"Student: {cours_participants[user]}")
                 with open(fpath, newline='', encoding="utf8") as csvfile:
                     reader = csv.reader(csvfile, delimiter=',')
                     #skip first line
@@ -173,14 +172,13 @@ def schedule_parser_2(cours_participants: dict[str, Student],src_dir:str) -> tup
                         if not date in schedule.keys():
                             schedule[date] = []
                         schedule[date].append((appointment_start, appointment_end))
-                        print(f"{date} = Start: {appointment_start} End: {appointment_end}")
+                        logger.debug(f"{date} = Start: {appointment_start} End: {appointment_end}")
 
                     cours_participants[user].schedule = schedule
             else:
                 logger.error(f"Found .csv for user {user}, but the user is not in cours_participants!")
                 csvErrors.append(user)
-        except ValueError as e:
-            logger.exception(e)
+        except ValueError:
             logger.warning(f"csv file for student {user} is empty.")
             csvEmpty.append(cours_participants[user])
         except Exception as e:

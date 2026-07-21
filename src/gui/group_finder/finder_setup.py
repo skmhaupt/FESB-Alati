@@ -22,6 +22,15 @@ def GroupFinder_setup(frame):
         return
     else: settings.working = True   # block other sections from starting
 
+    try:
+            frame.controller.cours_frame.save_data()
+    except Exception as e:
+        e.add_note('Failed saving to data.json')
+        logger.exception(e)
+        frame.status_label.configure(text='Neocekivana pogresk!', text_color='red')
+        frame.DoneWorking(error=True)
+        return
+
     participants = frame.csv_file_entry.get()
     if not participants:
         logger.warning('No .csv file provided.')

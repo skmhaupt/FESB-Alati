@@ -17,8 +17,10 @@ import logging, os, json, re
 # All the scraped data is stored in 'src\Raspored_scraping\data\timetables'
 class ScraperFrame(ctk.CTkFrame):
     def __init__(self, master):
+        from gui.group_gen.right_frame import RightFrame
         super().__init__(master)
 
+        self.controller: RightFrame = master
         logger = logging.getLogger('my_app.group_gen.scraper')
         logger.setLevel('INFO')
 
@@ -146,20 +148,35 @@ class ScraperFrame(ctk.CTkFrame):
     # create excel file with error details
     def ErrorDetails(self, csvMissing:list[Student], csvEmpty:list[Student], logger:logging.Logger):
         try:
-            GenScraperDetailesWorkbook(csvMissing, csvEmpty)
-        except Exception:
-            logger.critical('Error with creating Student_schedules_Error_detailes.xlsx')
-            raise
+            try:
+                self.controller.cours_frame.save_data()
+                self.controller.controller.controller.table_gen.cours_frame.set_entries()
+            except Exception as e:
+                e.add_note('Failed saving to data.json')
+                raise
+            
+            try:
+                GenScraperDetailesWorkbook(csvMissing, csvEmpty)
+            except Exception as e:
+                e.add_note('Error with creating Student_schedules_Error_detailes.xlsx')
+                raise
+            
+            try:
+                util.CopyAndRename(srcpath='data/Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
+                os.unlink('data/Student_schedules_Error_detailes.xlsx')
+            except Exception as e:
+                e.add_note('Error with downloading Student_schedules_Error_detailes.xlsx')
+                raise
+
+            self.details_button.configure(text='Preuzeto', text_color='green')
+            self.details_button.after(2000, lambda: util.ResetButton(self.details_button, 'Preuzmi detalje', 'white'))
         
-        try:
-            util.CopyAndRename(srcpath='data/Student_schedules_Error_detailes.xlsx', dstname='Greske_sa_preuzetim_rasporedima')
-            os.unlink('data/Student_schedules_Error_detailes.xlsx')
-        except Exception:
-            logger.exception('Error with downloading Student_schedules_Error_detailes.xlsx')
-        
-        self.details_button.configure(text='Preuzeto', text_color='green')
-        self.details_button.after(2000, lambda: util.ResetButton(self.details_button, 'Preuzmi detalje', 'white'))
-    
+        except Exception as e:
+            msg = e.__notes__[0]
+            logger.exception(msg)
+            self.details_button.configure(text='Pogreška', text_color='red')
+            self.details_button.after(2000, lambda: util.ResetButton(self.details_button, 'Preuzmi detalje', 'white'))
+
     # ------------------------------------------
     def ScrapSchedule_setup(self):
         logger = logging.getLogger('my_app.group_gen.scraper')
