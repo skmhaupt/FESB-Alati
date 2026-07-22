@@ -193,7 +193,7 @@ def gen_repeat_students(old_file:str = None, cours_participants:dict[str, Studen
 
         cours_participants_list = list(cours_participants.values())
         locale.setlocale(locale.LC_COLLATE, 'croatian')
-        cours_participants_list.sort(key=lambda x: locale.strxfrm(x.surname))
+        cours_participants_list.sort(key=lambda x: locale.strxfrm(x.fullname))
 
         if old_file:
             old_wb = openpyxl.load_workbook(filename=old_file, data_only=True)

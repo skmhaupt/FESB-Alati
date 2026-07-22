@@ -184,7 +184,7 @@ def GenResultsWorkbook(exempt_students:list[int]):
         cours_participants_list.append(student)
 
     locale.setlocale(locale.LC_COLLATE, "croatian")
-    cours_participants_list.sort(key=lambda x: locale.strxfrm(x.surname))
+    cours_participants_list.sort(key=lambda x: locale.strxfrm(x.fullname))
 
     for student in cours_participants_list:
         if student is cours_participants_list[-1]: 

@@ -141,13 +141,13 @@ def LoadInputData(sh: openpyxl.worksheet.worksheet.Worksheet) -> tuple[list[Stud
     # sort created groups list and students list
     groups.sort(key=lambda x: natural_keys(x.group_label))
     locale.setlocale(locale.LC_COLLATE, 'croatian')
-    cours_participants.sort(key=lambda x: locale.strxfrm(x.surname))
+    cours_participants.sort(key=lambda x: locale.strxfrm(x.fullname))
     
     if group_zero.group_size > 0:
         groups.append(group_zero)
 
     for group in groups:
-        group.students.sort(key=lambda x: locale.strxfrm(x.surname))
+        group.students.sort(key=lambda x: locale.strxfrm(x.fullname))
 
     return cours_participants, groups
 
