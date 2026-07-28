@@ -77,23 +77,32 @@ def LoadExemptData(sh: openpyxl.worksheet.worksheet.Worksheet) -> list[int]:
     return exempt_students
 
 
-def LoadOldData(sh1: openpyxl.worksheet.worksheet.Worksheet, sh2: openpyxl.worksheet.worksheet.Worksheet, cours_participants: list[Student]) -> dict:
-    num_of_students = sh1.max_row - 1
-    attendance_column = sh2.max_column - 7
-    grade_columnn = sh2.max_column - 6
+def LoadOldData(data_sh: openpyxl.worksheet.worksheet.Worksheet, table_sh: openpyxl.worksheet.worksheet.Worksheet, cours_participants: list[Student]) -> dict:
+    num_of_students = data_sh.max_row - 1
+    exempt_column = 7   #not zero indexed
+    attendance_column = table_sh.max_column - 7 #not zero indexed
+    grade_columnn = table_sh.max_column - 6
     repeat_students: dict = {}
 
-    repeat_students['old_acad_year'] = sh1.cell(row=1,column=11).value
+    first_data_content_row = 2    #not zero indexed
+    if table_sh.cell(row = 1, column = 1).value == 'Prezime i Ime':
+        first_table_content_row = 2    #not zero indexed
+    else:
+        first_table_content_row = 6    #not zero indexed
+    
+    repeat_students['old_acad_year'] = data_sh.cell(row=1,column=11).value
     for student_number in range(num_of_students):
-        jmbag:int = sh1.cell(row = student_number+2, column = 3).value
+        jmbag:int = data_sh.cell(row = student_number+first_data_content_row, column = 3).value
 
         if any(student.jmbag == jmbag for student in cours_participants):
-            passed_n_times: int = sh1.cell(row = student_number+2, column = 8).value
-            passed_in_years: str = sh1.cell(row = student_number+2, column = 9).value
+            passed_n_times: int = data_sh.cell(row = student_number+first_data_content_row, column = 8).value
+            passed_in_years: str = data_sh.cell(row = student_number+first_data_content_row, column = 9).value
             if not passed_n_times: passed_n_times = 0
 
-            # check if he passed
-            if sh2.cell(row=student_number+2, column=attendance_column).value == 'DA' and sh2.cell(row=student_number+2, column=grade_columnn).value >= 0.5:
+            # check if he was exempted, and if not, check if he passed
+            if not data_sh.cell(row=student_number+first_data_content_row, column=exempt_column).value == '+' and \
+               table_sh.cell(row=student_number+first_table_content_row, column=attendance_column).value == 'DA' and \
+               table_sh.cell(row=student_number+first_table_content_row, column=grade_columnn).value >= 0.5:
                 repeat_students[jmbag] = [True, passed_n_times, passed_in_years]
             else:
                 repeat_students[jmbag] = [False, passed_n_times, passed_in_years]

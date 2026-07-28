@@ -264,11 +264,11 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     def eval_attendance_checkbox_event(self):
         if settings.attendance_only.get():
-            self.create_extr_points_widgets()
-        elif hasattr(self, 'extra_points_label') and hasattr(self, 'extra_points_checkbox'):
-            if settings.using_extra_points.get():
-                settings.using_extra_points.set(False)
-            self.destroy_extr_points_widgets()
+            self.create_with_points_widgets()
+        elif hasattr(self, 'with_points_label') and hasattr(self, 'with_points_checkbox'):
+            if settings.using_with_points.get():
+                settings.using_with_points.set(False)
+            self.destroy_with_points_widgets()
 
     def eval_ex0_checkbox_event(self):
         if settings.no_eval_ex0.get() and not settings.using_custom_exlabels.get():
@@ -311,15 +311,15 @@ class TableGenOptionsFrame(ctk.CTkFrame):
 
     # --------------------------------------------------------------------------------------------------------
     # create/destroy widgets functions
-    def create_extr_points_widgets(self):
-        self.extra_points_label = ctk.CTkLabel(self.attendance_only_subframe, text='Dodatni bodovi:')
-        self.extra_points_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
-        self.extra_points_checkbox = ctk.CTkCheckBox(self.attendance_only_subframe, text='', width=24,variable=settings.using_extra_points, onvalue=True, offvalue=False)
-        self.extra_points_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky='nw')
+    def create_with_points_widgets(self):
+        self.with_points_label = ctk.CTkLabel(self.attendance_only_subframe, text='Sa bodovima:')
+        self.with_points_label.grid(row=0, column=2, padx=5, pady=5, sticky='nw')
+        self.with_points_checkbox = ctk.CTkCheckBox(self.attendance_only_subframe, text='', width=24,variable=settings.using_with_points, onvalue=True, offvalue=False)
+        self.with_points_checkbox.grid(row=0, column=3, padx=5, pady=5, sticky='nw')
     
-    def destroy_extr_points_widgets(self):
-        if self.extra_points_label.winfo_exists(): self.extra_points_label.destroy()
-        if self.extra_points_checkbox.winfo_exists(): self.extra_points_checkbox.destroy()
+    def destroy_with_points_widgets(self):
+        if self.with_points_label.winfo_exists(): self.with_points_label.destroy()
+        if self.with_points_checkbox.winfo_exists(): self.with_points_checkbox.destroy()
 
     def create_lab0_widgets(self):
         self.lab0_label = ctk.CTkLabel(self.evalex0_subframe, text='Koristiti nultu vježbu (lab0):')
