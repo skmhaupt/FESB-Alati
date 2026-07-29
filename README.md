@@ -46,8 +46,8 @@ Sustav za preuzimanje rasporeda studenata ('src/Raspored_scraping') je napravio 
 Windows:
 1. Preuzeti 'FESB_Alati-v#.#.#.zip' sa poveznice [Release](https://github.com/skmhaupt/FESB-Alati/releases/latest).
 2. Rraspakirati preuzeti direktorij.
-3. Program se pokreće otvaranjem 'FESB_Alati-v1.1.0.exe' datoteke
-4. Po želji napraviti poveznicu za 'FESB_Alati-v1.1.0.exe' datoteku na radnu površinu.
+3. Program se pokreće otvaranjem 'FESB_Alati-v#.#.#.exe' datoteke
+4. Po želji napraviti poveznicu za 'FESB_Alati-v#.#.#.exe' datoteku na radnu površinu.
 
 <!-- ### Priprema iz izvornih podataka
 
