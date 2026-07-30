@@ -61,6 +61,7 @@ def CheckForValidOldWorkbook(wb: openpyxl.Workbook, sh: openpyxl.worksheet.works
            not sh.cell(row = 1, column = 5).value == 'Email':
             raise BadWorkbook('Loaded old workbook is not apropriet.')
 
+        # will be removed, old table workbooks schould not be in use any longer
         if sh.cell(row = 1, column = 6).value == 'Grupa' and \
            sh.cell(row = 1, column = 7).value == 'Oslobođen' and \
            sh.cell(row = 1, column = 8).value == 'Položio X puta' and \
@@ -996,7 +997,7 @@ def gen_tables(input_file: str, old_file:str = None)-> tuple[bool,str]:
             logger.info(f'Valid {old_wb_type} wb.')            
             old_sh1 = old_wb['Studenti']
             if old_wb_type == 'old table':
-                old_sh2 = old_wb['Bodovi']
+                old_sh2 = old_wb['Bodovi']      # will be removed, old table workbooks schould not be in use any longer
                 repeat_students = LoadDataFromOldTable(old_sh1, old_sh2, cours_participants)
                 logger.info('Loaded old data from old wb.')
             elif old_wb_type == 'repeat table':
@@ -1010,10 +1011,7 @@ def gen_tables(input_file: str, old_file:str = None)-> tuple[bool,str]:
 
         out_wb = xlsxwriter.Workbook(new_file)
         data_sheet = out_wb.add_worksheet('Studenti')
-        if attendance_only:
-            point_worksheet = out_wb.add_worksheet('Prisutnost')
-        else:
-            point_worksheet = out_wb.add_worksheet('Bodovi')
+        point_worksheet = out_wb.add_worksheet('Rezultati')
         table_worksheet = out_wb.add_worksheet('Tablice')
         schedule_worksheet = out_wb.add_worksheet('Raspored')
         logger.info('Created output wb and sheets.')

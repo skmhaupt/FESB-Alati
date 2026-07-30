@@ -211,7 +211,7 @@ def gen_repeat_students(old_file:str = None, cours_participants:dict[str, Studen
             logger.info('Valid old wb.')
             
             old_sh1 = old_wb['Studenti']
-            old_sh2 = old_wb['Bodovi']
+            old_sh2 = old_wb['Rezultati']
             repeat_students = LoadOldData(old_sh1, old_sh2, cours_participants_list)
             logger.info('Loaded old data from old wb.')
         else: repeat_students = None
